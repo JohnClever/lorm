@@ -1,5 +1,11 @@
 # @lorm/cli
 
+## 0.1.5
+
+### Patch Changes
+
+- b13c3e2: bug fix: update required dep
+
 ## 0.1.4
 
 ### Patch Changes
