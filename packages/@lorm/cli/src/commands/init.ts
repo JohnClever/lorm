@@ -7,9 +7,9 @@ import { execSync } from "child_process";
 const base = process.cwd();
 const requiredDependencies = [
   "zod",
-  "@lorm/core@^0.1.0",
-  "@lorm/schema@^0.1.0",
-  "@lorm/lib@^0.1.0"
+  "@lorm/core@^0.0.1",
+  "@lorm/schema@^0.0.1",
+  "@lorm/lib@^0.0.1"
 ];
 
 const createFile = async (filepath: string, content: string) => {
