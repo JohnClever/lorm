@@ -1,2 +1,2 @@
-export * from "./packageManager";
-export * from "./fileExists";
+export * from "./packageManager.js";
+export * from "./fileExists.js";

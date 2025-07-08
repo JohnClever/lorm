@@ -1,8 +1,8 @@
 import { cac } from "cac";
 import { startServer } from "@lorm/core";
-import { push } from "./commands/push";
-import { watchProcedures } from "./commands/gen-lorm-types";
-import { initProject } from "./commands/init";
+import { push } from "./commands/push.js";
+import { watchProcedures } from "./commands/gen-lorm-types.js";
+import { initProject } from "./commands/init.js";
 
 console.log("⚡ Starting lorm dev server...");
 

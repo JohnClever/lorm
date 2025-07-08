@@ -19,10 +19,9 @@
     "build": "tsc -b",
     "prepublishOnly": "pnpm build"
   },
-  "peerDependencies": {
-    "@lorm/lib": "0.1.1"
-  },
+ 
   "dependencies": {
+     "@lorm/lib": "workspace:*",
     "@neondatabase/serverless": "^1.0.1",
     "@orpc/server": "^1.6.5",
     "dotenv": "^17.0.1",

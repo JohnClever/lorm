@@ -24,11 +24,11 @@ importers:
   packages/@lorm/cli:
     dependencies:
       '@lorm/core':
-        specifier: 0.1.0
-        version: 0.1.0(@lorm/lib@0.1.0(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4))(@types/pg@8.15.4)
+        specifier: workspace:*
+        version: link:../core
       '@lorm/lib':
-        specifier: 0.1.0
-        version: 0.1.0(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)
+        specifier: workspace:*
+        version: link:../lib
       cac:
         specifier: ^6.7.14
         version: 6.7.14
@@ -71,8 +71,8 @@ importers:
   packages/@lorm/core:
     dependencies:
       '@lorm/lib':
-        specifier: 0.1.0
-        version: 0.1.0(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)
+        specifier: workspace:*
+        version: link:../lib
       '@neondatabase/serverless':
         specifier: ^1.0.1
         version: 1.0.1
@@ -330,14 +330,6 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
-
-  '@lorm/core@0.1.0':
-    resolution: {integrity: sha512-mcrm9i2XhN0JLk3StEJ9z+gwAg91OB6nrv9gp3fIBeTN/coRFBFX9Nu0eEi4oBrx8J56WyAMAWm04U6nOyxO9g==}
-    peerDependencies:
-      '@lorm/lib': 0.1.0
-
-  '@lorm/lib@0.1.0':
-    resolution: {integrity: sha512-pXRPvd2/WFTURNhBwLJfS2axGMvi1l34QcIbOlGQmmEYP1xXHmpNjy+o9c60JB3+kebI6BWdeCuTRxiMKMW6UQ==}
 
   '@manypkg/find-root@1.1.0':
     resolution: {integrity: sha512-mki5uBvhHzO8kYYix/WRy2WX8S3B5wdVSc9D6KcU5lQNglP2yt58/VfLuAK49glRXChosY8ap2oJ1qgma3GUVA==}
@@ -1223,84 +1215,6 @@ snapshots:
 
   '@esbuild/win32-x64@0.25.6':
     optional: true
-
-  '@lorm/core@0.1.0(@lorm/lib@0.1.0(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4))(@types/pg@8.15.4)':
-    dependencies:
-      '@lorm/lib': 0.1.0(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)
-      '@neondatabase/serverless': 1.0.1
-      '@orpc/server': 1.6.6
-      dotenv: 17.1.0
-      drizzle-orm: 0.44.2(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)
-      zod: 3.25.76
-    transitivePeerDependencies:
-      - '@aws-sdk/client-rds-data'
-      - '@cloudflare/workers-types'
-      - '@electric-sql/pglite'
-      - '@libsql/client'
-      - '@libsql/client-wasm'
-      - '@op-engineering/op-sqlite'
-      - '@opentelemetry/api'
-      - '@planetscale/database'
-      - '@prisma/client'
-      - '@tidbcloud/serverless'
-      - '@types/better-sqlite3'
-      - '@types/pg'
-      - '@types/sql.js'
-      - '@upstash/redis'
-      - '@vercel/postgres'
-      - '@xata.io/client'
-      - better-sqlite3
-      - bun-types
-      - crossws
-      - expo-sqlite
-      - gel
-      - knex
-      - kysely
-      - mysql2
-      - pg
-      - postgres
-      - prisma
-      - sql.js
-      - sqlite3
-      - ws
-
-  '@lorm/lib@0.1.0(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)':
-    dependencies:
-      '@orpc/server': 1.6.6
-      drizzle-orm: 0.44.2(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)
-      zod: 3.25.76
-    transitivePeerDependencies:
-      - '@aws-sdk/client-rds-data'
-      - '@cloudflare/workers-types'
-      - '@electric-sql/pglite'
-      - '@libsql/client'
-      - '@libsql/client-wasm'
-      - '@neondatabase/serverless'
-      - '@op-engineering/op-sqlite'
-      - '@opentelemetry/api'
-      - '@planetscale/database'
-      - '@prisma/client'
-      - '@tidbcloud/serverless'
-      - '@types/better-sqlite3'
-      - '@types/pg'
-      - '@types/sql.js'
-      - '@upstash/redis'
-      - '@vercel/postgres'
-      - '@xata.io/client'
-      - better-sqlite3
-      - bun-types
-      - crossws
-      - expo-sqlite
-      - gel
-      - knex
-      - kysely
-      - mysql2
-      - pg
-      - postgres
-      - prisma
-      - sql.js
-      - sqlite3
-      - ws
 
   '@manypkg/find-root@1.1.0':
     dependencies:

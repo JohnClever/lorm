@@ -1,6 +1,6 @@
 import { pathToFileURL } from "url";
 import { resolve } from "path";
-import { loadConfig } from "./config";
+import { loadConfig } from "./config.js";
 import { fileExists } from "@lorm/lib";
 
 export { loadConfig };

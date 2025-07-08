@@ -13,10 +13,6 @@
   "bin": {
     "lorm": "bin/lorm.js"
   },
-  "peerDependencies": {
-    "@lorm/core": "0.1.1",
-    "@lorm/lib": "0.1.1"
-  },
   "scripts": {
     "build": "tsc -b",
     "prepublishOnly": "pnpm build"
@@ -30,6 +26,8 @@
     "access": "public"
   },
   "dependencies": {
+    "@lorm/core": "workspace:*",
+    "@lorm/lib": "workspace:*",
     "cac": "^6.7.14",
     "chalk": "^5.4.1",
     "chokidar": "^4.0.3",
