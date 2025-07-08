@@ -1,0 +1,40 @@
+{
+  "name": "@lorm/core",
+  "version": "0.1.0",
+  "description": "Core functionality for lorm framework",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "prepublishOnly": "pnpm build"
+  },
+  "peerDependencies": {
+    "@lorm/lib": "0.1.0"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.1",
+    "@orpc/server": "^1.6.5",
+    "dotenv": "^17.0.1",
+    "drizzle-orm": "^0.44.2",
+    "zod": "^3.25.71"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JohnClever/lorm.git",
+    "directory": "packages/@lorm/core"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

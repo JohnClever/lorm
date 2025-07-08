@@ -1,0 +1,37 @@
+{
+  "name": "@lorm/schema",
+  "version": "0.1.0",
+  "description": "Database schema abstractions for lorm framework",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "prepublishOnly": "pnpm build"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.44.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.10",
+    "typescript": "^5.8.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JohnClever/lorm.git",
+    "directory": "packages/@lorm/schema"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
