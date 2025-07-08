@@ -4,12 +4,11 @@ import { push } from "./commands/push.js";
 import { watchProcedures } from "./commands/gen-lorm-types.js";
 import { initProject } from "./commands/init.js";
 
-console.log("⚡ Starting lorm dev server...");
 
 const cli = cac("lorm");
 
 cli.command("dev", "Start lorm dev server").action(async () => {
-  console.log("[lorm] Starting dev server...");
+  console.log("⚡ [lorm] Starting dev server...");
   watchProcedures();
   await startServer();
 });
