@@ -1,5 +1,11 @@
 # @lorm/cli
 
+## 0.1.3
+
+### Patch Changes
+
+- fbcba9f: chore: build files
+
 ## 0.1.2
 
 ### Patch Changes
