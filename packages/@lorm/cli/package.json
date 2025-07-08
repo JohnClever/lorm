@@ -1,6 +1,6 @@
 {
   "name": "@lorm/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Command-line interface for lorm framework",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,8 +14,8 @@
     "lorm": "bin/lorm.js"
   },
   "peerDependencies": {
-    "@lorm/core": "0.1.0",
-    "@lorm/lib": "0.1.0"
+    "@lorm/core": "0.1.1",
+    "@lorm/lib": "0.1.1"
   },
   "scripts": {
     "build": "tsc -b",
