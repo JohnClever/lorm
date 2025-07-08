@@ -1,6 +1,6 @@
 {
   "name": "@lorm/core",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Core functionality for lorm framework",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -19,9 +19,8 @@
     "build": "tsc -b",
     "prepublishOnly": "pnpm build"
   },
- 
   "dependencies": {
-     "@lorm/lib": "workspace:*",
+    "@lorm/lib": "workspace:*",
     "@neondatabase/serverless": "^1.0.1",
     "@orpc/server": "^1.6.5",
     "dotenv": "^17.0.1",

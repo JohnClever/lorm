@@ -1,5 +1,14 @@
 # @lorm/cli
 
+## 0.1.4
+
+### Patch Changes
+
+- e505fc1: chore: package revamp
+- Updated dependencies [e505fc1]
+  - @lorm/core@0.1.2
+  - @lorm/lib@0.1.2
+
 ## 0.1.3
 
 ### Patch Changes
