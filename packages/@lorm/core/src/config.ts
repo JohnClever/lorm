@@ -18,6 +18,7 @@ export async function loadConfig(): Promise<lormConfig> {
 
   try {
     const configModule = await import(pathToFileURL(configPath).href);
+    console.log("[lorm] Loading config from lorm.config.ts", configModule);
     cached = configSchema.parse(configModule.default);
     return cached;
   } catch (e) {
