@@ -3,6 +3,16 @@ import { resolve } from "path";
 import { loadConfig } from "./config.js";
 import { fileExists } from "@lorm/lib";
 
+// Register tsx once at module level
+let tsxRegistered = false;
+async function ensureTsxRegistered() {
+  if (!tsxRegistered) {
+    const { register } = await import('tsx/esm/api');
+    register();
+    tsxRegistered = true;
+  }
+}
+
 export { loadConfig };
 
 export async function loadProcedures() {
@@ -12,10 +22,9 @@ export async function loadProcedures() {
     throw new Error("[lorm] lorm.procedures.ts not found in project root");
   }
 
-  // Register tsx loader for TypeScript files
+  // Ensure tsx is registered once
   if (proceduresPath.endsWith('.ts')) {
-    const { register } = await import('tsx/esm/api');
-    register();
+    await ensureTsxRegistered();
   }
 
   const module = await import(pathToFileURL(proceduresPath).href);
@@ -29,10 +38,9 @@ export async function loadSchema() {
     throw new Error("[lorm] lorm.schema.ts not found in project root");
   }
 
-  // Register tsx loader for TypeScript files
-  if (schemaPath.endsWith(".ts")) {
-    const { register } = await import("tsx/esm/api");
-    register();
+  // Ensure tsx is registered once
+  if (schemaPath.endsWith('.ts')) {
+    await ensureTsxRegistered();
   }
 
   const module = await import(pathToFileURL(schemaPath).href);

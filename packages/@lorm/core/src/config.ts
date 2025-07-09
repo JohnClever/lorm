@@ -4,6 +4,15 @@ import { pathToFileURL } from "url";
 import { fileExists, lormConfig, configSchema } from "@lorm/lib";
 
 let cached: lormConfig | null = null;
+let tsxRegistered = false;
+
+async function ensureTsxRegistered() {
+  if (!tsxRegistered) {
+    const { register } = await import('tsx/esm/api');
+    register();
+    tsxRegistered = true;
+  }
+}
 
 export const defineConfig = (config: lormConfig): lormConfig => config;
 
@@ -17,10 +26,9 @@ export async function loadConfig(): Promise<lormConfig> {
   }
 
   try {
-    // Register tsx loader for TypeScript files
+    // Ensure tsx is registered once
     if (configPath.endsWith('.ts')) {
-      const { register } = await import('tsx/esm/api');
-      register();
+      await ensureTsxRegistered();
     }
     
     const configModule = await import(pathToFileURL(configPath).href);
