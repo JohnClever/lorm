@@ -1,7 +1,3 @@
-// Add this at the very top, before any other imports
-import { register } from 'tsx/esm/api';
-register();
-
 import { cac } from "cac";
 import { startServer } from "@lorm/core";
 import { push } from "./commands/push.js";

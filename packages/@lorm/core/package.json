@@ -25,6 +25,7 @@
     "@orpc/server": "^1.6.5",
     "dotenv": "^17.0.1",
     "drizzle-orm": "^0.44.2",
+    "tsx": "^4.20.3",
     "zod": "^3.25.71"
   },
   "repository": {

@@ -12,6 +12,12 @@ export async function loadProcedures() {
     throw new Error("[lorm] lorm.procedures.ts not found in project root");
   }
 
+  // Register tsx loader for TypeScript files
+  if (proceduresPath.endsWith('.ts')) {
+    const { register } = await import('tsx/esm/api');
+    register();
+  }
+
   const module = await import(pathToFileURL(proceduresPath).href);
   return module.default ?? module.router ?? module;
 }
