@@ -1,5 +1,11 @@
 # @lorm/core
 
+## 0.1.6
+
+### Patch Changes
+
+- 1fa09dc: bug fix: config
+
 ## 0.1.5
 
 ### Patch Changes
