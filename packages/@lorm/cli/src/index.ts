@@ -1,3 +1,4 @@
+#!/usr/bin/env tsx
 import { cac } from "cac";
 import { startServer } from "@lorm/core";
 import { push } from "./commands/push";

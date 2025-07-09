@@ -11,7 +11,7 @@
     "README.md"
   ],
   "bin": {
-    "lorm": "bin/lorm.js"
+    "lorm": "./src/index.ts"
   },
   "scripts": {
     "build": "tsc -b",
