@@ -6,21 +6,17 @@
   "types": "dist/index.d.ts",
   "typesVersions": {
     "*": {
-      "*": [
-        "../../.lorm/types.d.ts"
-      ]
+      ".lorm/types": ["../../.lorm/types.d.ts"]
     }
   },
-  "type": "module",
-  "files": [
-    "dist",
-    "README.md"
-  ],
   "exports": {
     ".": {
       "import": "./dist/index.js",
       "require": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./.lorm/types": {
+      "types": "../../.lorm/types.d.ts"
     }
   },
   "scripts": {

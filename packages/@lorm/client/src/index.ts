@@ -1,18 +1,8 @@
 import type { RouterClient } from "@orpc/server";
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
-
-// Global type declaration - no import needed
-type LormRouter = {
-  [key: string]: any;
-};
-
-// This will be augmented by the generated types via typesVersions
-declare global {
-  namespace LormTypes {
-    interface Router extends LormRouter {}
-  }
-}
+// @ts-ignore
+import type { LormRouter } from ".lorm/types";
 
 export function createClient(baseUrl = "http://127.0.0.1:3000") {
   const link = new RPCLink({
@@ -23,5 +13,5 @@ export function createClient(baseUrl = "http://127.0.0.1:3000") {
     },
   });
 
-  return createORPCClient(link) as RouterClient<LormTypes.Router>;
+  return createORPCClient(link) as RouterClient<LormRouter>;
 }
