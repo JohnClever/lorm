@@ -1,5 +1,11 @@
 # @lorm/core
 
+## 0.1.7
+
+### Patch Changes
+
+- 9f31c4d: bug fix: ts
+
 ## 0.1.6
 
 ### Patch Changes
