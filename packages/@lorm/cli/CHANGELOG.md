@@ -1,5 +1,11 @@
 # @lorm/cli
 
+## 0.1.15
+
+### Patch Changes
+
+- 2590108: bug fix: cli update
+
 ## 0.1.14
 
 ### Patch Changes
