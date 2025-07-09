@@ -1,5 +1,11 @@
 # @lorm/core
 
+## 0.1.5
+
+### Patch Changes
+
+- f96e4ec: bug fix: lorm schema
+
 ## 0.1.4
 
 ### Patch Changes
