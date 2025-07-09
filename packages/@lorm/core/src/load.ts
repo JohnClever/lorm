@@ -29,6 +29,12 @@ export async function loadSchema() {
     throw new Error("[lorm] lorm.schema.ts not found in project root");
   }
 
+  // Register tsx loader for TypeScript files
+  if (schemaPath.endsWith(".ts")) {
+    const { register } = await import("tsx/esm/api");
+    register();
+  }
+
   const module = await import(pathToFileURL(schemaPath).href);
   return module;
 }
