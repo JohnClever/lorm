@@ -41,9 +41,6 @@ importers:
       execa:
         specifier: ^9.6.0
         version: 9.6.0
-      tsx:
-        specifier: ^4.20.3
-        version: 4.20.3
       which:
         specifier: ^5.0.0
         version: 5.0.0
@@ -88,6 +85,9 @@ importers:
       drizzle-orm:
         specifier: ^0.44.2
         version: 0.44.2(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)
+      tsx:
+        specifier: ^4.20.3
+        version: 4.20.3
       zod:
         specifier: ^3.25.71
         version: 3.25.76

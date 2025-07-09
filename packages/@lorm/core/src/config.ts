@@ -4,15 +4,6 @@ import { pathToFileURL } from "url";
 import { fileExists, lormConfig, configSchema } from "@lorm/lib";
 
 let cached: lormConfig | null = null;
-let tsxRegistered = false;
-
-async function ensureTsxRegistered() {
-  if (!tsxRegistered) {
-    const { register } = await import('tsx/esm/api');
-    register();
-    tsxRegistered = true;
-  }
-}
 
 export const defineConfig = (config: lormConfig): lormConfig => config;
 
@@ -26,16 +17,18 @@ export async function loadConfig(): Promise<lormConfig> {
   }
 
   try {
-    // Ensure tsx is registered once
-    if (configPath.endsWith('.ts')) {
-      await ensureTsxRegistered();
+    // Register tsx loader for TypeScript files
+    if (configPath.endsWith(".ts")) {
+      const { register } = await import("tsx/esm/api");
+      register();
     }
-    
+
     const configModule = await import(pathToFileURL(configPath).href);
     console.log("[lorm] Loading config from lorm.config.ts", configModule);
     cached = configSchema.parse(configModule.default);
     return cached;
   } catch (e) {
+    console.error("[lorm] Config error:", e);
     throw new Error("[lorm] Invalid lorm.config.ts format");
   }
 }
