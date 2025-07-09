@@ -1,5 +1,11 @@
 # @lorm/cli
 
+## 0.1.18
+
+### Patch Changes
+
+- 53c4a7d: update: drizzle
+
 ## 0.1.17
 
 ### Patch Changes
