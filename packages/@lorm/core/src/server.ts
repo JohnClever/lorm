@@ -1,7 +1,7 @@
 import { createServer } from "node:http";
 import { RPCHandler } from "@orpc/server/node";
 import { CORSPlugin } from "@orpc/server/plugins";
-import { loadConfig, loadProcedures, loadSchema } from "./load";
+import { loadConfig, loadProcedures, loadSchema } from "./load.js";
 import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
 

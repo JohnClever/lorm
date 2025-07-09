@@ -10,25 +10,25 @@ export const defineConfig = (config: lormConfig): lormConfig => config;
 export async function loadConfig(): Promise<lormConfig> {
   if (cached) return cached;
 
-  const configPath = resolve("lorm.config.ts");
+  const configPath = resolve("lorm.config.js");
 
   if (!(await fileExists(configPath))) {
-    throw new Error("[lorm] lorm.config.ts not found in project root");
+    throw new Error("[lorm] lorm.config.js not found in project root");
   }
 
   try {
     // Register tsx loader for TypeScript files
-    if (configPath.endsWith(".ts")) {
+    if (configPath.endsWith(".js")) {
       const { register } = await import("tsx/esm/api");
       register();
     }
 
     const configModule = await import(pathToFileURL(configPath).href);
-    console.log("[lorm] Loading config from lorm.config.ts", configModule);
+    console.log("[lorm] Loading config from lorm.config.js", configModule);
     cached = configSchema.parse(configModule.default);
     return cached;
   } catch (e) {
     console.error("[lorm] Config error:", e);
-    throw new Error("[lorm] Invalid lorm.config.ts format");
+    throw new Error("[lorm] Invalid lorm.config.js format");
   }
 }

@@ -1,5 +1,5 @@
-export { defineConfig, loadConfig } from "./config";
-export { defineProcedure } from "./procedure";
-export { defineRouter } from "./router";
-export { loadProcedures } from "./load";
-export { startServer } from "./server";
+export { defineConfig, loadConfig } from "./config.js";
+export { defineProcedure } from "./procedure.js";
+export { defineRouter } from "./router.js";
+export { loadProcedures } from "./load.js";
+export { startServer } from "./server.js";

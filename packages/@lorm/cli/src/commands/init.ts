@@ -30,28 +30,66 @@ export async function initProject() {
 
   console.log(`Installing required dependencies using ${pkgManager}...`);
   execSync(installCmd, { stdio: "inherit" });
-  // 1. Create lorm.procedures.ts
+  // 1. Create lorm.procedures.js
   await createFile(
-    "lorm.procedures.ts",
-    `import { defineProcedure } from "@lorm/core";\nimport { z } from "zod";\n\nexport const hello = defineProcedure({\n  input: z.object({ name: z.string() }),\n  resolve: async ({ input }) => ({\n    message: \`Hello, \${input.name}!\`,\n  }),\n});\n\nexport const router = { hello };\n`
+    "lorm.procedures.js",
+    `import { defineProcedure } from "@lorm/core";
+import { z } from "zod";
+import { schema } from "./lorm.schema.js";
+
+
+export const createUsers = defineProcedure({
+  input: z.object({
+    name: z.string()
+  }),
+  resolve: async ({input, db}) => {
+    try {
+      const [users] = await db.insert(schema.users).values({
+        name: input.name
+      }).returning()
+      console.log({users})
+      return users
+    } catch (error) {
+      console.log({error})
+      throw new Error("Something went wrong in createUsers procedure");
+    }
+  }
+
+})
+
+export const getAllUsers = defineProcedure({
+  input: z.void(),
+  resolve: async ({ db }) => {
+    try {
+      const res = await db.select().from(schema.users);
+      console.log({res})
+      return  res
+    } catch (err) {
+      console.error("Error in procedure:", err);
+      throw new Error("Something went wrong in hello procedure");
+    }
+   
+  },
+})
+
+
+
+export const router = {
+  getAllUsers,
+  createUsers
+}`
   );
 
-  // 2. Create lorm.schema.ts
+  // 2. Create lorm.schema.js
   await createFile(
-    "lorm.schema.ts",
+    "lorm.schema.js",
     `import { pgTable, uuid, varchar } from "@lorm/schema";\n\nexport const users = pgTable("users", {\n  id: uuid("id").defaultRandom().primaryKey(),\n  name: varchar("name", { length: 255 })\n});\n\nexport const schema = { users };`
   );
 
-  // 3. Create lorm.config.ts
+  // 3. Create lorm.config.js
   await createFile(
-    "lorm.config.ts",
+    "lorm.config.js",
     `export default {\n  db: {\n    url: "your_neon_database_url_here"\n  }\n}`
-  );
-
-  // 4. Create .lorm/types.ts (instead of lorm.types.ts)
-  await createFile(
-    ".lorm/types.ts",
-    `import type { router } from "../lorm.procedures";\nexport type lormRouter = typeof router;\n`
   );
 
   console.log(chalk.blue(`\n✨ lorm project initialized!`));

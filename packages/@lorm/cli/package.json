@@ -7,14 +7,15 @@
   "type": "module",
   "files": [
     "dist",
-    "src",
+    "bin",
     "README.md"
   ],
   "bin": {
-    "lorm": "./src/index.ts"
+    "lorm": "./bin/lorm.js"
   },
   "scripts": {
     "build": "tsc -b",
+    "dev": "tsx src/index.ts",
     "prepublishOnly": "pnpm build"
   },
   "repository": {
@@ -35,6 +36,8 @@
     "which": "^5.0.0"
   },
   "devDependencies": {
-    "@types/which": "^3.0.4"
+    "@types/which": "^3.0.4",
+    "drizzle-kit": "^0.31.4",
+    "tsx": "^4.20.3"
   }
 }

@@ -2,7 +2,7 @@ import chokidar from "chokidar";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
-const proceduresPath = path.resolve("lorm.procedures.ts");
+const proceduresPath = path.resolve("lorm.procedures.js");
 const lormDir = path.resolve(".lorm");
 const typesPath = path.resolve(".lorm/types.d.ts");
 
@@ -20,7 +20,7 @@ declare module "@lorm/client" {
 `;
   await writeFile(typesPath, typesContent, "utf8");
   
-  console.log("[lorm] ✅ Updated .lorm/types.d.ts");
+  // console.log("[lorm] ✅ Updated .lorm/types.d.ts");
 }
 
 export function watchProcedures() {
@@ -31,5 +31,5 @@ export function watchProcedures() {
   watcher.on("change", generateTypeFile);
   watcher.on("add", generateTypeFile);
 
-  console.log("[lorm] 👀 Watching lorm.procedures.ts for changes...");
+  console.log("[lorm] 👀 Watching lorm.procedures.js for changes...");
 }

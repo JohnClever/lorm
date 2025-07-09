@@ -30,27 +30,27 @@ function resolveDrizzleKitBin(): string {
 export async function push() {
   const rootDir = process.cwd();
   const lormDir = path.join(rootDir, ".lorm");
-  const drizzleConfigPath = path.join(lormDir, "drizzle.config.ts");
-  const schemaTargetPath = path.join(lormDir, "schema.ts");
+  const drizzleConfigPath = path.join(lormDir, "drizzle.config.js");
+  const schemaTargetPath = path.join(lormDir, "schema.js");
 
-  // 1. Load config (get db url from lorm.config.ts)
+  // 1. Load config (get db url from lorm.config.js)
   const config = await loadConfig();
 
   // 2. Ensure .lorm directory exists
   await fs.mkdir(lormDir, { recursive: true });
 
-  // 3. Generate schema.ts in .lorm that re-exports user schema
+  // 3. Generate schema.js in .lorm that re-exports user schema
   const schemaImport = `export * from "${path
     .join(rootDir, "lorm.schema")
     .replace(/\\/g, "/")}";`;
   await fs.writeFile(schemaTargetPath, schemaImport);
 
-  // 4. Write drizzle.config.ts
+  // 4. Write drizzle.config.js
   const drizzleConfig = `import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
   out: './drizzle',
-  schema: './schema.ts',
+  schema: './schema.js',
   dialect: 'postgresql',
   dbCredentials: {
     url: "${config.db.url}",
