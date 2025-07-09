@@ -1,5 +1,14 @@
 # @lorm/cli
 
+## 0.1.16
+
+### Patch Changes
+
+- e53d083: bug fix: added src
+- Updated dependencies [e53d083]
+  - @lorm/core@0.1.9
+  - @lorm/lib@0.1.4
+
 ## 0.1.15
 
 ### Patch Changes

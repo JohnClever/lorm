@@ -1,5 +1,13 @@
 # @lorm/core
 
+## 0.1.9
+
+### Patch Changes
+
+- e53d083: bug fix: added src
+- Updated dependencies [e53d083]
+  - @lorm/lib@0.1.4
+
 ## 0.1.8
 
 ### Patch Changes
