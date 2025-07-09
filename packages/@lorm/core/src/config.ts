@@ -17,6 +17,12 @@ export async function loadConfig(): Promise<lormConfig> {
   }
 
   try {
+    // Register tsx loader for TypeScript files
+    if (configPath.endsWith('.ts')) {
+      const { register } = await import('tsx/esm/api');
+      register();
+    }
+    
     const configModule = await import(pathToFileURL(configPath).href);
     console.log("[lorm] Loading config from lorm.config.ts", configModule);
     cached = configSchema.parse(configModule.default);
