@@ -1,5 +1,14 @@
 # @lorm/cli
 
+## 0.1.17
+
+### Patch Changes
+
+- 8730e6c: refinements: working version
+- Updated dependencies [8730e6c]
+  - @lorm/core@0.1.10
+  - @lorm/lib@0.1.5
+
 ## 0.1.16
 
 ### Patch Changes
