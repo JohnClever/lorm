@@ -1,5 +1,12 @@
 # @lorm/cli
 
+## 0.1.12
+
+### Patch Changes
+
+- Updated dependencies [1fa09dc]
+  - @lorm/core@0.1.6
+
 ## 0.1.11
 
 ### Patch Changes
