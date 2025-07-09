@@ -1,5 +1,11 @@
 # @lorm/client
 
+## 0.1.4
+
+### Patch Changes
+
+- e2510a3: refinement: typed client
+
 ## 0.1.3
 
 ### Patch Changes
