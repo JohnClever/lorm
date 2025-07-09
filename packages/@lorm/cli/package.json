@@ -33,11 +33,11 @@
     "chalk": "^5.4.1",
     "chokidar": "^4.0.3",
     "execa": "^9.6.0",
-    "which": "^5.0.0"
+    "which": "^5.0.0",
+    "drizzle-kit": "^0.31.4"
   },
   "devDependencies": {
     "@types/which": "^3.0.4",
-    "drizzle-kit": "^0.31.4",
     "tsx": "^4.20.3"
   }
 }
