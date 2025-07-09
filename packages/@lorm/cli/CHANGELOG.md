@@ -1,5 +1,11 @@
 # @lorm/cli
 
+## 0.1.9
+
+### Patch Changes
+
+- 5b709b0: bug fix: tsx dep
+
 ## 0.1.8
 
 ### Patch Changes
