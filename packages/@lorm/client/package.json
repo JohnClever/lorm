@@ -1,11 +1,25 @@
 {
   "name": "@lorm/client",
   "version": "0.1.1",
+  "description": "Client library for lorm framework",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "scripts": {
     "build": "tsc -b",
-    "dev": "tsx src/index.ts"
+    "dev": "tsx src/index.ts",
+    "prepublishOnly": "pnpm build"
   },
   "dependencies": {
     "@orpc/client": "^1.6.6",

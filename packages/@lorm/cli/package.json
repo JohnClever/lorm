@@ -7,7 +7,7 @@
   "type": "module",
   "files": [
     "dist",
-    "bin",
+    "src", 
     "README.md"
   ],
   "bin": {
