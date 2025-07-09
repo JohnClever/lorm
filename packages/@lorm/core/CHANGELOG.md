@@ -1,5 +1,11 @@
 # @lorm/core
 
+## 0.1.4
+
+### Patch Changes
+
+- 5f0a6a0: bug fix: tsx
+
 ## 0.1.3
 
 ### Patch Changes

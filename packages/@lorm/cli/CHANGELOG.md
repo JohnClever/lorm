@@ -1,5 +1,13 @@
 # @lorm/cli
 
+## 0.1.10
+
+### Patch Changes
+
+- 5f0a6a0: bug fix: tsx
+- Updated dependencies [5f0a6a0]
+  - @lorm/core@0.1.4
+
 ## 0.1.9
 
 ### Patch Changes
