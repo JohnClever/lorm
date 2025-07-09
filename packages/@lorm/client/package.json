@@ -1,12 +1,14 @@
 {
   "name": "@lorm/client",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Client library for lorm framework",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "typesVersions": {
     "*": {
-      ".lorm/types": ["../../.lorm/types.d.ts"]
+      ".lorm/types": [
+        "../../.lorm/types.d.ts"
+      ]
     }
   },
   "exports": {
