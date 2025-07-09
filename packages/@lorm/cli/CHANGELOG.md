@@ -1,5 +1,14 @@
 # @lorm/cli
 
+## 0.1.14
+
+### Patch Changes
+
+- 13d0773: bug fix: final ts build
+- Updated dependencies [13d0773]
+  - @lorm/core@0.1.8
+  - @lorm/lib@0.1.3
+
 ## 0.1.13
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @lorm/lib
 
+## 0.1.3
+
+### Patch Changes
+
+- 13d0773: bug fix: final ts build
+
 ## 0.1.2
 
 ### Patch Changes
