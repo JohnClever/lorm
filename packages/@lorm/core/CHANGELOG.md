@@ -1,5 +1,13 @@
 # @lorm/core
 
+## 0.1.12
+
+### Patch Changes
+
+- 7c0328d: refinements: renamed from procedures to router
+- Updated dependencies [7c0328d]
+  - @lorm/lib@0.1.7
+
 ## 0.1.11
 
 ### Patch Changes
