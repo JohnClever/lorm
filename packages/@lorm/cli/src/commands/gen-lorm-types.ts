@@ -2,15 +2,14 @@ import chokidar from "chokidar";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
-const proceduresPath = path.resolve("lorm.procedures.js");
+const routerPath = path.resolve("lorm.router.js");
 const lormDir = path.resolve(".lorm");
 const typesPath = path.resolve(".lorm/types.d.ts");
 
 export async function generateTypeFile() {
   await mkdir(lormDir, { recursive: true });
   
-  // Generate module augmentation
-  const typesContent = `import type { router } from "../lorm.procedures";
+  const typesContent = `import type { router } from "../lorm.router";
 
 declare module "@lorm/client" {
   interface LormRouterRegistry {
@@ -23,13 +22,13 @@ declare module "@lorm/client" {
   // console.log("[lorm] ✅ Updated .lorm/types.d.ts");
 }
 
-export function watchProcedures() {
-  const watcher = chokidar.watch(proceduresPath, {
+export function watchRouter() {
+  const watcher = chokidar.watch(routerPath, {
     ignoreInitial: false,
   });
 
   watcher.on("change", generateTypeFile);
   watcher.on("add", generateTypeFile);
 
-  console.log("[lorm] 👀 Watching lorm.procedures.js for changes...");
+  console.log("[lorm] 👀 Watching lorm.router.js for changes...");
 }

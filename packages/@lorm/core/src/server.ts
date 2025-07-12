@@ -1,7 +1,7 @@
 import { createServer } from "node:http";
 import { RPCHandler } from "@orpc/server/node";
 import { CORSPlugin } from "@orpc/server/plugins";
-import { loadConfig, loadRouters, loadSchema } from "./load.js";
+import { loadConfig, loadRouter, loadSchema } from "./load.js";
 import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
 
@@ -11,15 +11,15 @@ export async function startServer() {
   if (started) return;
   started = true;
 
-  const [config, procedures, { schema }] = await Promise.all([
+  const [config, router, { schema }] = await Promise.all([
     loadConfig(),
-    loadRouters(),
+    loadRouter(),
     loadSchema(),
   ]);
 
   const db = drizzle(neon(config.db.url), { schema });
 
-  const handler = new RPCHandler(procedures, {
+  const handler = new RPCHandler(router, {
     plugins: [new CORSPlugin()],
   });
 

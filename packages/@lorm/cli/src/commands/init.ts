@@ -30,7 +30,7 @@ export async function initProject() {
 
   console.log(`Installing required dependencies using ${pkgManager}...`);
   execSync(installCmd, { stdio: "inherit" });
-  // 1. Create lorm.procedures.js
+  // 1. Create lorm.router.js
   await createFile(
     "lorm.router.js",
     `import { defineRouter } from "@lorm/core";
@@ -51,7 +51,7 @@ export const createUsers = defineRouter({
       return users
     } catch (error) {
       console.log({error})
-      throw new Error("Something went wrong in createUsers procedure");
+      throw new Error("Something went wrong in createUsers route");
     }
   }
 
@@ -65,8 +65,8 @@ export const getAllUsers = defineRouter({
       console.log({res})
       return  res
     } catch (err) {
-      console.error("Error in procedure:", err);
-      throw new Error("Something went wrong in hello procedure");
+      console.error("Error in router:", err);
+      throw new Error("Something went wrong in getAllUsers route");
     }
    
   },

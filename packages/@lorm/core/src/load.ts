@@ -5,14 +5,14 @@ import { fileExists } from "@lorm/lib";
 
 export { loadConfig };
 
-export async function loadRouters() {
-  const routersPath = resolve("lorm.routers.js");
+export async function loadRouter() {
+  const routerPath = resolve("lorm.router.js");
 
-  if (!(await fileExists(routersPath))) {
-    throw new Error("[lorm] lorm.routers.js not found in project root");
+  if (!(await fileExists(routerPath))) {
+    throw new Error("[lorm] lorm.router.js not found in project root");
   }
 
-  const module = await import(pathToFileURL(routersPath).href);
+  const module = await import(pathToFileURL(routerPath).href);
   return module.default ?? module.router ?? module;
 }
 

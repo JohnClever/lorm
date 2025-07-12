@@ -15,8 +15,8 @@ export const configSchema = z.object({
 
 export type lormConfig = z.infer<typeof configSchema>;
 
-// Procedure definition type
-export type ProcedureDefinition<I, R> = {
+// Router definition type
+export type RouterDefinition<I, R> = {
   input: I;
   resolve: (opts: { input: any; db: NeonHttpDatabase }) => Promise<R>;
 };
