@@ -1,5 +1,14 @@
 # @lorm/cli
 
+## 0.1.24
+
+### Patch Changes
+
+- 59a1543: refinements and documentation
+- Updated dependencies [59a1543]
+  - @lorm/core@0.1.15
+  - @lorm/lib@0.1.10
+
 ## 0.1.23
 
 ### Patch Changes

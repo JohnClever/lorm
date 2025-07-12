@@ -1,5 +1,11 @@
 # @lorm/lib
 
+## 0.1.10
+
+### Patch Changes
+
+- 59a1543: refinements and documentation
+
 ## 0.1.9
 
 ### Patch Changes
