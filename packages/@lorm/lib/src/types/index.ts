@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { Procedure } from "@orpc/server";
 import type { IncomingHttpHeaders } from "node:http";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 
@@ -15,8 +16,8 @@ export const configSchema = z.object({
 
 export type lormConfig = z.infer<typeof configSchema>;
 
-// Router definition type
-export type RouterDefinition<I, R> = {
+// Procedure definition type
+export type ProcedureDefinition<I, R> = {
   input: I;
   resolve: (opts: { input: any; db: NeonHttpDatabase }) => Promise<R>;
 };

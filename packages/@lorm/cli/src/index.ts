@@ -1,14 +1,15 @@
+
 import { cac } from "cac";
 import { startServer } from "@lorm/core";
 import { push } from "./commands/push.js";
-import { watchRouter } from "./commands/gen-lorm-types.js";
+import { watchProcedures } from "./commands/gen-lorm-types.js";
 import { initProject } from "./commands/init.js";
 
 const cli = cac("lorm");
 
 cli.command("dev", "Start lorm dev server").action(async () => {
   console.log("⚡ [lorm] Starting dev server...");
-  watchRouter();
+  watchProcedures();
   await startServer();
 });
 
