@@ -3,7 +3,7 @@ import { lormContext } from "@lorm/lib";
 import type { ZodTypeAny, z } from "zod";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 
-export function defineProcedure<I extends ZodTypeAny, R>(def: {
+export function defineRouter<I extends ZodTypeAny, R>(def: {
   input: I;
   resolve: (opts: { input: z.infer<I>; db: NeonHttpDatabase }) => Promise<R>;
 }) {

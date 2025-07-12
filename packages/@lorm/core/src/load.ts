@@ -5,14 +5,14 @@ import { fileExists } from "@lorm/lib";
 
 export { loadConfig };
 
-export async function loadProcedures() {
-  const proceduresPath = resolve("lorm.procedures.js");
+export async function loadRouter() {
+  const routerPath = resolve("lorm.router.js");
 
-  if (!(await fileExists(proceduresPath))) {
-    throw new Error("[lorm] lorm.procedures.js not found in project root");
+  if (!(await fileExists(routerPath))) {
+    throw new Error("[lorm] lorm.router.js not found in project root");
   }
 
-  const module = await import(pathToFileURL(proceduresPath).href);
+  const module = await import(pathToFileURL(routerPath).href);
   return module.default ?? module.router ?? module;
 }
 
