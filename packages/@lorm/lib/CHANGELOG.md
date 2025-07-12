@@ -1,5 +1,11 @@
 # @lorm/lib
 
+## 0.1.6
+
+### Patch Changes
+
+- 03d18a3: refinements: renamed procedures to routers
+
 ## 0.1.5
 
 ### Patch Changes
