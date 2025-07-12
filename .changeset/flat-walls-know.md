@@ -1,0 +1,5 @@
+---
+"@lorm/client": patch
+---
+
+client
