@@ -24,11 +24,4 @@ cli.command("init", "Initialize lorm project").action(async () => {
 
 cli.help();
 
-// Parse the CLI arguments
-const parsed = cli.parse();
 
-// 🧠 If no subcommand (like "dev") was passed, run `startServer()` manually
-// if (parsed.args.length === 0) {
-//   console.log("[lorm] No command provided, defaulting to `dev`");
-//   await startServer();
-// }

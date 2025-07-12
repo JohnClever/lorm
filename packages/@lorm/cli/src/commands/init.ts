@@ -1,6 +1,6 @@
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
-import { fileExists, packageManager } from "@lorm/lib";
+import { fileExists, packageManager, routerTemplate, schemaTemplate, configTemplate } from "@lorm/lib";
 import chalk from "chalk";
 import { execSync } from "child_process";
 
@@ -30,67 +30,12 @@ export async function initProject() {
 
   console.log(`Installing required dependencies using ${pkgManager}...`);
   execSync(installCmd, { stdio: "inherit" });
-  // 1. Create lorm.router.js
-  await createFile(
-    "lorm.router.js",
-    `import { defineRouter } from "@lorm/core";
-import { z } from "zod";
-import { schema } from "./lorm.schema.js";
+  
+  await createFile("lorm.router.js", routerTemplate);
 
+  await createFile("lorm.schema.js", schemaTemplate);
 
-export const createUsers = defineRouter({
-  input: z.object({
-    name: z.string()
-  }),
-  resolve: async ({input, db}) => {
-    try {
-      const [users] = await db.insert(schema.users).values({
-        name: input.name
-      }).returning()
-      console.log({users})
-      return users
-    } catch (error) {
-      console.log({error})
-      throw new Error("Something went wrong in createUsers route");
-    }
-  }
-
-})
-
-export const getAllUsers = defineRouter({
-  input: z.void(),
-  resolve: async ({ db }) => {
-    try {
-      const res = await db.select().from(schema.users);
-      console.log({res})
-      return  res
-    } catch (err) {
-      console.error("Error in router:", err);
-      throw new Error("Something went wrong in getAllUsers route");
-    }
-   
-  },
-})
-
-
-
-export const router = {
-  getAllUsers,
-  createUsers
-}`
-  );
-
-  // 2. Create lorm.schema.js
-  await createFile(
-    "lorm.schema.js",
-    `import { pgTable, uuid, varchar } from "@lorm/schema";\n\nexport const users = pgTable("users", {\n  id: uuid("id").defaultRandom().primaryKey(),\n  name: varchar("name", { length: 255 })\n});\n\nexport const schema = { users };`
-  );
-
-  // 3. Create lorm.config.js
-  await createFile(
-    "lorm.config.js",
-    `export default {\n  db: {\n    url: "your_neon_database_url_here"\n  }\n}`
-  );
+  await createFile("lorm.config.js", configTemplate);
 
   console.log(chalk.blue(`\n✨ lorm project initialized!`));
   console.log(
