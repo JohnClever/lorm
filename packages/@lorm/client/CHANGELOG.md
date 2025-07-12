@@ -1,5 +1,11 @@
 # @lorm/client
 
+## 0.1.6
+
+### Patch Changes
+
+- 7d320fd: client
+
 ## 0.1.5
 
 ### Patch Changes
