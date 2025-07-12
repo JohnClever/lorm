@@ -1,5 +1,14 @@
 # @lorm/cli
 
+## 0.1.19
+
+### Patch Changes
+
+- 03d18a3: refinements: renamed procedures to routers
+- Updated dependencies [03d18a3]
+  - @lorm/core@0.1.11
+  - @lorm/lib@0.1.6
+
 ## 0.1.18
 
 ### Patch Changes
