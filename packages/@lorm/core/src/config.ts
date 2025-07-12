@@ -1,4 +1,3 @@
-import { z } from "zod";
 import { resolve } from "path";
 import { pathToFileURL } from "url";
 import { fileExists, lormConfig, configSchema } from "@lorm/lib";
@@ -17,7 +16,6 @@ export async function loadConfig(): Promise<lormConfig> {
   }
 
   try {
-    // Register tsx loader for TypeScript files
     if (configPath.endsWith(".js")) {
       const { register } = await import("tsx/esm/api");
       register();

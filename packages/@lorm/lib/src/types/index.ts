@@ -1,5 +1,4 @@
 import { z } from "zod";
-import type { Procedure } from "@orpc/server";
 import type { IncomingHttpHeaders } from "node:http";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 

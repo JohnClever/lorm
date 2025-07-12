@@ -32,13 +32,13 @@ export async function initProject() {
   execSync(installCmd, { stdio: "inherit" });
   // 1. Create lorm.procedures.js
   await createFile(
-    "lorm.procedures.js",
-    `import { defineProcedure } from "@lorm/core";
+    "lorm.router.js",
+    `import { defineRouter } from "@lorm/core";
 import { z } from "zod";
 import { schema } from "./lorm.schema.js";
 
 
-export const createUsers = defineProcedure({
+export const createUsers = defineRouter({
   input: z.object({
     name: z.string()
   }),
@@ -57,7 +57,7 @@ export const createUsers = defineProcedure({
 
 })
 
-export const getAllUsers = defineProcedure({
+export const getAllUsers = defineRouter({
   input: z.void(),
   resolve: async ({ db }) => {
     try {
