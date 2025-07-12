@@ -1,5 +1,14 @@
 # @lorm/cli
 
+## 0.1.23
+
+### Patch Changes
+
+- 0e946df: stable
+- Updated dependencies [0e946df]
+  - @lorm/core@0.1.14
+  - @lorm/lib@0.1.9
+
 ## 0.1.22
 
 ### Patch Changes

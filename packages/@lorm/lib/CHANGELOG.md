@@ -1,5 +1,11 @@
 # @lorm/lib
 
+## 0.1.9
+
+### Patch Changes
+
+- 0e946df: stable
+
 ## 0.1.8
 
 ### Patch Changes
