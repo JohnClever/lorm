@@ -1,5 +1,11 @@
 # @lorm/cli
 
+## 0.1.26
+
+### Patch Changes
+
+- b914a5c: refine
+
 ## 0.1.25
 
 ### Patch Changes
