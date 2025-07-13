@@ -1,11 +1,17 @@
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
-import { fileExists, packageManager, routerTemplate, schemaTemplate, configTemplate } from "@lorm/lib";
+import {
+  fileExists,
+  packageManager,
+  routerTemplate,
+  schemaTemplate,
+  configTemplate,
+} from "@lorm/lib";
 import chalk from "chalk";
 import { execSync } from "child_process";
 
 const base = process.cwd();
-const requiredDependencies = ["zod", "@lorm/core", "@lorm/schema", "@lorm/lib"];
+const requiredDependencies = ["zod", "@lorm/schema"];
 
 const createFile = async (filepath: string, content: string) => {
   const full = path.resolve(base, filepath);
@@ -30,7 +36,7 @@ export async function initProject() {
 
   console.log(`Installing required dependencies using ${pkgManager}...`);
   execSync(installCmd, { stdio: "inherit" });
-  
+
   await createFile("lorm.router.js", routerTemplate);
 
   await createFile("lorm.schema.js", schemaTemplate);
