@@ -24,11 +24,11 @@ importers:
   packages/@lorm/cli:
     dependencies:
       '@lorm/core':
-        specifier: ^0.1.17
-        version: 0.1.17(@types/pg@8.15.4)
+        specifier: workspace:*
+        version: link:../core
       '@lorm/lib':
-        specifier: ^0.1.12
-        version: 0.1.12(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)
+        specifier: workspace:*
+        version: link:../lib
       cac:
         specifier: ^6.7.14
         version: 6.7.14
@@ -66,6 +66,32 @@ importers:
       zod:
         specifier: ^3.25.71
         version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^24.0.10
+        version: 24.0.13
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
+
+  packages/@lorm/core:
+    dependencies:
+      '@lorm-enterprise/core':
+        specifier: ^0.1.1
+        version: 0.1.1(@types/pg@8.15.4)
+    devDependencies:
+      '@types/node':
+        specifier: ^24.0.10
+        version: 24.0.13
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
+
+  packages/@lorm/lib:
+    dependencies:
+      '@lorm-enterprise/lib':
+        specifier: ^0.1.1
+        version: 0.1.1(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)
     devDependencies:
       '@types/node':
         specifier: ^24.0.10
@@ -447,11 +473,11 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@lorm/core@0.1.17':
-    resolution: {integrity: sha512-ewdY/LOWzw3qujIoXXuqu05CIO3j6d6E7DpFoV45sllGeiR3YkwZFj4HUBfaDw2wJlkAQOINWOGnurwijlZmSw==}
+  '@lorm-enterprise/core@0.1.1':
+    resolution: {integrity: sha512-+z7TEIHzw8ZEBerqCifCUQUosuNVdZfcLVEAD99br8Gscm3sGHQ5lNk3znDfzCHD8OQBw26aE7wX85USdChbZQ==}
 
-  '@lorm/lib@0.1.12':
-    resolution: {integrity: sha512-1gxxKvq5wLVLBXXvLyyo23n2yitfHLjVT5XhiMnPDcQJsKRyQAWNQvfYk0/zYpV61ElBH3sstUYdSHOzkFGuFA==}
+  '@lorm-enterprise/lib@0.1.1':
+    resolution: {integrity: sha512-n6cXKAl88pI0Xf01ynwX73yyInj7ANjvgvhvNsLvN0HK9ZZlabyvvWeIYCWaCf7sOo4X/a1cGfudmiWm5LJqOQ==}
 
   '@manypkg/find-root@1.1.0':
     resolution: {integrity: sha512-mki5uBvhHzO8kYYix/WRy2WX8S3B5wdVSc9D6KcU5lQNglP2yt58/VfLuAK49glRXChosY8ap2oJ1qgma3GUVA==}
@@ -1452,9 +1478,9 @@ snapshots:
   '@esbuild/win32-x64@0.25.6':
     optional: true
 
-  '@lorm/core@0.1.17(@types/pg@8.15.4)':
+  '@lorm-enterprise/core@0.1.1(@types/pg@8.15.4)':
     dependencies:
-      '@lorm/lib': 0.1.12(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)
+      '@lorm/lib': '@lorm-enterprise/lib@0.1.1(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)'
       '@neondatabase/serverless': 1.0.1
       '@orpc/server': 1.6.8
       dotenv: 17.2.0
@@ -1493,7 +1519,7 @@ snapshots:
       - sqlite3
       - ws
 
-  '@lorm/lib@0.1.12(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)':
+  '@lorm-enterprise/lib@0.1.1(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)':
     dependencies:
       '@orpc/server': 1.6.8
       drizzle-orm: 0.44.2(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)
