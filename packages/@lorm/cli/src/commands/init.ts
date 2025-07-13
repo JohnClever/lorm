@@ -11,7 +11,7 @@ import chalk from "chalk";
 import { execSync } from "child_process";
 
 const base = process.cwd();
-const requiredDependencies = ["zod", "@lorm/schema"];
+const requiredDependencies = ["zod", "@lorm/core", "@lorm/schema", "@lorm/lib"];
 
 const createFile = async (filepath: string, content: string) => {
   const full = path.resolve(base, filepath);
