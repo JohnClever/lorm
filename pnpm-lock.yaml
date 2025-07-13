@@ -74,42 +74,6 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
-  packages/@lorm/core:
-    dependencies:
-      '@lorm/lib':
-        specifier: workspace:*
-        version: link:../lib
-      '@neondatabase/serverless':
-        specifier: ^1.0.1
-        version: 1.0.1
-      '@orpc/server':
-        specifier: ^1.6.5
-        version: 1.6.6
-      dotenv:
-        specifier: ^17.0.1
-        version: 17.1.0
-      drizzle-orm:
-        specifier: ^0.44.2
-        version: 0.44.2(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)
-      tsx:
-        specifier: ^4.20.3
-        version: 4.20.3
-      zod:
-        specifier: ^3.25.71
-        version: 3.25.76
-
-  packages/@lorm/lib:
-    dependencies:
-      '@orpc/server':
-        specifier: ^1.6.5
-        version: 1.6.6
-      drizzle-orm:
-        specifier: ^0.44.2
-        version: 0.44.2(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)
-      zod:
-        specifier: ^3.25.71
-        version: 3.25.76
-
   packages/@lorm/schema:
     dependencies:
       drizzle-orm:
