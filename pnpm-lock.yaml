@@ -77,8 +77,8 @@ importers:
   packages/@lorm/core:
     dependencies:
       '@lorm-enterprise/core':
-        specifier: ^0.1.1
-        version: 0.1.1(@types/pg@8.15.4)
+        specifier: ^0.1.2
+        version: 0.1.2(@types/pg@8.15.4)
     devDependencies:
       '@types/node':
         specifier: ^24.0.10
@@ -90,8 +90,8 @@ importers:
   packages/@lorm/lib:
     dependencies:
       '@lorm-enterprise/lib':
-        specifier: ^0.1.1
-        version: 0.1.1(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)
+        specifier: ^0.1.2
+        version: 0.1.2(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)
     devDependencies:
       '@types/node':
         specifier: ^24.0.10
@@ -473,11 +473,11 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@lorm-enterprise/core@0.1.1':
-    resolution: {integrity: sha512-+z7TEIHzw8ZEBerqCifCUQUosuNVdZfcLVEAD99br8Gscm3sGHQ5lNk3znDfzCHD8OQBw26aE7wX85USdChbZQ==}
+  '@lorm-enterprise/core@0.1.2':
+    resolution: {integrity: sha512-iTs9hinQl8gcg0drTgOZO/5o93k38eV8TKete7PcYeaXSyL4/wZC3lVVZr0/JZC8k+QYKn+wjIfJUlUWn8l4pQ==}
 
-  '@lorm-enterprise/lib@0.1.1':
-    resolution: {integrity: sha512-n6cXKAl88pI0Xf01ynwX73yyInj7ANjvgvhvNsLvN0HK9ZZlabyvvWeIYCWaCf7sOo4X/a1cGfudmiWm5LJqOQ==}
+  '@lorm-enterprise/lib@0.1.2':
+    resolution: {integrity: sha512-Mxy75fHhRYBvKyY6O8YW2MO9oEJxlEsjqvk0jMocyKPAajzTV8+4hoqKC/eBIbSGFh7UiuPzXU50AEd1Ull68A==}
 
   '@manypkg/find-root@1.1.0':
     resolution: {integrity: sha512-mki5uBvhHzO8kYYix/WRy2WX8S3B5wdVSc9D6KcU5lQNglP2yt58/VfLuAK49glRXChosY8ap2oJ1qgma3GUVA==}
@@ -1478,9 +1478,9 @@ snapshots:
   '@esbuild/win32-x64@0.25.6':
     optional: true
 
-  '@lorm-enterprise/core@0.1.1(@types/pg@8.15.4)':
+  '@lorm-enterprise/core@0.1.2(@types/pg@8.15.4)':
     dependencies:
-      '@lorm/lib': '@lorm-enterprise/lib@0.1.1(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)'
+      '@lorm/lib': '@lorm-enterprise/lib@0.1.2(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)'
       '@neondatabase/serverless': 1.0.1
       '@orpc/server': 1.6.8
       dotenv: 17.2.0
@@ -1519,7 +1519,7 @@ snapshots:
       - sqlite3
       - ws
 
-  '@lorm-enterprise/lib@0.1.1(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)':
+  '@lorm-enterprise/lib@0.1.2(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)':
     dependencies:
       '@orpc/server': 1.6.8
       drizzle-orm: 0.44.2(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)
