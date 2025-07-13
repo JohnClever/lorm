@@ -1,5 +1,11 @@
 # @lorm/cli
 
+## 0.1.25
+
+### Patch Changes
+
+- 67586d6: ready to make open source
+
 ## 0.1.24
 
 ### Patch Changes
