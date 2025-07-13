@@ -1,5 +1,11 @@
 # @lorm/client
 
+## 0.1.8
+
+### Patch Changes
+
+- 80b12c3: version update
+
 ## 0.1.7
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@lorm/core",
-  "version": "0.1.17",
+  "version": "0.1.18",
   "description": "Core server logic for lorm framework - re-exports from @lorm-enterprise/core",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

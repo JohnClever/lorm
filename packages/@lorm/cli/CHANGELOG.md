@@ -1,5 +1,14 @@
 # @lorm/cli
 
+## 0.1.28
+
+### Patch Changes
+
+- 80b12c3: version update
+- Updated dependencies [80b12c3]
+  - @lorm/core@0.1.18
+  - @lorm/lib@0.1.13
+
 ## 0.1.27
 
 ### Patch Changes
