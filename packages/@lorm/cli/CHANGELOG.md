@@ -1,5 +1,11 @@
 # @lorm/cli
 
+## 0.1.29
+
+### Patch Changes
+
+- b38ecf7: dependencies
+
 ## 0.1.28
 
 ### Patch Changes
