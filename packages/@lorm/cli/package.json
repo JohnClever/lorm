@@ -27,14 +27,14 @@
     "access": "public"
   },
   "dependencies": {
-    "@lorm/core": "workspace:*",
-    "@lorm/lib": "workspace:*",
+    "@lorm/core": "^0.1.17",
+    "@lorm/lib": "^0.1.12",
     "cac": "^6.7.14",
     "chalk": "^5.4.1",
     "chokidar": "^4.0.3",
+    "drizzle-kit": "^0.31.4",
     "execa": "^9.6.0",
-    "which": "^5.0.0",
-    "drizzle-kit": "^0.31.4"
+    "which": "^5.0.0"
   },
   "devDependencies": {
     "@types/which": "^3.0.4",
