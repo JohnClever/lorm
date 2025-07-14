@@ -1,5 +1,11 @@
 # @lorm/core
 
+## 0.1.22
+
+### Patch Changes
+
+- 5cd72bc: trying out ts
+
 ## 0.1.21
 
 ### Patch Changes
