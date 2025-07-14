@@ -1,5 +1,14 @@
 # @lorm/cli
 
+## 0.1.31
+
+### Patch Changes
+
+- 30b74d0: dynamic db
+- Updated dependencies [30b74d0]
+  - @lorm/core@0.1.19
+  - @lorm/lib@0.1.14
+
 ## 0.1.30
 
 ### Patch Changes
