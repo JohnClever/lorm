@@ -1,5 +1,11 @@
 # @lorm/lib
 
+## 0.1.15
+
+### Patch Changes
+
+- 10e984e: vb
+
 ## 0.1.14
 
 ### Patch Changes
