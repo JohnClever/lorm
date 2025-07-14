@@ -83,8 +83,8 @@ importers:
   packages/@lorm/core:
     dependencies:
       '@lorm-enterprise/core':
-        specifier: ^0.1.5
-        version: 0.1.5(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)
+        specifier: ^0.1.6
+        version: 0.1.6(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)
     devDependencies:
       '@types/node':
         specifier: ^24.0.10
@@ -600,8 +600,8 @@ packages:
       '@types/node':
         optional: true
 
-  '@lorm-enterprise/core@0.1.5':
-    resolution: {integrity: sha512-WQsEIYUmVlWu5KNc+grmz0eCPEM/yHraFQOychin+iUBKYQu0iwErq770IVRsKaAEsQpB9bTjQSl/CLWO1SPVA==}
+  '@lorm-enterprise/core@0.1.6':
+    resolution: {integrity: sha512-YdjHmeKEY25f+7f/A58Pc+mgQpwB6lnWDeN5U0BmAmKmwAU+ZRqo35NRrf/3qTCSgDgvdit3nM3Q082z+MOhDA==}
     peerDependencies:
       '@libsql/client': ^0.15.9
       '@neondatabase/serverless': ^1.0.1
@@ -1787,7 +1787,7 @@ snapshots:
     optionalDependencies:
       '@types/node': 24.0.13
 
-  '@lorm-enterprise/core@0.1.5(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)':
+  '@lorm-enterprise/core@0.1.6(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)':
     dependencies:
       '@lorm-enterprise/lib': 0.1.4(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)
       '@orpc/server': 1.7.0
