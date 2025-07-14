@@ -1,5 +1,11 @@
 # @lorm/core
 
+## 0.1.20
+
+### Patch Changes
+
+- 648388e: updated db
+
 ## 0.1.19
 
 ### Patch Changes
