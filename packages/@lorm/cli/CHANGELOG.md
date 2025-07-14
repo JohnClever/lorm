@@ -1,5 +1,11 @@
 # @lorm/cli
 
+## 0.1.30
+
+### Patch Changes
+
+- 7db69d3: cli parse
+
 ## 0.1.29
 
 ### Patch Changes
