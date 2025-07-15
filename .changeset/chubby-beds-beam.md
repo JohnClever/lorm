@@ -1,5 +1,0 @@
----
-"@lorm/lib": patch
----
-
-js
