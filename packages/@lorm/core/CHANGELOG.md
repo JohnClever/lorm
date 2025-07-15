@@ -1,5 +1,11 @@
 # @lorm/core
 
+## 0.1.23
+
+### Patch Changes
+
+- 765ed87: js
+
 ## 0.1.22
 
 ### Patch Changes

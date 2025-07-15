@@ -1,5 +1,0 @@
----
-"@lorm/core": patch
----
-
-js
