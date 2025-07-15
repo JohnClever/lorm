@@ -1,5 +1,11 @@
 # @lorm/lib
 
+## 0.1.17
+
+### Patch Changes
+
+- 6c3a49a: js
+
 ## 0.1.16
 
 ### Patch Changes
