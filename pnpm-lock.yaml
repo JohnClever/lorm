@@ -96,8 +96,8 @@ importers:
   packages/@lorm/lib:
     dependencies:
       '@lorm-enterprise/lib':
-        specifier: ^0.1.5
-        version: 0.1.5(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)
+        specifier: ^0.1.6
+        version: 0.1.6(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)
     devDependencies:
       '@types/node':
         specifier: ^24.0.10
@@ -625,6 +625,9 @@ packages:
 
   '@lorm-enterprise/lib@0.1.5':
     resolution: {integrity: sha512-cE0l4HQn31OuqV/D3NXE2ZInlhOTi9S93BPRDPW61Ad/OxKr5d/olSsCh+RMSSjNV3Ah33MM8BDsDZ2zvLza/Q==}
+
+  '@lorm-enterprise/lib@0.1.6':
+    resolution: {integrity: sha512-XNB4p2RGRwS0jP3mlbojltPZflxM0MU/+PZH7pQbVtpnOPQZBYy2/PyFyk+uqsk27PHnbDvt3kfwUNKyRSpL4Q==}
 
   '@manypkg/find-root@1.1.0':
     resolution: {integrity: sha512-mki5uBvhHzO8kYYix/WRy2WX8S3B5wdVSc9D6KcU5lQNglP2yt58/VfLuAK49glRXChosY8ap2oJ1qgma3GUVA==}
@@ -1824,6 +1827,44 @@ snapshots:
       - ws
 
   '@lorm-enterprise/lib@0.1.5(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)':
+    dependencies:
+      '@orpc/server': 1.7.0
+      drizzle-orm: 0.44.2(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)
+      zod: 3.25.76
+    transitivePeerDependencies:
+      - '@aws-sdk/client-rds-data'
+      - '@cloudflare/workers-types'
+      - '@electric-sql/pglite'
+      - '@libsql/client'
+      - '@libsql/client-wasm'
+      - '@neondatabase/serverless'
+      - '@op-engineering/op-sqlite'
+      - '@opentelemetry/api'
+      - '@planetscale/database'
+      - '@prisma/client'
+      - '@tidbcloud/serverless'
+      - '@types/better-sqlite3'
+      - '@types/pg'
+      - '@types/sql.js'
+      - '@upstash/redis'
+      - '@vercel/postgres'
+      - '@xata.io/client'
+      - better-sqlite3
+      - bun-types
+      - crossws
+      - expo-sqlite
+      - gel
+      - knex
+      - kysely
+      - mysql2
+      - pg
+      - postgres
+      - prisma
+      - sql.js
+      - sqlite3
+      - ws
+
+  '@lorm-enterprise/lib@0.1.6(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)':
     dependencies:
       '@orpc/server': 1.7.0
       drizzle-orm: 0.44.2(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)
