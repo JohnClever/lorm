@@ -1,5 +1,11 @@
 # @lorm/lib
 
+## 0.1.18
+
+### Patch Changes
+
+- 131fd6b: mjs
+
 ## 0.1.17
 
 ### Patch Changes
