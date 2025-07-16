@@ -1,5 +1,14 @@
 # @lorm/cli
 
+## 0.1.38
+
+### Patch Changes
+
+- 131fd6b: mjs
+- Updated dependencies [131fd6b]
+  - @lorm/core@0.1.25
+  - @lorm/lib@0.1.18
+
 ## 0.1.37
 
 ### Patch Changes

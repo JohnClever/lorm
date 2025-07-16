@@ -1,5 +1,11 @@
 # @lorm/core
 
+## 0.1.25
+
+### Patch Changes
+
+- 131fd6b: mjs
+
 ## 0.1.24
 
 ### Patch Changes
