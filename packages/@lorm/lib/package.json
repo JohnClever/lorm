@@ -28,6 +28,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@lorm-enterprise/lib": "^0.1.6"
+    "@lorm-enterprise/lib": "^0.1.7"
   }
 }
