@@ -10,11 +10,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function resolveDrizzleKitBin(): string {
   try {
-    // Try to resolve drizzle-kit from the CLI package dependencies
     const drizzleKitPath = require.resolve("drizzle-kit/bin.js");
     return drizzleKitPath;
   } catch {
-    // Fallback to binary resolution
     try {
       const globalBin = which.sync("drizzle-kit", { nothrow: true });
       if (globalBin) return globalBin;
