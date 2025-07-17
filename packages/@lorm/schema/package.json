@@ -1,6 +1,6 @@
 {
   "name": "@lorm/schema",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Database schema abstractions for lorm framework",
   "main": "dist/index.cjs",
   "module": "dist/index.js",

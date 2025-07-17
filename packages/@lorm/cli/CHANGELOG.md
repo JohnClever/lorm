@@ -1,5 +1,14 @@
 # @lorm/cli
 
+## 0.1.39
+
+### Patch Changes
+
+- 74fd061: fixing cjs
+- Updated dependencies [74fd061]
+  - @lorm/core@0.1.26
+  - @lorm/lib@0.1.19
+
 ## 0.1.38
 
 ### Patch Changes
