@@ -1,5 +1,11 @@
 # @lorm/schema
 
+## 0.1.6
+
+### Patch Changes
+
+- 74fd061: fixing cjs
+
 ## 0.1.5
 
 ### Patch Changes

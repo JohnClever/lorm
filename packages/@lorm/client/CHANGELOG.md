@@ -1,5 +1,11 @@
 # @lorm/client
 
+## 0.1.9
+
+### Patch Changes
+
+- 74fd061: fixing cjs
+
 ## 0.1.8
 
 ### Patch Changes

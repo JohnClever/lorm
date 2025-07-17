@@ -1,6 +1,6 @@
 {
   "name": "@lorm/client",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Client library for lorm framework",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
