@@ -1,5 +1,11 @@
 # @lorm/core
 
+## 0.1.26
+
+### Patch Changes
+
+- 74fd061: fixing cjs
+
 ## 0.1.25
 
 ### Patch Changes
