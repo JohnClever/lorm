@@ -1,5 +1,11 @@
 # @lorm/cli
 
+## 0.1.40
+
+### Patch Changes
+
+- 9893fab: cli
+
 ## 0.1.39
 
 ### Patch Changes
