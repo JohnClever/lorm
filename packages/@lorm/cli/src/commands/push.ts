@@ -1,5 +1,4 @@
 import fs from "fs/promises";
-import fssync from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { execa } from "execa";
