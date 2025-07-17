@@ -1,5 +1,11 @@
 # @lorm/lib
 
+## 0.1.20
+
+### Patch Changes
+
+- 95ce8e8: removed tsup
+
 ## 0.1.19
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @lorm/cli
 
+## 0.1.39
+
+### Patch Changes
+
+- 95ce8e8: removed tsup
+- Updated dependencies [95ce8e8]
+  - @lorm/core@0.1.27
+  - @lorm/lib@0.1.20
+
 ## 0.1.40
 
 ### Patch Changes

@@ -4,6 +4,12 @@
 
 ### Patch Changes
 
+- 95ce8e8: removed tsup
+
+## 0.1.9
+
+### Patch Changes
+
 - 74fd061: fixing cjs
 
 ## 0.1.8
