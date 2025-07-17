@@ -2,7 +2,8 @@
   "name": "@lorm/schema",
   "version": "0.1.5",
   "description": "Database schema abstractions for lorm framework",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "files": [
@@ -11,13 +12,13 @@
   ],
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     }
   },
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsup",
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
@@ -25,6 +26,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.0.10",
+    "tsup": "^8.5.0",
     "typescript": "^5.8.3"
   },
   "repository": {

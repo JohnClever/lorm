@@ -35,7 +35,7 @@ export async function initProject(options: InitOptions = {}) {
   try {
     console.log(chalk.blue("🚀 Initializing LORM project..."));
 
-    if (!force && (await fileExists("lorm.config.mjs"))) {
+    if (!force && (await fileExists("lorm.config.js"))) {
       console.log(
         chalk.yellow(
           "⚠️  LORM project already initialized. Use --force to overwrite."
@@ -99,8 +99,8 @@ export async function initProject(options: InitOptions = {}) {
     console.log(chalk.blue("📝 Generating configuration files..."));
 
     const configContent = getConfigTemplate(adapter);
-    await fs.writeFile("lorm.config.mjs", configContent);
-    console.log(chalk.green("✅ Created lorm.config.mjs"));
+    await fs.writeFile("lorm.config.js", configContent);
+    console.log(chalk.green("✅ Created lorm.config.js"));
 
     const routerContent = routerTemplate;
     await fs.writeFile("lorm.router.js", routerContent);
@@ -113,7 +113,7 @@ export async function initProject(options: InitOptions = {}) {
 
     console.log(chalk.green("\n🎉 LORM project initialized successfully!"));
     console.log(chalk.blue("\n📖 Next steps:"));
-    console.log(chalk.white("1. Update your database URL in lorm.config.mjs"));
+    console.log(chalk.white("1. Update your database URL in lorm.config.js"));
     console.log(chalk.white("2. Define your schema in lorm.schema.js"));
     console.log(chalk.white("3. Create your API routes in lorm.router.js"));
     console.log(chalk.white("4. Start your development server"));

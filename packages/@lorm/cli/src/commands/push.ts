@@ -1,16 +1,27 @@
 import fs from "fs/promises";
 import fssync from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
 import { execa } from "execa";
 import { loadConfig } from "@lorm/core";
 import which from "which";
 import { drizzleConfigTemplate } from "@lorm/lib";
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Cross-platform __dirname equivalent
+function getCurrentDir(): string {
+  try {
+    // Try ES module approach first
+    return path.dirname(new URL(import.meta.url).pathname);
+  } catch {
+    // Fallback to process.cwd() or relative resolution
+    return path.resolve(__dirname || process.cwd());
+  }
+}
+
+const currentDir = getCurrentDir();
 
 function resolveDrizzleKitBin(): string {
   const localBin = path.resolve(
-    __dirname,
+    currentDir,
     "../../node_modules/.bin/drizzle-kit"
   );
   if (fssync.existsSync(localBin)) return localBin;

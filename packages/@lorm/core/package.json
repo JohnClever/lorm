@@ -2,7 +2,8 @@
   "name": "@lorm/core",
   "version": "0.1.25",
   "description": "Core server logic for lorm framework - re-exports from @lorm-enterprise/core",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "files": [
@@ -11,20 +12,21 @@
   ],
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     }
   },
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsup",
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
-    "@lorm-enterprise/core": "^0.1.10"
+    "@lorm-enterprise/core": "^0.1.11"
   },
   "devDependencies": {
     "@types/node": "^24.0.10",
+    "tsup": "^8.5.0",
     "typescript": "^5.8.3"
   },
   "publishConfig": {
