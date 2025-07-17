@@ -1,5 +1,11 @@
 # @lorm/core
 
+## 0.1.27
+
+### Patch Changes
+
+- 95ce8e8: removed tsup
+
 ## 0.1.26
 
 ### Patch Changes
