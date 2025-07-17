@@ -6,7 +6,6 @@ import { execa } from "execa";
 import { loadConfig } from "@lorm/core";
 import which from "which";
 import { drizzleConfigTemplate } from "@lorm/lib";
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function resolveDrizzleKitBin(): string {

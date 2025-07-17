@@ -1,9 +1,8 @@
 {
   "name": "@lorm/client",
-  "version": "0.1.9",
+  "version": "0.1.8",
   "description": "Client library for lorm framework",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist",
@@ -20,14 +19,14 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "require": "./dist/index.js"
     },
     "./.lorm/types": {
       "types": "../../.lorm/types.d.ts"
     }
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsc -b",
     "dev": "tsx src/index.ts",
     "prepublishOnly": "pnpm build"
   },
@@ -38,7 +37,6 @@
   },
   "devDependencies": {
     "@types/node": "^24.0.10",
-    "tsup": "^8.5.0",
     "typescript": "^5.8.3"
   },
   "repository": {
