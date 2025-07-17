@@ -1,5 +1,12 @@
 # @lorm/cli
 
+## 0.1.41
+
+### Patch Changes
+
+- 371f037: fss
+- 83b015a: com
+
 ## 0.1.40
 
 ### Patch Changes
