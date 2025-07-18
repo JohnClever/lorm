@@ -23,29 +23,78 @@ function resolveDrizzleKitBin(): string {
   );
 }
 
-export async function push() {
+export interface PushOptions {
+  verbose?: boolean;
+  dryRun?: boolean;
+}
+
+export async function push(options: PushOptions = {}) {
+  const { verbose = false, dryRun = false } = options;
   const rootDir = process.cwd();
   const lormDir = path.join(rootDir, ".lorm");
   const drizzleConfigPath = path.join(lormDir, "drizzle.config.js");
   const schemaTargetPath = path.join(lormDir, "schema.js");
+  const schemaSourcePath = path.join(rootDir, "lorm.schema.js");
 
-  const config = await loadConfig();
+  try {
+    // Validate required files exist
+    if (!fssync.existsSync(schemaSourcePath)) {
+      throw new Error(
+        `Schema file not found: ${schemaSourcePath}\n💡 Did you forget to run 'lorm init'?`
+      );
+    }
 
-  await fs.mkdir(lormDir, { recursive: true });
+    if (verbose) {
+      console.log(`[lorm] Loading config from ${rootDir}`);
+    }
 
-  const schemaImport = `export * from "${path
-    .join(rootDir, "lorm.schema")
-    .replace(/\\/g, "/")}";`;
-  await fs.writeFile(schemaTargetPath, schemaImport);
+    const config = await loadConfig();
 
-  await fs.writeFile(drizzleConfigPath, drizzleConfigTemplate(config));
+    if (verbose) {
+      console.log(`[lorm] Creating .lorm directory: ${lormDir}`);
+    }
 
-  const drizzleKitBin = resolveDrizzleKitBin();
+    await fs.mkdir(lormDir, { recursive: true });
 
-  await execa(drizzleKitBin, ["push"], {
-    cwd: lormDir,
-    stdio: "inherit",
-  });
+    const schemaImport = `export * from "${path
+      .join(rootDir, "lorm.schema")
+      .replace(/\\/g, "/")}";`;
 
-  console.log("✅ [lorm] Schema pushed to database.");
+    if (verbose) {
+      console.log(`[lorm] Writing schema import: ${schemaTargetPath}`);
+    }
+
+    await fs.writeFile(schemaTargetPath, schemaImport);
+
+    if (verbose) {
+      console.log(`[lorm] Writing drizzle config: ${drizzleConfigPath}`);
+    }
+
+    await fs.writeFile(drizzleConfigPath, drizzleConfigTemplate(config));
+
+    if (dryRun) {
+      console.log("🔍 [lorm] Dry run - would execute:");
+      console.log(`  drizzle-kit push (in ${lormDir})`);
+      console.log("✅ [lorm] Dry run completed.");
+      return;
+    }
+
+    const drizzleKitBin = resolveDrizzleKitBin();
+
+    if (verbose) {
+      console.log(`[lorm] Executing: ${drizzleKitBin} push`);
+    }
+
+    await execa(drizzleKitBin, ["push"], {
+      cwd: lormDir,
+      stdio: "inherit",
+    });
+
+    console.log("✅ [lorm] Schema pushed to database.");
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to push schema: ${error.message}`);
+    }
+    throw error;
+  }
 }

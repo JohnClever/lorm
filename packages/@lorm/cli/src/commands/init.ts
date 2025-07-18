@@ -7,7 +7,6 @@ import {
   installDependencies,
   fileExists,
   routerTemplate,
-  typeTemplate,
   getConfigTemplate,
   getSchemaTemplate,
 } from "@lorm/lib";
@@ -110,6 +109,29 @@ export async function initProject(options: InitOptions = {}) {
     await fs.writeFile("lorm.schema.js", schemaContent);
     console.log(chalk.green("✅ Created lorm.schema.js"));
 
+    // Check for metro.config.js and rename to metro.config.cjs
+    if (await fileExists("metro.config.js")) {
+      await fs.rename("metro.config.js", "metro.config.cjs");
+      console.log(chalk.green("✅ Renamed metro.config.js to metro.config.cjs"));
+    }
+
+    // Add "type": "module" to package.json if it doesn't exist
+    if (await fileExists("package.json")) {
+      try {
+        const packageJsonContent = await fs.readFile("package.json", "utf-8");
+        const packageJson = JSON.parse(packageJsonContent);
+        
+        if (!packageJson.type) {
+          packageJson.type = "module";
+          await fs.writeFile("package.json", JSON.stringify(packageJson, null, 2));
+          console.log(chalk.green("✅ Added \"type\": \"module\" to package.json"));
+        } else {
+          console.log(chalk.blue("ℹ️  package.json already has type field"));
+        }
+      } catch (error) {
+        console.log(chalk.yellow("⚠️  Could not modify package.json:"), error);
+      }
+    }
 
     console.log(chalk.green("\n🎉 LORM project initialized successfully!"));
     console.log(chalk.blue("\n📖 Next steps:"));
