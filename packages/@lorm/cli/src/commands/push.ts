@@ -1,4 +1,5 @@
 import fs from "fs/promises";
+import fssync from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { execa } from "execa";
@@ -8,21 +9,18 @@ import { drizzleConfigTemplate } from "@lorm/lib";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function resolveDrizzleKitBin(): string {
-  try {
-    const drizzleKitPath = require.resolve("drizzle-kit/bin.js");
-    return drizzleKitPath;
-  } catch {
-    try {
-      const globalBin = which.sync("drizzle-kit", { nothrow: true });
-      if (globalBin) return globalBin;
-    } catch {}
-    
-    throw new Error(
-      "[lorm] drizzle-kit not found. Please install it:\n" +
-      "  - Globally: npm install -g drizzle-kit\n" +
-      "  - In project: npm install drizzle-kit"
-    );
-  }
+  const localBin = path.resolve(
+    __dirname,
+    "../../node_modules/.bin/drizzle-kit"
+  );
+  if (fssync.existsSync(localBin)) return localBin;
+
+  const globalBin = which.sync("drizzle-kit", { nothrow: true });
+  if (globalBin) return globalBin;
+
+  throw new Error(
+    "[lorm] drizzle-kit not found. Please make sure it’s installed in @lorm/cli."
+  );
 }
 
 export async function push() {
