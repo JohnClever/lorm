@@ -1,5 +1,11 @@
 # @lorm/core
 
+## 0.1.28
+
+### Patch Changes
+
+- 4784818: vr upd
+
 ## 0.1.27
 
 ### Patch Changes
