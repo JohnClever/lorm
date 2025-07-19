@@ -1,5 +1,11 @@
 # @lorm/cli
 
+## 0.1.48
+
+### Patch Changes
+
+- 9bf706b: refinement
+
 ## 0.1.47
 
 ### Patch Changes
