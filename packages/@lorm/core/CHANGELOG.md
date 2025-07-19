@@ -1,5 +1,11 @@
 # @lorm/core
 
+## 0.1.32
+
+### Patch Changes
+
+- 1e33269: revert
+
 ## 0.1.31
 
 ### Patch Changes
