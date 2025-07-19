@@ -1,5 +1,11 @@
 # @lorm/schema
 
+## 0.1.7
+
+### Patch Changes
+
+- c9ab05d: refinements
+
 ## 0.1.6
 
 ### Patch Changes
