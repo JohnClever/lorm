@@ -1,5 +1,11 @@
 # @lorm/core
 
+## 0.1.30
+
+### Patch Changes
+
+- d6679d8: vp upd
+
 ## 0.1.29
 
 ### Patch Changes
