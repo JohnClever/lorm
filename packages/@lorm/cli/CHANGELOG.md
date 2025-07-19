@@ -1,5 +1,11 @@
 # @lorm/cli
 
+## 0.1.51
+
+### Patch Changes
+
+- cd1ea93: revert
+
 ## 0.1.50
 
 ### Patch Changes
