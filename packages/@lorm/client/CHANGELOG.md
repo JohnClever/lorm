@@ -1,5 +1,11 @@
 # @lorm/client
 
+## 0.1.11
+
+### Patch Changes
+
+- 45de019: vr update
+
 ## 0.1.9
 
 ### Patch Changes
