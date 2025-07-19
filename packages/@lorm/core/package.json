@@ -21,7 +21,7 @@
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
-    "@lorm-enterprise/core": "^0.1.17"
+    "@lorm-enterprise/core": "^0.1.18"
   },
   "devDependencies": {
     "@types/node": "^24.0.10",
