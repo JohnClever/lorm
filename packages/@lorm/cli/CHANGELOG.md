@@ -1,5 +1,11 @@
 # @lorm/cli
 
+## 0.1.49
+
+### Patch Changes
+
+- 11d22ab: client
+
 ## 0.1.48
 
 ### Patch Changes
