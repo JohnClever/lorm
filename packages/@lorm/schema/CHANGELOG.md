@@ -1,5 +1,11 @@
 # @lorm/schema
 
+## 0.1.8
+
+### Patch Changes
+
+- 45de019: vr update
+
 ## 0.1.7
 
 ### Patch Changes
