@@ -1,5 +1,11 @@
 # @lorm/lib
 
+## 0.1.24
+
+### Patch Changes
+
+- 5d17baa: sum
+
 ## 0.1.23
 
 ### Patch Changes
