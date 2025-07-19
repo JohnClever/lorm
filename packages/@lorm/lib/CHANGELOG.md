@@ -1,5 +1,11 @@
 # @lorm/lib
 
+## 0.1.22
+
+### Patch Changes
+
+- 45de019: vr update
+
 ## 0.1.21
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @lorm/cli
 
+## 0.1.46
+
+### Patch Changes
+
+- 45de019: vr update
+- Updated dependencies [45de019]
+  - @lorm/core@0.1.29
+  - @lorm/lib@0.1.22
+
 ## 0.1.45
 
 ### Patch Changes
