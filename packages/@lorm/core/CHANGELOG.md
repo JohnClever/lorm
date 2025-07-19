@@ -1,5 +1,11 @@
 # @lorm/core
 
+## 0.1.31
+
+### Patch Changes
+
+- 5d17baa: sum
+
 ## 0.1.30
 
 ### Patch Changes
