@@ -1,5 +1,11 @@
 # @lorm/lib
 
+## 0.1.25
+
+### Patch Changes
+
+- 1e33269: revert
+
 ## 0.1.24
 
 ### Patch Changes
