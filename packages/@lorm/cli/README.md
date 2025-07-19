@@ -73,15 +73,17 @@ Start a local development server with hot reload.
 
 ---
 
+## 🗄️ Database Commands
+
 ### `lorm push`
 
-Push your schema changes to your database.
+Push your schema changes directly to your database (development workflow).
 
 **What it does:**
 
 - Reads your `lorm.schema.js` file
 - Connects to your database using `lorm.config.js`
-- Generates and applies database migrations
+- Applies schema changes directly to the database
 - Syncs your schema with the database
 - Updates `.lorm/` directory with compiled artifacts
 
@@ -89,6 +91,129 @@ Push your schema changes to your database.
 
 - Valid database URL in `lorm.config.js`
 - Properly defined schema in `lorm.schema.js`
+
+**Best for:** Quick prototyping and local development
+
+---
+
+### `lorm generate`
+
+Generate migration files based on schema changes (production workflow).
+
+**What it does:**
+
+- Compares your current schema with the database
+- Generates SQL migration files in `drizzle/` directory
+- Creates timestamped migration files
+- Prepares migrations for production deployment
+
+**Best for:** Production deployments and team collaboration
+
+---
+
+### `lorm migrate`
+
+Apply pending migrations to your database.
+
+**What it does:**
+
+- Runs all pending migration files
+- Updates the database to match your schema
+- Tracks applied migrations in the database
+- Ensures consistent database state across environments
+
+**Best for:** Production deployments and CI/CD pipelines
+
+---
+
+### `lorm pull`
+
+Pull existing database schema and generate Drizzle schema files.
+
+**What it does:**
+
+- Connects to your existing database
+- Introspects the current database schema
+- Generates corresponding Drizzle schema files
+- Creates TypeScript schema definitions
+
+**Best for:** Migrating existing databases to Lorm
+
+---
+
+### `lorm check`
+
+Check for schema consistency and potential issues.
+
+**What it does:**
+
+- Validates your schema definitions
+- Checks for potential migration conflicts
+- Identifies schema inconsistencies
+- Provides recommendations for fixes
+
+**Best for:** Pre-deployment validation and debugging
+
+---
+
+### `lorm up`
+
+Upgrade your schema to the latest version.
+
+**What it does:**
+
+- Applies any pending schema upgrades
+- Updates database structure
+- Ensures compatibility with latest Lorm version
+- Handles version-specific migrations
+
+**Best for:** Framework upgrades and maintenance
+
+---
+
+### `lorm studio`
+
+Launch Drizzle Studio for visual database management.
+
+**What it does:**
+
+- Starts Drizzle Studio web interface
+- Provides visual database browser
+- Enables data viewing and editing
+- Offers query execution interface
+
+**Features:**
+
+- 🎨 Visual database browser
+- 📊 Data visualization
+- ✏️ In-browser data editing
+- 🔍 Query builder interface
+
+**Best for:** Database exploration and data management
+
+---
+
+### `lorm drop`
+
+⚠️ **DANGER ZONE** ⚠️ Drop all tables from your database.
+
+**What it does:**
+
+- **PERMANENTLY DELETES** all tables and data
+- Only works on local databases (localhost/127.0.0.1)
+- Requires explicit user confirmation
+- Supports PostgreSQL, MySQL, and SQLite
+
+**Safety features:**
+
+- 🛡️ Local-only protection
+- ⚠️ Confirmation prompts
+- 🔒 Transaction safety
+- 📋 Detailed logging
+
+**Best for:** Resetting development databases
+
+**⚠️ WARNING:** This command will permanently delete all your data. Only use in development!
 
 ---
 
@@ -114,11 +239,13 @@ my-app/
 Edit `lorm.config.js` to configure your database:
 
 ```js
-export default {
+export default defineConfig({
   db: {
-    url: "your-db-url"
+    url: "your-db-url",
+    adapter: "your-selected-adapter",
+    options: "your-adapter-options"
   }
-}
+});`;
 ```
 
 **Supported databases:**
@@ -136,7 +263,7 @@ You can use any database supported by [Drizzle ORM](https://orm.drizzle.team/doc
 Define your database schema in `lorm.schema.js`:
 
 ```js
-import { pgTable, uuid, varchar } from "@lorm/schema";
+import { pgTable, uuid, varchar } from "@lorm/schema/pg";
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -260,7 +387,15 @@ The Lorm CLI embodies the framework's core philosophy:
 
 ## 📜 License
 
-Private project. All rights reserved. © 2025 John Clever
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
 For more information, visit the main [Lorm documentation](https://github.com/JohnClever/lorm).
 

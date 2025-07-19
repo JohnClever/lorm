@@ -35,18 +35,20 @@ my-app/
 
 ```js
 // lorm.config.js
-export default {
+export default defineConfig({
   db: {
-    url: "your-db-url"
+    url: "your-db-url",
+    adapter: "your-selected-adapter",
+    options: "your-adapter-options"
   }
-}
+});`;
 ```
 
 ## 🧱 1. Define Your Schema
 
 ```js
 // lorm.schema.js
-import { pgTable, uuid, varchar } from "@lorm/schema";
+import { pgTable, uuid, varchar } from "@lorm/schema/pg";
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
