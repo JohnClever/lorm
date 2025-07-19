@@ -155,12 +155,12 @@ function displayCompletionMessage(adapter: DatabaseAdapter, isRN: boolean): void
   console.log(chalk.white("3. Create your API routes in lorm.router.js"));
   console.log(chalk.white("4. Start your development server"));
 
-  if (isRN) {
-    console.log(chalk.blue("\n📱 React Native specific notes:"));
-    console.log(chalk.gray("   • metro.config.js has been renamed to metro.config.cjs"));
-    console.log(chalk.gray("   • type: 'module' has been added to package.json"));
-    console.log(chalk.gray("   • This ensures compatibility with ES modules"));
-  }
+  // if (isRN) {
+  //   console.log(chalk.blue("\n📱 React Native specific notes:"));
+  //   console.log(chalk.gray("   • metro.config.js has been renamed to metro.config.cjs"));
+  //   console.log(chalk.gray("   • type: 'module' has been added to package.json"));
+  //   console.log(chalk.gray("   • This ensures compatibility with ES modules"));
+  // }
 
   console.log(chalk.blue("\n💡 Database-specific notes:"));
   switch (adapter) {
@@ -209,9 +209,9 @@ export async function initProject(options: InitOptions = {}) {
     }
 
     const isRN = await isReactNativeProject();
-    if (isRN) {
-      await handleReactNativeConfig();
-    }
+    // if (isRN) {
+    //   await handleReactNativeConfig();
+    // }
 
     const adapter = (await select({
       message: "Select your database adapter:",

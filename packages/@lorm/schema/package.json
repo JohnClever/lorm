@@ -17,15 +17,18 @@
     },
     "./pg": {
       "types": "./dist/adapters/pg.d.ts",
-      "import": "./dist/adapters/pg.js"
+      "import": "./dist/adapters/pg.js",
+      "require": "./dist/adapters/pg.js"
     },
     "./mysql": {
       "types": "./dist/adapters/mysql.d.ts",
-      "import": "./dist/adapters/mysql.js"
+      "import": "./dist/adapters/mysql.js",
+      "require": "./dist/adapters/mysql.js"
     },
     "./sqlite": {
       "types": "./dist/adapters/sqlite.d.ts",
-      "import": "./dist/adapters/sqlite.js"
+      "import": "./dist/adapters/sqlite.js",
+      "require": "./dist/adapters/sqlite.js"
     }
   },
   "scripts": {
