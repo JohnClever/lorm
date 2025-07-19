@@ -1,5 +1,11 @@
 # @lorm/schema
 
+## 0.1.9
+
+### Patch Changes
+
+- d6679d8: vp upd
+
 ## 0.1.8
 
 ### Patch Changes

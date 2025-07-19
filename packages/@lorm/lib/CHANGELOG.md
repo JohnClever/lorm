@@ -1,5 +1,11 @@
 # @lorm/lib
 
+## 0.1.23
+
+### Patch Changes
+
+- d6679d8: vp upd
+
 ## 0.1.22
 
 ### Patch Changes

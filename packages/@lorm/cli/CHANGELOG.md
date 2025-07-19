@@ -1,5 +1,14 @@
 # @lorm/cli
 
+## 0.1.47
+
+### Patch Changes
+
+- d6679d8: vp upd
+- Updated dependencies [d6679d8]
+  - @lorm/core@0.1.30
+  - @lorm/lib@0.1.23
+
 ## 0.1.46
 
 ### Patch Changes
