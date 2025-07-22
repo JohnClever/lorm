@@ -143,40 +143,7 @@ export function CodeBlock({
             className="overflow-auto scrollbar-thin scrollbar-track-[#161b22] scrollbar-thumb-[#30363d] hover:scrollbar-thumb-[#484f58]"
             style={{ maxHeight }}
           >
-            {/* {showLineNumbers ? (
-              <div className="flex min-h-full">
-              
-                <div className="flex-shrink-0 px-3 py-2 bg-[#0d1117] border-r border-[#21262d] select-none">
-                  {lines.map((_, index) => {
-                    const lineNumber = index + 1;
-                    return (
-                      <div
-                        key={lineNumber}
-                        className="text-sm font-mono leading-6 text-right text-[#6e7681] hover:text-[#8b949e] transition-colors"
-                        style={{ minWidth: "2.5rem" }}
-                      >
-                        {lineNumber}
-                      </div>
-                    );
-                  })}
-                </div>
-
-              
-                <div className="flex-1 min-w-0">
-                  <div
-                    className={cn(
-                      "p-2 font-mono text-base leading-6 overflow-x-auto",
-                      "[&_pre]:!bg-transparent [&_pre]:!p-0 [&_pre]:!m-0",
-                      "[&_code]:!bg-transparent [&_code]:!font-mono",
-                      "[&_.line]:block [&_.line]:min-h-[1.5rem]"
-                    )}
-                    dangerouslySetInnerHTML={{
-                      __html: highlightedCode,
-                    }}
-                  />
-                </div>
-              </div>
-            ) : ( */}
+           
             <div
               className={cn(
                 "p-2 font-mono text-base  ",
@@ -188,7 +155,7 @@ export function CodeBlock({
                 __html: highlightedCode,
               }}
             />
-            {/* // )} */}
+          
           </div>
         )}
       </div>

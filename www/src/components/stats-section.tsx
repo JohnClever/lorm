@@ -107,7 +107,7 @@ export function StatsSection() {
           <h2 className="text-4xl md:text-5xl font-bold mb-4 gradient-text">
             Trusted by Developers Worldwide
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl  text-muted-foreground max-w-2xl mx-auto">
             Join thousands of developers building type-safe, full-stack applications with zero backend boilerplate
           </p>
         </motion.div>

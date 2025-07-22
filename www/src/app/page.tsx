@@ -64,7 +64,7 @@ export default function HomePage() {
                   className="mb-8 border-slate-700 bg-slate-800/50 text-slate-300 px-4 py-2 text-sm font-medium"
                 >
                   <Terminal className="w-4 h-4 mr-2" />
-                  Zero-Config Full-Stack Framework
+                  Ewe - Lorm
                 </Badge>
               </motion.div>
 
@@ -92,7 +92,8 @@ export default function HomePage() {
                 Full-stack framework that generates type-safe APIs from your
                 database schema.
                 <br className="hidden sm:block" />
-                Zero backend boilerplate. Works with any frontend.
+                Zero backend boilerplate. Works with any React Native and any
+                frontend.
               </motion.p>
             </motion.div>
 
@@ -189,7 +190,7 @@ export default function HomePage() {
           viewport={{ once: true }}
           className="py-16 sm:py-20 md:py-32 px-4 md:px-6 relative"
         >
-          <div className="max-w-7xl mx-auto relative z-10">
+          <div className="w-96 md:max-w-7xl mx-auto relative z-10">
             <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
               <motion.div
                 initial={{ opacity: 0, x: -30 }}
