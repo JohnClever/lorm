@@ -17,7 +17,7 @@ const socialLinks = [
   {
     name: "Twitter",
     icon: Twitter,
-    url: "https:/x.com/jc_johnclever",
+    url: "https://x.com/jc_johnclever",
     description: "Follow updates",
   },
 ];
