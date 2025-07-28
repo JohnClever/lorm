@@ -1,5 +1,11 @@
 # @lorm/client
 
+## 0.1.12
+
+### Patch Changes
+
+- 3514f6f: refinements
+
 ## 0.1.11
 
 ### Patch Changes
