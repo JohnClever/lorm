@@ -1,120 +1,57 @@
-# Lorm Website
+# React + TypeScript + Vite
 
-The official website and documentation for Lorm - a powerful, type-safe mobile framework for mobile applications.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Built With
+Currently, two official plugins are available:
 
-- **Next.js 15** - React framework for production
-- **Fumadocs** - Beautiful documentation framework
-- **Tailwind CSS** - Utility-first CSS framework
-- **TypeScript** - Type-safe JavaScript
-- **Lucide React** - Beautiful icons
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Features
+## Expanding the ESLint configuration
 
-- 🎨 Modern, responsive design inspired by tRPC and GitHub
-- 📚 Comprehensive documentation with Fumadocs
-- 🌙 Dark/light mode support
-- ⚡ Fast page loads with Next.js optimizations
-- 🔍 Built-in search functionality
-- 📱 Mobile-first responsive design
-- ♿ Accessibility-first approach
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-## Development
-
-### Prerequisites
-
-- Node.js 18+
-- pnpm (recommended)
-
-### Getting Started
-
-1. Install dependencies:
-   ```bash
-   pnpm install
-   ```
-
-2. Start the development server:
-   ```bash
-   pnpm dev
-   ```
-
-3. Open [http://localhost:3000](http://localhost:3000) in your browser
-
-### Available Scripts
-
-- `pnpm dev` - Start development server
-- `pnpm build` - Build for production
-- `pnpm start` - Start production server
-- `pnpm lint` - Run ESLint
-- `pnpm type-check` - Run TypeScript type checking
-
-## Project Structure
-
-```
-src/
-├── app/                 # Next.js app directory
-│   ├── docs/           # Documentation pages
-│   ├── layout.tsx      # Root layout
-│   └── page.tsx        # Homepage
-├── components/         # Reusable components
-│   ├── ui/            # UI components (Button, Card, etc.)
-│   ├── code-block.tsx # Syntax highlighting
-│   ├── feature-grid.tsx
-│   └── stats-section.tsx
-└── lib/               # Utility functions
-    └── utils.ts
+```js
+export default tseslint.config({
+  extends: [
+    // Remove ...tseslint.configs.recommended and replace with this
+    ...tseslint.configs.recommendedTypeChecked,
+    // Alternatively, use this for stricter rules
+    ...tseslint.configs.strictTypeChecked,
+    // Optionally, add this for stylistic rules
+    ...tseslint.configs.stylisticTypeChecked,
+  ],
+  languageOptions: {
+    // other options...
+    parserOptions: {
+      project: ['./tsconfig.node.json', './tsconfig.app.json'],
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
+})
 ```
 
-## Customization
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-### Styling
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-The website uses Tailwind CSS with custom design tokens. Key files:
-
-- `tailwind.config.js` - Tailwind configuration with Fumadocs preset
-- `src/app/globals.css` - Global styles and custom CSS
-
-### Content
-
-- Homepage content: `src/app/page.tsx`
-- Documentation: `src/app/docs/`
-- Navigation: `src/app/layout.config.tsx`
-
-### Components
-
-All UI components are built with:
-- Radix UI primitives for accessibility
-- Class Variance Authority (CVA) for variants
-- Tailwind CSS for styling
-
-## Deployment
-
-The website is optimized for deployment on:
-
-- **Vercel** (recommended)
-- **Netlify**
-- **Railway**
-- Any Node.js hosting platform
-
-### Build for Production
-
-```bash
-pnpm build
+export default tseslint.config({
+  extends: [
+    // other configs...
+    // Enable lint rules for React
+    reactX.configs['recommended-typescript'],
+    // Enable lint rules for React DOM
+    reactDom.configs.recommended,
+  ],
+  languageOptions: {
+    // other options...
+    parserOptions: {
+      project: ['./tsconfig.node.json', './tsconfig.app.json'],
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
+})
 ```
-
-This creates an optimized production build in the `.next` directory.
-
-## Contributing
-
-Contributions are welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## License
-
-MIT License - see the [LICENSE](../../LICENSE) file for details.
