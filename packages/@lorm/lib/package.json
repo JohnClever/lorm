@@ -1,8 +1,9 @@
 {
   "name": "@lorm/lib",
-  "version": "0.1.25",
-  "description": "Shared utilities and types for lorm framework - re-exports from @lorm-enterprise/lib",
-  "main": "dist/index.js",
+  "version": "0.1.0",
+  "description": "Shared utilities and types for lorm - mobile-first framework",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "files": [
@@ -13,21 +14,28 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "require": "./dist/index.cjs"
     }
   },
   "scripts": {
     "build": "tsc -b",
     "prepublishOnly": "pnpm build"
   },
-  "devDependencies": {
-    "@types/node": "^24.0.10",
-    "typescript": "^5.8.3"
+  "dependencies": {
+    "@orpc/server": "^1.6.5",
+    "drizzle-orm": "^0.44.2",
+    "zod": "^3.25.71"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JohnClever/lorm.git",
+    "directory": "packages/@lorm/lib"
   },
   "publishConfig": {
     "access": "public"
   },
-  "dependencies": {
-    "@lorm-enterprise/lib": "^0.1.15"
+  "devDependencies": {
+    "@types/node": "^24.0.13",
+    "terser": "^5.43.1"
   }
 }

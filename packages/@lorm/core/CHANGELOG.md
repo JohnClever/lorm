@@ -1,91 +1,135 @@
-# @lorm/core
-
-## 0.1.32
-
-### Patch Changes
-
-- 1e33269: revert
-
-## 0.1.31
-
-### Patch Changes
-
-- 5d17baa: sum
-
-## 0.1.30
-
-### Patch Changes
-
-- d6679d8: vp upd
-
-## 0.1.29
-
-### Patch Changes
-
-- 45de019: vr update
-
-## 0.1.28
-
-### Patch Changes
-
-- 4784818: vr upd
-
-## 0.1.27
-
-### Patch Changes
-
-- 95ce8e8: removed tsup
-
-## 0.1.26
-
-### Patch Changes
-
-- 74fd061: fixing cjs
-
-## 0.1.25
-
-### Patch Changes
-
-- 131fd6b: mjs
-
-## 0.1.24
-
-### Patch Changes
-
-- 2e7af6f: js
-
-## 0.1.23
-
-### Patch Changes
-
-- 765ed87: js
-
-## 0.1.22
-
-### Patch Changes
-
-- 5cd72bc: trying out ts
-
-## 0.1.21
-
-### Patch Changes
-
-- 10e984e: vb
-
-## 0.1.20
-
-### Patch Changes
-
-- 648388e: updated db
-
-## 0.1.19
-
-### Patch Changes
-
-- 30b74d0: dynamic db
+# @lorm-enterprise/core
 
 ## 0.1.18
 
 ### Patch Changes
 
-- 80b12c3: version update
+- 603f066: revert
+- Updated dependencies [603f066]
+  - @lorm-enterprise/lib@0.1.15
+
+## 0.1.17
+
+### Patch Changes
+
+- 30e9166: summ
+- 11ae1ef: sum
+- Updated dependencies [30e9166]
+- Updated dependencies [11ae1ef]
+  - @lorm-enterprise/lib@0.1.14
+
+## 0.1.16
+
+### Patch Changes
+
+- db8e859: upd
+- Updated dependencies [db8e859]
+  - @lorm-enterprise/lib@0.1.13
+
+## 0.1.15
+
+### Patch Changes
+
+- 7a0aa55: minified code
+- Updated dependencies [7a0aa55]
+  - @lorm-enterprise/lib@0.1.12
+
+## 0.1.14
+
+### Patch Changes
+
+- Updated dependencies [83933e3]
+  - @lorm-enterprise/lib@0.1.11
+
+## 0.1.13
+
+### Patch Changes
+
+- 1ddf63a: pub
+- Updated dependencies [1ddf63a]
+  - @lorm-enterprise/lib@0.1.10
+
+## 0.1.12
+
+### Patch Changes
+
+- 62062b6: pub
+- Updated dependencies [62062b6]
+  - @lorm-enterprise/lib@0.1.9
+
+## 0.1.11
+
+### Patch Changes
+
+- d595369: fixed cjs
+- Updated dependencies [d595369]
+  - @lorm-enterprise/lib@0.1.8
+
+## 0.1.10
+
+### Patch Changes
+
+- 109b97b: mjs
+- Updated dependencies [109b97b]
+  - @lorm-enterprise/lib@0.1.7
+
+## 0.1.9
+
+### Patch Changes
+
+- Updated dependencies [17944f8]
+  - @lorm-enterprise/lib@0.1.6
+
+## 0.1.8
+
+### Patch Changes
+
+- 4812ac4: js
+- Updated dependencies [4812ac4]
+  - @lorm-enterprise/lib@0.1.5
+
+## 0.1.7
+
+### Patch Changes
+
+- abaa42a: js
+
+## 0.1.6
+
+### Patch Changes
+
+- de4812b: trying out ts
+
+## 0.1.5
+
+### Patch Changes
+
+- 41960d3: vb
+- Updated dependencies [41960d3]
+  - @lorm-enterprise/lib@0.1.4
+
+## 0.1.4
+
+### Patch Changes
+
+- 5771d0f: fixed db
+
+## 0.1.3
+
+### Patch Changes
+
+- ce29066: dynamic db
+- Updated dependencies [ce29066]
+  - @lorm-enterprise/lib@0.1.3
+
+## 0.1.2
+
+### Patch Changes
+
+- 9756cdf: version update
+
+## 0.1.1
+
+### Patch Changes
+
+- 33b7831: initial

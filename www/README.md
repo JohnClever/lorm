@@ -1,6 +1,6 @@
 # Lorm Website
 
-The official website and documentation for Lorm - a powerful, type-safe ORM for modern applications.
+The official website and documentation for Lorm - a powerful, type-safe mobile framework for mobile applications.
 
 ## Built With
 

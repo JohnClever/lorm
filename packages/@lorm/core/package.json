@@ -1,8 +1,9 @@
 {
   "name": "@lorm/core",
-  "version": "0.1.32",
-  "description": "Core server logic for lorm framework - re-exports from @lorm-enterprise/core",
-  "main": "dist/index.js",
+  "version": "0.1.0",
+  "description": "Core functionality for lorm - mobile-first framework",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "files": [
@@ -13,7 +14,7 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "require": "./dist/index.cjs"
     }
   },
   "scripts": {
@@ -21,11 +22,28 @@
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
-    "@lorm-enterprise/core": "^0.1.18"
+    "@libsql/client": "^0.15.9",
+    "@lorm/lib": "workspace:*",
+    "@neondatabase/serverless": "^1.0.1",
+    "@orpc/server": "^1.6.5",
+    "@planetscale/database": "^1.19.0",
+    "better-sqlite3": "^12.2.0",
+    "dotenv": "^17.0.1",
+    "drizzle-orm": "^0.44.2",
+    "mysql2": "^3.14.2",
+    "postgres": "^3.4.7",
+    "zod": "^3.25.71"
   },
   "devDependencies": {
-    "@types/node": "^24.0.10",
-    "typescript": "^5.8.3"
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/pg": "^8.15.4",
+    "terser": "^5.43.1",
+    "tsx": "^4.20.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JohnClever/lorm.git",
+    "directory": "packages/@lorm/core"
   },
   "publishConfig": {
     "access": "public"

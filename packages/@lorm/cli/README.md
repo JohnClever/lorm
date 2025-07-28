@@ -1,16 +1,12 @@
 # 🪄 @lorm/cli
 
-Command-line interface for the **Lorm framework** — a zero-config, full-stack framework for building type-safe, high-performance apps optimized for **Mobile Applications**.
+Command-line interface for the **Lorm framework** — a zero-config, full-stack mobile framework built for **Mobile Applications**.
 
+> 📱 Built for **React Native** and **Expo**
+> ✅ Works with **any Drizzle-supported database**: PostgreSQL, MySQL, SQLite, and more
 ---
 
 ## 📦 Installation
-
-### Global Installation (Recommended)
-
-```bash
-npm install -g @lorm/cli
-```
 
 ### Local Installation
 
@@ -25,15 +21,15 @@ npm install @lorm/cli --save-dev
 ```bash
 cd my-app
 npx @lorm/cli init
-lorm push
-lorm dev
+npx @lorm/cli push
+npx @lorm/cli dev
 ```
 
 ---
 
 ## 📋 Commands
 
-### `lorm init`
+### `npx @lorm/cli init`
 
 Initialize a new Lorm project in your existing directory.
 
@@ -75,7 +71,7 @@ Start a local development server with hot reload.
 
 ## 🗄️ Database Commands
 
-### `lorm push`
+### `npx @lorm/cli push`
 
 Push your schema changes directly to your database (development workflow).
 
@@ -96,7 +92,7 @@ Push your schema changes directly to your database (development workflow).
 
 ---
 
-### `lorm generate`
+### `npx @lorm/cli generate`
 
 Generate migration files based on schema changes (production workflow).
 
@@ -111,7 +107,7 @@ Generate migration files based on schema changes (production workflow).
 
 ---
 
-### `lorm migrate`
+### `npx @lorm/cli migrate`
 
 Apply pending migrations to your database.
 
@@ -126,7 +122,7 @@ Apply pending migrations to your database.
 
 ---
 
-### `lorm pull`
+### `npx @lorm/cli pull`
 
 Pull existing database schema and generate Drizzle schema files.
 
@@ -141,7 +137,7 @@ Pull existing database schema and generate Drizzle schema files.
 
 ---
 
-### `lorm check`
+### `npx @lorm/cli check`
 
 Check for schema consistency and potential issues.
 
@@ -156,7 +152,7 @@ Check for schema consistency and potential issues.
 
 ---
 
-### `lorm up`
+### `npx @lorm/cli up`
 
 Upgrade your schema to the latest version.
 
@@ -171,7 +167,7 @@ Upgrade your schema to the latest version.
 
 ---
 
-### `lorm studio`
+### `npx @lorm/cli studio`
 
 Launch Drizzle Studio for visual database management.
 
@@ -193,7 +189,7 @@ Launch Drizzle Studio for visual database management.
 
 ---
 
-### `lorm drop`
+### `npx @lorm/cli drop`
 
 ⚠️ **DANGER ZONE** ⚠️ Drop all tables from your database.
 
@@ -219,7 +215,7 @@ Launch Drizzle Studio for visual database management.
 
 ## 🗂️ Project Structure
 
-After running `lorm init`, your project will include:
+After running `npx @lorm/cli init`, your project will include:
 
 ```
 my-app/
@@ -305,9 +301,7 @@ Use the generated types in your frontend:
 Works with:
 
 - ✅ React Native
-- ✅ React / Next.js
-- ✅ Svelte / SvelteKit
-- ✅ Any TypeScript frontend
+- ✅ Expo
 
 ---
 
@@ -336,7 +330,7 @@ PORT=3000
 
 - Node.js 18+
 - A Drizzle-supported database
-- TypeScript frontend (for full type safety)
+- React Native or Expo development environment
 
 ---
 
@@ -349,7 +343,7 @@ The Lorm CLI embodies the framework's core philosophy:
 - 🧘‍♀️ Zero config — works out of the box
 - 🔐 End-to-end type safety — from database to frontend
 - ⚡️ CLI-first workflow — everything through simple commands
-- 🚀 Mobile-optimized — built for React Native and mobile-first teams
+- 📱 Mobile-exclusive — built exclusively for React Native and Expo teams
 
 ---
 
@@ -375,13 +369,12 @@ The Lorm CLI embodies the framework's core philosophy:
 
 **"Types not updating"**
 
-- Restart `lorm dev` to regenerate types
+- Restart `npx @lorm/cli dev` to regenerate types
 - Check your router exports
 
 **"Command not found"**
 
-- Install globally: `npm install -g @lorm/cli`
-- Or use via `npx`: `npx @lorm/cli init`
+- Install via `npx`: `npx @lorm/cli init`
 
 ---
 

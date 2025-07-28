@@ -1,8 +1,9 @@
 {
   "name": "@lorm/cli",
   "version": "0.1.52",
-  "description": "Command-line interface for lorm framework",
-  "main": "dist/index.js",
+  "description": "Command-line interface for lorm - mobile-first framework",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "files": [
@@ -15,7 +16,6 @@
   },
   "scripts": {
     "build": "tsc -b",
-    "dev": "tsx src/index.ts",
     "prepublishOnly": "pnpm build"
   },
   "repository": {
