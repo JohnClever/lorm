@@ -5,6 +5,17 @@
 > 📱 Built for **React Native** and **Expo**
 > ✅ Works with **any Drizzle-supported database**: PostgreSQL, MySQL, SQLite, and more
 
+<div align="center">
+
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![npm version](https://badge.fury.io/js/%40lorm%2Fcli.svg)](https://badge.fury.io/js/%40lorm%2Fcli)
+[![GitHub stars](https://img.shields.io/github/stars/JohnClever/lorm?style=social)](https://github.com/JohnClever/lorm)
+[![GitHub forks](https://img.shields.io/github/forks/JohnClever/lorm?style=social)](https://github.com/JohnClever/lorm/fork)
+[![X Follow](https://img.shields.io/x/follow/jc_johnclever?style=social)](https://x.com/jc_johnclever)
+[![Discord](https://img.shields.io/discord/eUCav29w?color=7289da&label=Discord&logo=discord&logoColor=white)](https://discord.gg/eUCav29w)
+
+</div>
+
 ---
 
 ## 🚀 Features
