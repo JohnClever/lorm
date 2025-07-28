@@ -12,7 +12,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/JohnClever/lorm?style=social)](https://github.com/JohnClever/lorm)
 [![GitHub forks](https://img.shields.io/github/forks/JohnClever/lorm?style=social)](https://github.com/JohnClever/lorm/fork)
 [![X Follow](https://img.shields.io/twitter/follow/jc_johnclever?style=social)](https://x.com/jc_johnclever)
-[![Discord](https://img.shields.io/discord/jc_johnclever?color=7289da&label=Discord&logo=discord&logoColor=white)](https://discord.gg/eUCav29w)
+[![Discord](https://img.shields.io/discord/1396855376221307081?color=7289da&label=Discord&logo=discord&logoColor=white)](https://discord.gg/eUCav29w)
 
 </div>
 
