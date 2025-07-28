@@ -1,5 +1,13 @@
 # @lorm-enterprise/core
 
+## 0.1.1
+
+### Patch Changes
+
+- 3514f6f: refinements
+- Updated dependencies [3514f6f]
+  - @lorm/lib@0.1.1
+
 ## 0.1.18
 
 ### Patch Changes

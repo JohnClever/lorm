@@ -1,6 +1,6 @@
 {
   "name": "@lorm/client",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "Client library for lorm - mobile-first framework",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -18,7 +18,7 @@
   },
   "exports": {
     ".": {
-     "types": "./dist/index.d.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
