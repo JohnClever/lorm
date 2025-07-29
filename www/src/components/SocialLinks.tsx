@@ -10,7 +10,7 @@ const socialLinks = [
   {
     name: "Website",
     icon: VenetianMask,
-    url: "https://discord.gg/eUCav29w",
+    url: "https://discord.gg/T3pUn5NvnV",
     description: "Visit our Discord channel",
   },
 
