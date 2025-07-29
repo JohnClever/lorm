@@ -1,5 +1,13 @@
 # @lorm-enterprise/core
 
+## 0.1.3
+
+### Patch Changes
+
+- 26e4376: y
+- Updated dependencies [26e4376]
+  - @lorm/lib@0.1.3
+
 ## 0.1.2
 
 ### Patch Changes
