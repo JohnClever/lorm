@@ -1,0 +1,5 @@
+---
+"@lorm/core": patch
+---
+
+core
