@@ -1,6 +1,6 @@
 {
   "name": "@lorm/client",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "description": "Client library for lorm - mobile-first framework",
   "type": "module",
   "main": "dist/index.cjs",
