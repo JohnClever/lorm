@@ -2,7 +2,6 @@ import fs from "fs/promises";
 import path from "path";
 
 import { drizzleConfigTemplate } from "@lorm/lib";
-import { loadConfig } from "@lorm/core";
 
 export async function ensureLormDirectory(lormDir: string): Promise<void> {
   try {
@@ -72,6 +71,7 @@ export async function initializeAdvancedCommand(commandName: string) {
   const schemaTargetPath = path.join(lormDir, "schema.js");
 
   console.log("📖 [lorm] Loading configuration...");
+  const { loadConfig } = await import("@lorm/core");
   const config = await loadConfig();
 
   await validateSchemaFileOptional(rootDir);

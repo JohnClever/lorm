@@ -11,9 +11,7 @@
     "bin",
     "README.md"
   ],
-  "bin": {
-    "lorm": "./bin/lorm.js"
-  },
+  "bin": "./bin/cli.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

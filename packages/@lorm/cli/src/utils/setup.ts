@@ -1,6 +1,5 @@
 import fs from "fs/promises";
 import path from "path";
-import { loadConfig } from "@lorm/core";
 import { drizzleConfigTemplate } from "@lorm/lib";
 
 export async function validateSchemaFile(schemaPath: string): Promise<void> {
@@ -51,6 +50,7 @@ export async function initializeCommand(commandName: string) {
   const schemaTargetPath = path.join(lormDir, "schema.js");
 
   console.log("📖 [lorm] Loading configuration...");
+  const { loadConfig } = await import("@lorm/core");
   const config = await loadConfig();
   console.log(`📊 [lorm] Using ${config.db.adapter} database adapter`);
 
