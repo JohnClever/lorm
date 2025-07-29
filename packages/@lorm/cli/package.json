@@ -1,6 +1,6 @@
 {
   "name": "@lorm/cli",
-  "version": "0.1.58",
+  "version": "0.1.59",
   "description": "Command-line interface for lorm - mobile-first framework",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
