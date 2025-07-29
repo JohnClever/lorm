@@ -1,5 +1,11 @@
 # @lorm-enterprise/core
 
+## 0.1.5
+
+### Patch Changes
+
+- ed7faba: removed lib
+
 ## 0.1.4
 
 ### Patch Changes
