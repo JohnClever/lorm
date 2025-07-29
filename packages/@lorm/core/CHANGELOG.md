@@ -1,5 +1,13 @@
 # @lorm-enterprise/core
 
+## 0.1.2
+
+### Patch Changes
+
+- b225895: refinements
+- Updated dependencies [b225895]
+  - @lorm/lib@0.1.2
+
 ## 0.1.1
 
 ### Patch Changes
