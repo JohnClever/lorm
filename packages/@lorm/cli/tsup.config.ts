@@ -7,7 +7,7 @@ export default defineConfig({
   clean: true,
   splitting: true, // Enable code splitting to reduce bundle size
   sourcemap: true,
-  minify: true, // Enable minification to reduce bundle size
+  minify: false, // Disable minification for debugging
   target: 'es2020',
   outDir: 'dist',
   shims: true, // Add shims for import.meta and other ESM features in CJS

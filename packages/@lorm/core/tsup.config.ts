@@ -7,7 +7,7 @@ export default defineConfig({
   clean: true,
   splitting: true,
   sourcemap: true,
-  minify: true,
+  minify: false, // Disable minification for debugging
   target: 'es2020',
   outDir: 'dist',
   external: [
