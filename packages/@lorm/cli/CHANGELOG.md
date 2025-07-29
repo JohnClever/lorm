@@ -1,5 +1,13 @@
 # @lorm/cli
 
+## 0.1.61
+
+### Patch Changes
+
+- ed7faba: removed lib
+- Updated dependencies [ed7faba]
+  - @lorm/core@0.1.5
+
 ## 0.1.60
 
 ### Patch Changes

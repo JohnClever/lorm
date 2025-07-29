@@ -1,5 +1,11 @@
 # @lorm/client
 
+## 0.1.15
+
+### Patch Changes
+
+- ed7faba: removed lib
+
 ## 0.1.14
 
 ### Patch Changes
