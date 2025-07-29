@@ -1,6 +1,6 @@
 {
   "name": "@lorm/lib",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Shared utilities and types for lorm - mobile-first framework",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
