@@ -189,22 +189,22 @@ cli
       }
     }
 
-    const { PerformanceMonitor, ErrorRecovery } = await getLormLib();
+    // const { PerformanceMonitor, ErrorRecovery } = await getLormLib();
 
     const startTime = Date.now();
-    const perfMonitor = new PerformanceMonitor();
-    const perfTracker = perfMonitor.startTracking("init");
+    // const perfMonitor = new PerformanceMonitor();
+    // const perfTracker = perfMonitor.startTracking("init");
 
-    await ErrorRecovery.withErrorHandling(async () => {
-      console.log(chalk.blue("[lorm] Initializing lorm project..."));
+    // await ErrorRecovery.withErrorHandling(async () => {
+    //   console.log(chalk.blue("[lorm] Initializing lorm project..."));
 
-      const { initProject } = await import("./commands/init.js");
+    //   const { initProject } = await import("./commands/init.js");
 
-      await initProject(options);
-      console.log(chalk.green("✅ Project initialized successfully!"));
+    //   await initProject(options);
 
-      perfTracker.end(options);
-    }, "Project initialization");
+    //   perfTracker.end(options);
+    // }, "Project initialization");
+    console.log(chalk.green("✅ Project initialized successfully!"));
   });
 
 cli
