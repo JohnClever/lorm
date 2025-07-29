@@ -1,7 +1,7 @@
 
 # Contributing to Lorm 🛠️
 
-Welcome! 👋 We're excited that you're interested in contributing to **Lorm** — a zero-config, full-stack mobile framework for building high-performance, type-safe mobile applications.
+Welcome! 👋 I'm excited that you're interested in contributing to **Lorm** — a zero-config, full-stack mobile framework for building high-performance, type-safe mobile applications.
 
 Whether it's a bug report, feature request, or a pull request — all contributions are welcome and appreciated!
 
