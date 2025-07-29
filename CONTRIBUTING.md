@@ -125,7 +125,7 @@ Lorm is built in the open to empower mobile-first developers with better tools a
 ## 💬 Need Help?
 
 - Open a discussion on [GitHub Discussions](https://github.com/JohnClever/lorm/discussions)
-- Join our Discord Community [@Lorm](https://discord.gg/eUCav29w)
+- Join our Discord Community [@Lorm](https://discord.gg/T3pUn5NvnV)
 - Reach out on X [@jc_johnclever](https://x.com/jc_johnclever)
 
 ---
