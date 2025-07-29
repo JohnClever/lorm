@@ -137,16 +137,33 @@ function getAdapterSpecificConfigOptions(adapter: string): string {
   }
 }
 
-export const typeTemplate = `import type { router } from "../lorm.router";
+export const typeTemplate = `// Auto-generated types for Lorm
 
-declare module "@lorm/client" {
-  interface LormRouterRegistry {
-    router: typeof router;
-  }
-}
+
+import type { router } from "../lorm.router";
+
 
 export type LormRouter = typeof router;
-`;
+
+
+type ExtractRouterMethods<T> = {
+  [K in keyof T]: T[K] extends (...args: any[]) => any ? T[K] : never;
+};
+
+
+export type TypedLormRouter = ExtractRouterMethods<typeof router>;
+
+
+declare module '@lorm/client' {
+  interface LormRouterRegistry extends TypedLormRouter {}
+  
+  
+  type LormRouter = TypedLormRouter;
+}
+
+
+export { router as default };
+export type { router as RouterType };`;
 
 export const drizzleConfigTemplate = (config: lormConfig) => {
   const adapter = config.db.adapter || "neon";
@@ -201,3 +218,16 @@ function getAdapterSpecificOptions(adapter: string): string {
       return "";
   }
 }
+
+export const basicTypes = `// Auto-generated types for Lorm
+
+
+export type LormRouter = Record<string, never>;
+export type TypedLormRouter = Record<string, never>;
+
+
+declare module '@lorm/client' {
+  interface LormRouterRegistry extends Record<string, never> {}
+  type LormRouter = Record<string, never>;
+}
+`;

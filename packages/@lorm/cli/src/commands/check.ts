@@ -1,163 +1,39 @@
-import fs from "fs/promises";
-import fssync from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-import { execa } from "execa";
-import { loadConfig } from "@lorm/core";
-import which from "which";
-import { drizzleConfigTemplate } from "@lorm/lib";
+import { executeDrizzleKit, validateConfigOrExit } from "@lorm/lib";
+import { initializeCommand, handleCommandError } from "../utils/index.js";
+import chalk from "chalk";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-/**
- * Resolves the drizzle-kit binary path
- * @returns The path to the drizzle-kit binary
- * @throws Error if drizzle-kit is not found
- */
-function resolveDrizzleKitBin(): string {
+export async function check(options: { verbose?: boolean; fix?: boolean } = {}): Promise<void> {
   try {
-    const localBin = path.resolve(
-      __dirname,
-      "../../node_modules/.bin/drizzle-kit"
-    );
+    console.log(chalk.blue("[lorm] 🔍 Checking Lorm project setup..."));
 
-    if (fssync.existsSync(localBin)) {
-      console.log("🔍 [lorm] Using local drizzle-kit binary");
-      return localBin;
-    }
-
-    const globalBin = which.sync("drizzle-kit", { nothrow: true });
-    if (globalBin) {
-      console.log("🔍 [lorm] Using global drizzle-kit binary");
-      return globalBin;
-    }
-
-    throw new Error(
-      "[lorm] drizzle-kit not found. Please install it:\n" +
-        "  npm install drizzle-kit\n" +
-        "  or\n" +
-        "  npm install -g drizzle-kit"
-    );
-  } catch (error) {
-    if (
-      error instanceof Error &&
-      error.message.includes("drizzle-kit not found")
-    ) {
-      throw error;
-    }
-    throw new Error(`[lorm] Failed to resolve drizzle-kit binary: ${error}`);
-  }
-}
-
-/**
- * Validates that the schema file exists
- * @param schemaPath The path to the schema file
- * @throws Error if schema file doesn't exist
- */
-async function validateSchemaFile(schemaPath: string): Promise<void> {
-  try {
-    await fs.access(schemaPath);
-    console.log("✅ [lorm] Schema file found");
-  } catch {
-    throw new Error(
-      `[lorm] Schema file not found at ${schemaPath}.\n` +
-        "Please create a lorm.schema.js file in your project root or run 'lorm init' first."
-    );
-  }
-}
-
-/**
- * Sets up the .lorm directory and required files
- * @param lormDir The .lorm directory path
- * @param schemaTargetPath The schema target file path
- * @param drizzleConfigPath The drizzle config file path
- * @param rootDir The project root directory
- * @param config The loaded configuration
- */
-async function setupLormDirectory(
-  lormDir: string,
-  schemaTargetPath: string,
-  drizzleConfigPath: string,
-  rootDir: string,
-  config: any
-): Promise<void> {
-  try {
-    await fs.mkdir(lormDir, { recursive: true });
-    console.log("📁 [lorm] Created .lorm directory");
-
-    const schemaPath = path.join(rootDir, "lorm.schema.js");
-    await validateSchemaFile(schemaPath);
-
-    const schemaImport = `export * from "${path
-      .join(rootDir, "lorm.schema")
-      .replace(/\\/g, "/")}";`;
-    await fs.writeFile(schemaTargetPath, schemaImport);
-    console.log("📝 [lorm] Generated schema import file");
-
-    await fs.writeFile(drizzleConfigPath, drizzleConfigTemplate(config));
-    console.log("⚙️ [lorm] Generated drizzle config file");
-  } catch (error) {
-    throw new Error(`[lorm] Failed to setup .lorm directory: ${error}`);
-  }
-}
-
-/**
- * Executes the drizzle-kit check command
- * @param drizzleKitBin The path to drizzle-kit binary
- * @param lormDir The .lorm directory path
- */
-async function executeCheck(
-  drizzleKitBin: string,
-  lormDir: string
-): Promise<void> {
-  try {
-    console.log("🔍 [lorm] Running schema consistency check...");
-
-    await execa(drizzleKitBin, ["check"], {
-      cwd: lormDir,
-      stdio: "inherit",
+    await validateConfigOrExit({ 
+      requireConfig: true, 
+      requireSchema: true,
+      checkDatabase: false 
     });
 
-    console.log("✅ [lorm] Schema check completed successfully!");
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(`[lorm] Schema check failed: ${error.message}`);
+    if (options.verbose) {
+      console.log(chalk.green('✓ Configuration validation passed'));
     }
-    throw new Error(`[lorm] Schema check failed: ${error}`);
-  }
-}
 
-export async function check(): Promise<void> {
-  try {
-    console.log("🔄 [lorm] Starting schema check process...");
+    const { lormDir } = await initializeCommand("schema check");
 
-    const rootDir = process.cwd();
-    const lormDir = path.join(rootDir, ".lorm");
-    const drizzleConfigPath = path.join(lormDir, "drizzle.config.js");
-    const schemaTargetPath = path.join(lormDir, "schema.js");
-
-    console.log("📖 [lorm] Loading configuration...");
-    const config = await loadConfig();
-    console.log(`📊 [lorm] Using ${config.db.adapter} database adapter`);
-
-    await setupLormDirectory(
+    console.log(chalk.blue("\n[lorm] Running drizzle-kit check..."));
+    
+    await executeDrizzleKit(
+      "check",
       lormDir,
-      schemaTargetPath,
-      drizzleConfigPath,
-      rootDir,
-      config
+      "✅ Schema check passed successfully!"
     );
 
-    const drizzleKitBin = resolveDrizzleKitBin();
-
-    await executeCheck(drizzleKitBin, lormDir);
-  } catch (error) {
-    console.error("❌ [lorm] Schema check failed:");
-    if (error instanceof Error) {
-      console.error(error.message);
-    } else {
-      console.error(String(error));
+    if (options.fix) {
+      console.log(chalk.yellow("\n💡 Auto-fix suggestions:"));
+      console.log(chalk.yellow("  • Run 'npx @lorm/cli db:generate' to create migrations"));
+      console.log(chalk.yellow("  • Run 'npx @lorm/cli gen-types' to update type definitions"));
     }
-    process.exit(1);
+
+    console.log(chalk.green("\n✅ All checks passed!"));
+  } catch (error) {
+    handleCommandError(error, "Check");
   }
 }

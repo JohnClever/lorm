@@ -4,34 +4,72 @@ Command-line interface for the **Lorm framework** — a zero-config, full-stack 
 
 > 📱 Built for **React Native** and **Expo**
 > ✅ Works with **any Drizzle-supported database**: PostgreSQL, MySQL, SQLite, and more
+> 📦 **Optimized Bundle**: ~50KB with enterprise features and performance monitoring
 ---
 
 ## 📦 Installation
 
-### Local Installation
+**Step 1: Install the CLI package locally**
 
 ```bash
+# Using npm
 npm install @lorm/cli --save-dev
+
+# Using pnpm
+pnpm add @lorm/cli --save-dev
+
+# Using yarn
+yarn add @lorm/cli --dev
 ```
+
+**Step 2: Use the CLI via npx/pnpx**
+
+```bash
+# Using npx (npm)
+npx @lorm/cli <command>
+
+# Using pnpx (pnpm)
+pnpx @lorm/cli <command>
+```
+
+> 💡 **Note**: The CLI is designed for local execution only and does not support global installation. You must first install the package locally in your project, then use npx/pnpx to execute commands. This ensures consistent behavior across different projects and environments.
 
 ---
 
 ## 🚀 Quick Start
 
-```bash
-cd my-app
-npx @lorm/cli init
-npx @lorm/cli push
-npx @lorm/cli dev
-```
+1. Install the CLI locally:
+   ```bash
+   npm install @lorm/cli --save-dev
+   ```
+
+2. Initialize a new Lorm project:
+   ```bash
+   npx @lorm/cli init
+   ```
+
+3. Configure your database connection in `lorm.config.js`
+
+4. Define your schema in `lorm.schema.js`
+
+5. Push your schema to the database:
+   ```bash
+   npx @lorm/cli push
+   ```
+
+6. Start the development server:
+   ```bash
+   npx @lorm/cli dev
+   ```
 
 ---
 
 ## 📋 Commands
 
-### `npx @lorm/cli init`
+### Core Commands
 
-Initialize a new Lorm project in your existing directory.
+#### `npx @lorm/cli init`
+Initialize a new Lorm project with configuration files and directory structure.
 
 **What it does:**
 
@@ -49,9 +87,8 @@ Initialize a new Lorm project in your existing directory.
 
 ---
 
-### `lorm dev`
-
-Start a local development server with hot reload.
+#### `npx @lorm/cli dev`
+Start development server with file watching, automatic type generation, and hot reloading.
 
 **What it does:**
 
@@ -69,77 +106,8 @@ Start a local development server with hot reload.
 
 ---
 
-## 🗄️ Database Commands
-
-### `npx @lorm/cli push`
-
-Push your schema changes directly to your database (development workflow).
-
-**What it does:**
-
-- Reads your `lorm.schema.js` file
-- Connects to your database using `lorm.config.js`
-- Applies schema changes directly to the database
-- Syncs your schema with the database
-- Updates `.lorm/` directory with compiled artifacts
-
-**Requirements:**
-
-- Valid database URL in `lorm.config.js`
-- Properly defined schema in `lorm.schema.js`
-
-**Best for:** Quick prototyping and local development
-
----
-
-### `npx @lorm/cli generate`
-
-Generate migration files based on schema changes (production workflow).
-
-**What it does:**
-
-- Compares your current schema with the database
-- Generates SQL migration files in `drizzle/` directory
-- Creates timestamped migration files
-- Prepares migrations for production deployment
-
-**Best for:** Production deployments and team collaboration
-
----
-
-### `npx @lorm/cli migrate`
-
-Apply pending migrations to your database.
-
-**What it does:**
-
-- Runs all pending migration files
-- Updates the database to match your schema
-- Tracks applied migrations in the database
-- Ensures consistent database state across environments
-
-**Best for:** Production deployments and CI/CD pipelines
-
----
-
-### `npx @lorm/cli pull`
-
-Pull existing database schema and generate Drizzle schema files.
-
-**What it does:**
-
-- Connects to your existing database
-- Introspects the current database schema
-- Generates corresponding Drizzle schema files
-- Creates TypeScript schema definitions
-
-**Best for:** Migrating existing databases to Lorm
-
----
-
-### `npx @lorm/cli check`
-
-Check for schema consistency and potential issues.
+#### `npx @lorm/cli check`
+Validate schema consistency, configuration files, and project structure.
 
 **What it does:**
 
@@ -152,44 +120,135 @@ Check for schema consistency and potential issues.
 
 ---
 
-### `npx @lorm/cli up`
+## 🗄️ Database Commands
 
-Upgrade your schema to the latest version.
+### `npx @lorm/cli db:push` (alias: `push`)
 
-**What it does:**
-
-- Applies any pending schema upgrades
-- Updates database structure
-- Ensures compatibility with latest Lorm version
-- Handles version-specific migrations
-
-**Best for:** Framework upgrades and maintenance
-
----
-
-### `npx @lorm/cli studio`
-
-Launch Drizzle Studio for visual database management.
+Push schema changes directly to database (recommended for development).
 
 **What it does:**
 
-- Starts Drizzle Studio web interface
-- Provides visual database browser
-- Enables data viewing and editing
-- Offers query execution interface
+- Compares your current schema with the database
+- Applies changes directly without generating migration files
+- Perfect for rapid development and prototyping
+- Provides immediate feedback on schema changes
 
-**Features:**
+**Best for:** Development and prototyping
 
-- 🎨 Visual database browser
-- 📊 Data visualization
-- ✏️ In-browser data editing
-- 🔍 Query builder interface
-
-**Best for:** Database exploration and data management
+```bash
+npx @lorm/cli db:push
+# or
+npx @lorm/cli push
+```
 
 ---
 
-### `npx @lorm/cli drop`
+### `npx @lorm/cli db:generate` (alias: `generate`)
+
+Generate migration files from schema changes.
+
+**What it does:**
+
+- Analyzes differences between your schema and database
+- Creates timestamped migration files with SQL commands
+- Allows you to review and modify changes before applying
+- Supports custom migration logic
+
+**Best for:** Production deployments and version control
+
+```bash
+npx @lorm/cli db:generate
+# or
+npx @lorm/cli generate
+```
+
+---
+
+### `npx @lorm/cli db:migrate` (alias: `migrate`)
+
+Apply pending database migrations to production or staging environments.
+
+**What it does:**
+
+- Runs all pending migration files in chronological order
+- Updates the migration history table
+- Ensures database schema is up to date
+- Provides rollback capabilities
+
+**Best for:** Production deployments and CI/CD pipelines
+
+```bash
+npx @lorm/cli db:migrate
+# or
+npx @lorm/cli migrate
+```
+
+---
+
+### `npx @lorm/cli db:pull` (alias: `pull`)
+
+Pull and introspect schema from existing database.
+
+**What it does:**
+
+- Introspects your existing database structure
+- Generates schema files based on current tables and relationships
+- Creates a starting point for existing projects
+- Preserves existing data and relationships
+
+**Best for:** Migrating existing databases to Lorm
+
+```bash
+npx @lorm/cli db:pull
+# or
+npx @lorm/cli pull
+```
+
+---
+
+### `npx @lorm/cli db:studio` (alias: `studio`)
+
+Start Drizzle Studio for visual database management and data browsing.
+
+**What it does:**
+
+- Launches a web-based database browser interface
+- Allows you to view, edit, and manage data visually
+- Provides query builder and data visualization tools
+- Supports multiple database connections
+
+**Best for:** Database administration, debugging, and data exploration
+
+```bash
+npx @lorm/cli db:studio
+# or
+npx @lorm/cli studio
+```
+
+---
+
+### `npx @lorm/cli db:up` (alias: `up`)
+
+Upgrade schema to latest version with automatic conflict resolution.
+
+**What it does:**
+
+- Automatically resolves schema conflicts and inconsistencies
+- Applies the latest schema changes intelligently
+- Handles complex migration scenarios
+- Provides detailed upgrade reports
+
+**Best for:** Automated deployments and schema maintenance
+
+```bash
+npx @lorm/cli db:up
+# or
+npx @lorm/cli up
+```
+
+---
+
+### `npx @lorm/cli db:drop` (alias: `drop`)
 
 ⚠️ **DANGER ZONE** ⚠️ Drop all tables from your database.
 
@@ -210,6 +269,12 @@ Launch Drizzle Studio for visual database management.
 **Best for:** Resetting development databases
 
 **⚠️ WARNING:** This command will permanently delete all your data. Only use in development!
+
+```bash
+npx @lorm/cli db:drop
+# or
+npx @lorm/cli drop
+```
 
 ---
 
@@ -312,7 +377,7 @@ Works with:
 Set a custom port with the `PORT` env variable:
 
 ```bash
-PORT=4000 lorm dev
+PORT=4000 npx @lorm/cli dev
 ```
 
 ### Environment Variables
@@ -347,6 +412,78 @@ The Lorm CLI embodies the framework's core philosophy:
 
 ---
 
+## 🆘 Help & Information
+
+### `npx @lorm/cli help`
+
+Show general help information or detailed help for specific commands.
+
+**Usage:**
+
+```bash
+# General help
+npx @lorm/cli help
+npx @lorm/cli --help
+npx @lorm/cli -h
+
+# Command-specific help
+npx @lorm/cli help init
+npx @lorm/cli help db:push
+npx @lorm/cli help dev
+```
+
+**What it provides:**
+
+- Complete command reference
+- Usage examples and syntax
+- Available options and flags
+- Best practices and recommendations
+
+---
+
+### `npx @lorm/cli --version`
+
+Show CLI version information.
+
+```bash
+npx @lorm/cli --version
+npx @lorm/cli -v
+```
+
+---
+
+## ✨ Features
+
+### Enhanced Help System
+- **Comprehensive Documentation**: Detailed help for all commands with practical examples
+- **Context-Aware Assistance**: Command-specific help with relevant options and use cases
+- **Interactive Guidance**: Step-by-step instructions for complex workflows
+
+### Improved Error Recovery
+- **Smart Error Detection**: Identifies common configuration and setup issues
+- **Actionable Solutions**: Provides specific steps to resolve problems
+- **Recovery Suggestions**: Offers alternative approaches when commands fail
+
+### Command Organization
+- **Logical Grouping**: Database operations grouped under `db:` prefix for clarity
+- **Intuitive Aliases**: Short aliases for frequently used commands
+- **Consistent Naming**: Standardized command structure across all operations
+
+### Local Execution Only
+- **Project Isolation**: Each project uses its own CLI version
+- **Consistent Behavior**: Eliminates version conflicts between projects
+- **Easy Updates**: Simple `npx`/`pnpx` usage without global installation management
+
+### Type Safety & Reliability
+- **Full TypeScript Support**: Complete type checking and IntelliSense support
+- **Comprehensive Testing**: Extensive integration tests ensure reliability
+- **Dependency Optimization**: Minimal dependencies for faster installation
+- **Bundle Size Monitoring**: Automated size analysis and optimization
+- **Clean Architecture**: Professional codebase with automated cleanup
+- **Performance Tracking**: Built-in performance monitoring and metrics
+
+---
+
 ## 📚 Related Packages
 
 | Package         | Description                              |
@@ -358,37 +495,39 @@ The Lorm CLI embodies the framework's core philosophy:
 
 ---
 
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](../../../CONTRIBUTING.md) for details.
+
 ## 🐛 Troubleshooting
 
 ### Common Issues
 
-**"Database connection failed"**
+**Command not found:**
+```bash
+# Make sure you're using npx/pnpx
+npx @lorm/cli --version
+```
 
-- Check your database URL in `lorm.config.js`
-- Ensure your database is running and accessible
+**Configuration errors:**
+```bash
+# Validate your configuration
+npx @lorm/cli check
+```
 
-**"Types not updating"**
+**Database connection issues:**
+```bash
+# Check your database URL and credentials
+npx @lorm/cli help db:push
+```
 
-- Restart `npx @lorm/cli dev` to regenerate types
-- Check your router exports
+### Getting Help
 
-**"Command not found"**
+- Use `npx @lorm/cli help <command>` for command-specific guidance
+- Check the [main documentation](../../../README.md) for setup instructions
+- Report issues on [GitHub](https://github.com/lormjs/lorm/issues)
 
-- Install via `npx`: `npx @lorm/cli init`
+## 📄 License
 
----
-
-## 📜 License
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-For more information, visit the main [Lorm documentation](https://github.com/JohnClever/lorm).
+MIT License - see [LICENSE](../../../LICENSE) for details.
 

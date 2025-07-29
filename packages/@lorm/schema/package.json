@@ -2,7 +2,8 @@
   "name": "@lorm/schema",
   "version": "0.1.11",
   "description": "Database schema abstractions for lorm - mobile-first framework",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "files": [
@@ -13,33 +14,37 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "require": "./dist/index.cjs"
     },
     "./pg": {
       "types": "./dist/adapters/pg.d.ts",
       "import": "./dist/adapters/pg.js",
-      "require": "./dist/adapters/pg.js"
+      "require": "./dist/adapters/pg.cjs"
     },
     "./mysql": {
       "types": "./dist/adapters/mysql.d.ts",
       "import": "./dist/adapters/mysql.js",
-      "require": "./dist/adapters/mysql.js"
+      "require": "./dist/adapters/mysql.cjs"
     },
     "./sqlite": {
       "types": "./dist/adapters/sqlite.d.ts",
       "import": "./dist/adapters/sqlite.js",
-      "require": "./dist/adapters/sqlite.js"
+      "require": "./dist/adapters/sqlite.cjs"
     }
   },
   "scripts": {
-    "build": "tsc -b",
-    "prepublishOnly": "pnpm build"
+    "build": "tsup",
+    "prepublishOnly": "pnpm build",
+    "size": "tsx ../../../scripts/bundle-size.ts",
+    "size:check": "pnpm build && pnpm size",
+    "size:watch": "pnpm build && pnpm size && echo '\nWatching for changes...' && pnpm build --watch"
   },
   "dependencies": {
     "drizzle-orm": "^0.44.2"
   },
   "devDependencies": {
     "@types/node": "^24.0.10",
+    "tsx": "^4.20.3",
     "typescript": "^5.8.3"
   },
   "repository": {

@@ -18,14 +18,17 @@
     }
   },
   "scripts": {
-    "build": "tsc -b",
-    "prepublishOnly": "pnpm build"
+    "build": "tsup",
+    "prepublishOnly": "pnpm build",
+    "size": "tsx ../../../scripts/bundle-size.ts",
+    "size:check": "pnpm build && pnpm size",
+    "size:watch": "pnpm build && pnpm size && echo '\nWatching for changes...' && pnpm build --watch"
   },
   "dependencies": {
     "@libsql/client": "^0.15.9",
     "@lorm/lib": "workspace:*",
     "@neondatabase/serverless": "^1.0.1",
-    "@orpc/server": "^1.6.5",
+    "typed-rpc": "^2.0.0",
     "@planetscale/database": "^1.19.0",
     "better-sqlite3": "^12.2.0",
     "dotenv": "^17.0.1",

@@ -72,70 +72,7 @@ async function isReactNativeProject(): Promise<boolean> {
   }
 }
 
-async function handleReactNativeConfig(): Promise<void> {
-  const packageJsonPath = path.join(process.cwd(), "package.json");
-  const metroConfigPath = path.join(process.cwd(), "metro.config.js");
-  const metroConfigCjsPath = path.join(process.cwd(), "metro.config.cjs");
 
-  console.log(
-    chalk.blue("🔧 Configuring React Native project for ES modules...")
-  );
-
-  try {
-    if (await fileExists(packageJsonPath)) {
-      const packageJsonContent = await fs.readFile(packageJsonPath, "utf-8");
-      const packageJson = JSON.parse(packageJsonContent);
-
-      if (!packageJson.type) {
-        packageJson.type = "module";
-        await fs.writeFile(
-          packageJsonPath,
-          JSON.stringify(packageJson, null, 2) + "\n"
-        );
-        console.log(chalk.green("✅ Added type: 'module' to package.json"));
-      } else if (packageJson.type === "module") {
-        console.log(chalk.gray("ℹ️  package.json already has type: 'module'"));
-      } else {
-        console.log(
-          chalk.yellow(
-            `⚠️  package.json has type: '${packageJson.type}', consider changing to 'module'`
-          )
-        );
-      }
-    } else {
-      console.log(
-        chalk.red("❌ package.json not found, cannot add type: 'module'")
-      );
-    }
-
-    const metroConfigExists = await fileExists(metroConfigPath);
-    const metroConfigCjsExists = await fileExists(metroConfigCjsPath);
-
-    if (metroConfigExists && !metroConfigCjsExists) {
-      await fs.rename(metroConfigPath, metroConfigCjsPath);
-      console.log(
-        chalk.green("✅ Renamed metro.config.js to metro.config.cjs")
-      );
-    } else if (metroConfigExists && metroConfigCjsExists) {
-      console.log(
-        chalk.yellow(
-          "⚠️  Both metro.config.js and metro.config.cjs exist, please resolve manually"
-        )
-      );
-    } else if (!metroConfigExists && metroConfigCjsExists) {
-      console.log(chalk.gray("ℹ️  metro.config.cjs already exists"));
-    } else {
-      console.log(chalk.gray("ℹ️  No metro config files found"));
-    }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(
-      chalk.red("❌ Failed to configure React Native project:"),
-      errorMessage
-    );
-    throw new Error(`React Native configuration failed: ${errorMessage}`);
-  }
-}
 
 async function createConfigFiles(adapter: DatabaseAdapter): Promise<void> {
   console.log(chalk.blue("📝 Generating configuration files..."));
@@ -257,12 +194,7 @@ function displayCompletionMessage(
     );
   }
 
-  // if (isRN) {
-  //   console.log(chalk.blue("\n📱 React Native specific notes:"));
-  //   console.log(chalk.gray("   • metro.config.js has been renamed to metro.config.cjs"));
-  //   console.log(chalk.gray("   • type: 'module' has been added to package.json"));
-  //   console.log(chalk.gray("   • This ensures compatibility with ES modules"));
-  // }
+
 
   console.log(chalk.blue("\n💡 Database-specific notes:"));
   switch (adapter) {
@@ -311,7 +243,7 @@ function displayCompletionMessage(
   }
 }
 
-export async function initProject(options: InitOptions = {}) {
+export async function initProject(options: InitOptions = {}): Promise<void> {
   const { force = false, skipInstall = false } = options;
 
   try {
@@ -331,9 +263,6 @@ export async function initProject(options: InitOptions = {}) {
     }
 
     const isRN = await isReactNativeProject();
-    // if (isRN) {
-    //   await handleReactNativeConfig();
-    // }
 
     const adapter = (await select({
       message: "Select your database adapter:",
@@ -373,7 +302,6 @@ export async function initProject(options: InitOptions = {}) {
 
     console.log(chalk.green(`✅ Selected adapter: ${adapter}`));
 
-    // Prompt for client installation
     let includeClient = false;
     if (!skipInstall) {
       includeClient = await promptForClientInstallation();

@@ -1,8 +1,8 @@
-import { createServer } from "node:http";
-import { RPCHandler } from "@orpc/server/node";
-import { CORSPlugin } from "@orpc/server/plugins";
+import { createServer, IncomingMessage, ServerResponse } from "node:http";
+import { handleRpc } from "typed-rpc/lib/server.js";
 import { loadConfig, loadRouter, loadSchema } from "./load.js";
 import { createDatabase } from "./database.js";
+import { setDatabase } from "./router.js";
 
 let started = false;
 
@@ -16,19 +16,47 @@ export async function startServer() {
     loadSchema(),
   ]);
 
-  // Use the dynamic database factory
   const db = await createDatabase(config, schema);
+  
+  setDatabase(db);
 
-  const handler = new RPCHandler(router, {
-    plugins: [new CORSPlugin()],
-  });
-
-  const server = createServer(async (req, res) => {
+  const server = createServer(async (req: IncomingMessage, res: ServerResponse) => {
     try {
-      await handler.handle(req, res, {
-        context: { headers: req.headers, db },
-      });
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+      res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Lorm-Client");
+      
+      if (req.method === "OPTIONS") {
+        res.statusCode = 200;
+        res.end();
+        return;
+      }
+
+      if (req.method === "POST") {
+        let body = "";
+        req.on("data", (chunk: Buffer) => {
+          body += chunk.toString();
+        });
+        
+        req.on("end", async () => {
+          try {
+            const requestData = JSON.parse(body);
+            const result = await handleRpc(requestData, router);
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify(result));
+          } catch (error) {
+            console.error("RPC error:", error);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Internal server error" }));
+          }
+        });
+      } else {
+        res.statusCode = 405;
+        res.end("Method not allowed");
+      }
     } catch (err) {
+      console.error("Server error:", err);
       if (!res.headersSent) {
         res.statusCode = 500;
         res.setHeader("Content-Type", "application/json");
@@ -37,7 +65,5 @@ export async function startServer() {
     }
   });
 
-  server.listen(3000, "127.0.0.1", () => {
-    console.log("🚀 Server running on http://127.0.0.1:3000");
-  });
+  server.listen(3000);
 }

@@ -43,9 +43,11 @@ Use labels if possible:
 #### 🚦 Guidelines:
 - Keep pull requests focused and small
 - Include tests if applicable
-- Run `pnpm lint` and `pnpm test` before submitting
+- Run `pnpm build`, `pnpm lint`, and `pnpm test` before submitting
+- Test CLI changes with `npx @lorm/cli` commands
 - Describe what your PR does in the description
 - Link to related issues
+- Update documentation if you change CLI commands or behavior
 
 ---
 
@@ -58,7 +60,43 @@ cd lorm
 
 # install dependencies
 pnpm install
+
+# build all packages
+pnpm build
+
+# run tests
+pnpm test
+
+# test CLI locally (after building)
+npx @lorm/cli --version
 ```
+
+### Working with the CLI
+
+The CLI package requires building before testing:
+
+```bash
+# navigate to CLI package
+cd packages/@lorm/cli
+
+# build the CLI
+pnpm build
+
+# test CLI commands
+node bin/cli.js --help
+node bin/cli.js --version
+
+# or use npx after building
+npx @lorm/cli help
+```
+
+### Development Workflow
+
+1. **Make changes** to source files in `src/`
+2. **Build the package** with `pnpm build`
+3. **Test your changes** using `npx @lorm/cli <command>`
+4. **Run integration tests** with `pnpm test`
+5. **Validate with linting** using `pnpm lint`
 
 ---
 

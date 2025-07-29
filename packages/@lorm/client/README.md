@@ -4,6 +4,9 @@ Auto-typed HTTP client for consuming routes from your Lorm backend.
 
 The `@lorm/client` package connects your mobile app (React Native, Expo) to the Lorm backend with full type safety — no manual typing, no REST boilerplate.
 
+> 📦 **Ultra-Lightweight**: ~6KB optimized bundle with comprehensive tree-shaking
+> 🚀 **Production-Ready**: Enterprise-grade build configuration and performance monitoring
+
 ---
 
 ## 📦 Installation
@@ -57,6 +60,8 @@ Types are generated automatically when you run:
 npx @lorm/cli dev
 ```
 
+> 💡 **Note**: Use `npx @lorm/cli` for local execution. The CLI is designed for project-specific usage and doesn't require global installation.
+
 They live in:
 
 ```
@@ -74,6 +79,13 @@ Works seamlessly with:
 - ✅ React Native
 - ✅ Expo
 
+## 📦 Bundle Optimization
+
+- **Ultra-Lightweight**: ~6KB optimized bundle size
+- **Tree-Shaking**: Comprehensive dead code elimination
+- **Minification**: Production-ready compressed output
+- **Zero Dependencies**: Minimal runtime overhead for mobile apps
+
 ---
 
 ## 🐛 Troubleshooting
@@ -83,13 +95,36 @@ Works seamlessly with:
 - Check if the route name matches exactly
 - Make sure `.lorm/types.d.ts` exists and is correctly imported
 
-**“Types not found”**
+**"Types not found"**
 
 - Run `npx @lorm/cli dev` to regenerate types
 - Check your TypeScript config paths
+- Validate your configuration with `npx @lorm/cli check`
+
+**"CLI command not found"**
+
+- Make sure you're using `npx @lorm/cli` (not global installation)
+- Verify the CLI is available: `npx @lorm/cli --version`
+
+### Getting Help
+
+- Use `npx @lorm/cli help` for CLI assistance
+- Check the [CLI documentation](../cli/README.md) for detailed command reference
+- Visit the [main documentation](../../../README.md) for setup guides
 
 ---
 
-## 📜 License
+## 📚 Related Packages
 
-Private project. All rights reserved. © 2025 John Clever
+- [`@lorm/cli`](../cli/README.md) - Command-line interface for Lorm projects
+- [`@lorm/core`](../core/README.md) - Core Lorm functionality and utilities
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](../../../CONTRIBUTING.md) for details.
+
+## 📄 License
+
+MIT License - see [LICENSE](../../../LICENSE) for details.

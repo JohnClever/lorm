@@ -15,16 +15,38 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/types/index.js",
+      "require": "./dist/types/index.cjs"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "import": "./dist/utils/index.js",
+      "require": "./dist/utils/index.cjs"
+    },
+    "./plugin": {
+      "types": "./dist/utils/plugin-system.d.ts",
+      "import": "./dist/utils/plugin-system.js",
+      "require": "./dist/utils/plugin-system.cjs"
     }
   },
   "scripts": {
-    "build": "tsc -b",
-    "prepublishOnly": "pnpm build"
+    "build": "tsup",
+    "prepublishOnly": "pnpm build",
+    "size": "tsx ../../../scripts/bundle-size.ts",
+    "size:check": "pnpm build && pnpm size",
+    "size:watch": "pnpm build && pnpm size && echo '\nWatching for changes...' && pnpm build --watch"
   },
   "dependencies": {
-    "@orpc/server": "^1.6.5",
-    "drizzle-orm": "^0.44.2",
     "zod": "^3.25.71"
+  },
+  "peerDependencies": {
+    "cac": "^6.7.14",
+    "chalk": "^5.4.1",
+    "execa": "^9.6.0",
+    "which": "^5.0.0"
   },
   "repository": {
     "type": "git",
@@ -36,6 +58,8 @@
   },
   "devDependencies": {
     "@types/node": "^24.0.13",
-    "terser": "^5.43.1"
+    "@types/which": "^3.0.4",
+    "terser": "^5.43.1",
+    "tsx": "^4.20.3"
   }
 }

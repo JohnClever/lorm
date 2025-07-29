@@ -16,6 +16,16 @@
       "publish-packages": {
         "dependsOn": ["build"],
         "cache": false
+      },
+      "size": {
+        "dependsOn": ["build"]
+      },
+      "size:check": {
+        "dependsOn": ["build"]
+      },
+      "size:watch": {
+        "dependsOn": ["build"],
+        "cache": false
       }
     }
   }
