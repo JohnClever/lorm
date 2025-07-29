@@ -26,7 +26,7 @@ export interface InitOptions {
 }
 
 function getClientDependencies(includeClient: boolean = false): string[] {
-  const baseDependencies = ["zod", "@lorm/core", "@lorm/schema", "@lorm/lib"];
+  const baseDependencies = ["zod", "@lorm/schema"];
 
   if (includeClient) {
     baseDependencies.push("@lorm/client");
@@ -140,7 +140,7 @@ async function promptForClientInstallation(): Promise<boolean> {
 async function installProjectDependencies(
   includeClient: boolean = false
 ): Promise<void> {
-  console.log(chalk.blue("📦 Installing dependencies..."));
+  console.log(chalk.blue("📦 Installing project dependencies..."));
 
   try {
     const packageManager = getPackageManager();
@@ -159,7 +159,7 @@ async function installProjectDependencies(
         );
       }
     } else {
-      console.log(chalk.blue("ℹ️  No client-side dependencies to install"));
+      console.log(chalk.blue("ℹ️  No additional dependencies to install"));
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);

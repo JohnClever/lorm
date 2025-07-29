@@ -3,6 +3,8 @@ import { readFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { lazyLoaders, preloadModules } from "./utils/lazy-loader";
+import { execSync } from "child_process";
+import { existsSync } from "fs";
 
 const getLormLib = async () => {
   const {
@@ -158,8 +160,36 @@ cli
   .option("--force", "Overwrite existing files")
   .option("--skip-install", "Skip dependency installation")
   .action(async (options) => {
-    const { PerformanceMonitor, ErrorRecovery } = await getLormLib();
     const chalk = await getChalk();
+
+    if (!options.skipInstall) {
+      console.log(chalk.blue("[lorm] Installing core dependencies..."));
+
+      let packageManager = "npm";
+      if (existsSync("pnpm-lock.yaml")) {
+        packageManager = "pnpm";
+      } else if (existsSync("yarn.lock")) {
+        packageManager = "yarn";
+      }
+
+      try {
+        const installCmd =
+          packageManager === "npm"
+            ? "npm install @lorm/lib @lorm/core"
+            : `${packageManager} add @lorm/lib @lorm/core`;
+
+        execSync(installCmd, { stdio: "inherit" });
+        console.log(chalk.green("✅ Core dependencies installed!"));
+      } catch (error) {
+        console.error(
+          chalk.red("❌ Failed to install core dependencies:"),
+          (error as Error).message
+        );
+        process.exit(1);
+      }
+    }
+
+    const { PerformanceMonitor, ErrorRecovery } = await getLormLib();
 
     const startTime = Date.now();
     const perfMonitor = new PerformanceMonitor();
