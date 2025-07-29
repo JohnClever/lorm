@@ -1,5 +1,11 @@
 # @lorm/cli
 
+## 0.1.62
+
+### Patch Changes
+
+- c52aa1a: cli
+
 ## 0.1.61
 
 ### Patch Changes
