@@ -7,12 +7,12 @@ import {
   packageManager as getPackageManager,
   installDependencies,
 } from "../utils/index.js";
-import { fileExists } from "@lorm/core";
 import {
   routerTemplate,
   getConfigTemplate,
   getSchemaTemplate,
 } from "../templates/index.js";
+import { fileExists } from "../utils/file-exists.js";
 
 export type DatabaseAdapter =
   | "neon"
@@ -28,7 +28,7 @@ export interface InitOptions {
 }
 
 function getClientDependencies(includeClient: boolean = false): string[] {
-  const baseDependencies = ["zod", "@lorm/schema"];
+  const baseDependencies = ["zod", "@lorm/schema", "@lorm/core"];
 
   if (includeClient) {
     baseDependencies.push("@lorm/client");
@@ -73,8 +73,6 @@ async function isReactNativeProject(): Promise<boolean> {
     return false;
   }
 }
-
-
 
 async function createConfigFiles(adapter: DatabaseAdapter): Promise<void> {
   console.log(chalk.blue("📝 Generating configuration files..."));
@@ -195,8 +193,6 @@ function displayCompletionMessage(
       chalk.gray("   • Enjoy type-safe data fetching with auto-completion")
     );
   }
-
-
 
   console.log(chalk.blue("\n💡 Database-specific notes:"));
   switch (adapter) {
