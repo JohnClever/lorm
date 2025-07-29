@@ -1,4 +1,4 @@
-import { typeTemplate, basicTypes } from "@lorm/lib";
+import { typeTemplate, basicTypes } from "../templates/index";
 import chokidar from "chokidar";
 import { writeFile, mkdir, readFile, access } from "fs/promises";
 import path from "path";

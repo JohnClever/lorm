@@ -43,8 +43,6 @@ export const lazyLoaders = {
   
   lormCore: createLazyLoader(() => import('@lorm/core')),
   
-  lormLib: createLazyLoader(() => import('@lorm/lib')),
-  
   chalk: createLazyLoader(() => import('chalk').then(m => m.default))
 };
 

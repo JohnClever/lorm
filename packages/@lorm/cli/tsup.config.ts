@@ -15,7 +15,6 @@ export default defineConfig({
   external: [
     '@inquirer/prompts',
     '@lorm/core',
-    '@lorm/lib',
     'cac',
     'chalk',
     'chokidar',

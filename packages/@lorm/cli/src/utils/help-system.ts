@@ -201,39 +201,30 @@ export function displayCommandHelp(commandName: string): void {
 }
 
 /**
- * Display general help with command overview
+ * Display general help with all available commands
  */
 export function displayGeneralHelp(): void {
-  console.log(chalk.bold.blue('\nLorm CLI - Mobile-first framework'));
-  console.log(chalk.gray('A powerful CLI for managing your Lorm projects\n'));
+  console.log(chalk.bold.blue('\n🚀 Lorm CLI - Mobile-first framework'));
+  console.log(chalk.gray('Build full-stack, type-safe mobile apps fast\n'));
   
   console.log(chalk.bold('Usage:'));
   console.log('  npx @lorm/cli <command> [options]\n');
   
   console.log(chalk.bold('Available Commands:'));
   
-  console.log(chalk.bold('\n  Project:'));
-  console.log(`  ${chalk.cyan('init'.padEnd(15))} Initialize a new Lorm project`);
-  console.log(`  ${chalk.cyan('dev'.padEnd(15))} Start development server`);
-  console.log(`  ${chalk.cyan('check'.padEnd(15))} Validate project configuration`);
+  const commands = Object.values(COMMAND_HELP);
+  const maxNameLength = Math.max(...commands.map(cmd => cmd.name.length));
   
-  console.log(chalk.bold('\n  Database:'));
-  console.log(`  ${chalk.cyan('db:push'.padEnd(15))} Push schema changes to database`);
-  console.log(`  ${chalk.cyan('db:generate'.padEnd(15))} Generate migration files`);
-  console.log(`  ${chalk.cyan('db:migrate'.padEnd(15))} Apply database migrations`);
-  console.log(`  ${chalk.cyan('db:pull'.padEnd(15))} Pull schema from database`);
-  console.log(`  ${chalk.cyan('db:studio'.padEnd(15))} Start Drizzle Studio`);
+  commands.forEach(cmd => {
+    console.log(`  ${chalk.cyan(cmd.name.padEnd(maxNameLength + 2))} ${chalk.gray(cmd.description)}`);
+  });
   
-  console.log(chalk.bold('\nGlobal Options:'));
-  console.log(`  ${chalk.yellow('--help, -h'.padEnd(15))} Show help information`);
-  console.log(`  ${chalk.yellow('--version, -v'.padEnd(15))} Show version number`);
+  console.log('\n' + chalk.bold('Examples:'));
+  console.log('  npx @lorm/cli init              Initialize a new project');
+  console.log('  npx @lorm/cli dev               Start development server');
+  console.log('  npx @lorm/cli db:push           Push schema to database');
+  console.log('  npx @lorm/cli help <command>    Get help for specific command');
   
-  console.log(chalk.bold('\nExamples:'));
-  console.log(`  ${chalk.cyan('npx @lorm/cli init')}         Initialize new project`);
-  console.log(`  ${chalk.cyan('npx @lorm/cli dev')}          Start development`);
-  console.log(`  ${chalk.cyan('npx @lorm/cli db:push --force')}  Force push schema`);
-  console.log(`  ${chalk.cyan('npx @lorm/cli help <command>')}   Get help for specific command`);
-  
-  console.log(chalk.gray('\nFor more information on a specific command, run:'));
-  console.log(chalk.gray('  npx @lorm/cli help <command>\n'));
+  console.log('\n' + chalk.gray('For more information, visit: https://lorm.dev/docs'));
+  console.log();
 }

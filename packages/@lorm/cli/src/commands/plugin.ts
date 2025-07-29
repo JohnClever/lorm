@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import type { CAC } from "cac";
-import { PluginManager } from "@lorm/lib";
+import { PluginManager } from "../utils/index.js";
 import { promises as fs } from "fs";
 import { resolve, join } from "path";
 
@@ -94,7 +94,7 @@ class PluginCommandUtils {
 
 export async function installAction(name: string, options: PluginInstallOptions & { force?: boolean } = {}, pluginManager?: PluginManager): Promise<void> {
   if (!pluginManager) {
-    const { PluginManager } = await import('@lorm/lib');
+    const { PluginManager } = await import('../utils/index.js');
     const chalk = await import('chalk').then(m => m.default);
     pluginManager = new PluginManager({
       cli: null as any,
@@ -136,7 +136,7 @@ export async function installAction(name: string, options: PluginInstallOptions 
 
 export async function searchAction(query: string, options: PluginSearchOptions & { sort?: string } = { limit: 10 }, pluginManager?: PluginManager): Promise<void> {
   if (!pluginManager) {
-    const { PluginManager } = await import('@lorm/lib');
+    const { PluginManager } = await import('../utils/index.js');
     const chalk = await import('chalk').then(m => m.default);
     pluginManager = new PluginManager({
       cli: null as any,
@@ -213,8 +213,9 @@ export async function testAction(options: { plugin?: string; verbose?: boolean }
 
 export async function reloadAction(options: { force?: boolean } = {}, pluginManager?: PluginManager): Promise<void> {
   if (!pluginManager) {
-    const { PluginManager } = await import('@lorm/lib');
+    const { PluginManager } = await import('../utils/index.js');
     const chalk = await import('chalk').then(m => m.default);
+    
     pluginManager = new PluginManager({
       cli: null as any,
       version: '0.1.0',

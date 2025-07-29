@@ -17,4 +17,3 @@ export const configSchema = z.object({
 });
 
 export type lormConfig = z.infer<typeof configSchema>;
-

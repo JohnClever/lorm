@@ -1,8 +1,8 @@
-import { executeDrizzleKit } from "@lorm/lib";
+import { executeDrizzleKit } from "../../utils/index";
 import {
   initializeCommand,
   handleCommandError,
-} from "../../utils/index.js";
+} from "../../utils/index";
 
 export async function push(): Promise<void> {
   try {

@@ -1,7 +1,8 @@
 import { resolve } from "path";
 import { pathToFileURL } from "url";
-import { fileExists, configSchema } from "@lorm/lib";
-import type { lormConfig } from "@lorm/lib";
+import { fileExists } from "./file-exists";
+import { configSchema } from "./types";
+import type { lormConfig } from "./types";
 
 let cached: lormConfig | null = null;
 

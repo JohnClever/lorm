@@ -3,21 +3,19 @@ import { readFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { lazyLoaders, preloadModules } from "./utils/lazy-loader";
-import { execSync } from "child_process";
-import { existsSync } from "fs";
 
 const getLormLib = async () => {
   const {
-    commandCache,
+    CommandCache,
     PluginManager,
     PerformanceMonitor,
-    validateConfigOrExit,
     ErrorRecovery,
     displayGeneralHelp,
     displayCommandHelp,
-  } = await import("@lorm/lib");
+  } = await import("./utils/index.js");
+  const { validateConfigOrExit } = await import("@lorm/core");
   return {
-    commandCache,
+    commandCache: CommandCache,
     PluginManager,
     PerformanceMonitor,
     validateConfigOrExit,
@@ -160,51 +158,23 @@ cli
   .option("--force", "Overwrite existing files")
   .option("--skip-install", "Skip dependency installation")
   .action(async (options) => {
+    const { PerformanceMonitor, ErrorRecovery } = await getLormLib();
     const chalk = await getChalk();
 
-    if (!options.skipInstall) {
-      console.log(chalk.blue("[lorm] Installing core dependencies..."));
-
-      let packageManager = "npm";
-      if (existsSync("pnpm-lock.yaml")) {
-        packageManager = "pnpm";
-      } else if (existsSync("yarn.lock")) {
-        packageManager = "yarn";
-      }
-
-      try {
-        const installCmd =
-          packageManager === "npm"
-            ? "npm install @lorm/lib @lorm/core"
-            : `${packageManager} add @lorm/lib @lorm/core`;
-
-        execSync(installCmd, { stdio: "inherit" });
-        console.log(chalk.green("✅ Core dependencies installed!"));
-      } catch (error) {
-        console.error(
-          chalk.red("❌ Failed to install core dependencies:"),
-          (error as Error).message
-        );
-        process.exit(1);
-      }
-    }
-
-    // const { PerformanceMonitor, ErrorRecovery } = await getLormLib();
-
     const startTime = Date.now();
-    // const perfMonitor = new PerformanceMonitor();
-    // const perfTracker = perfMonitor.startTracking("init");
+    const perfMonitor = new PerformanceMonitor();
+    const perfTracker = perfMonitor.startTracking("init");
 
-    // await ErrorRecovery.withErrorHandling(async () => {
-    //   console.log(chalk.blue("[lorm] Initializing lorm project..."));
+    await ErrorRecovery.withErrorHandling(async () => {
+      console.log(chalk.blue("[lorm] Initializing lorm project..."));
 
-    //   const { initProject } = await import("./commands/init.js");
+      const { initProject } = await import("./commands/init.js");
 
-    //   await initProject(options);
+      await initProject(options);
+      console.log(chalk.green("✅ Project initialized successfully!"));
 
-    //   perfTracker.end(options);
-    // }, "Project initialization");
-    console.log(chalk.green("✅ Project initialized successfully!"));
+      perfTracker.end(options);
+    }, "Project initialization");
   });
 
 cli

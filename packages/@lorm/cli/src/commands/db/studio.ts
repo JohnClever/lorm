@@ -1,8 +1,8 @@
-import { executeDrizzleKit } from "@lorm/lib";
+import { executeDrizzleKit } from "../../utils/index";
 import {
   initializeAdvancedCommand,
   handleAdvancedCommandError,
-} from "../../utils/index.js";
+} from "../../utils/index";
 
 export async function studio(): Promise<void> {
   const startTime = Date.now();

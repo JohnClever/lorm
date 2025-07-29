@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 
-import { drizzleConfigTemplate } from "@lorm/lib";
+import { drizzleConfigTemplate } from "../templates/index";
 import { loadConfig } from "@lorm/core";
 
 export async function ensureLormDirectory(lormDir: string): Promise<void> {

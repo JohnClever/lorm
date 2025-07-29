@@ -1,5 +1,5 @@
-import { executeDrizzleKit } from "@lorm/lib";
-import { handleCommandError, initializeCommand } from "../../utils/index.js";
+import { executeDrizzleKit } from "../../utils/index";
+import { handleCommandError, initializeCommand } from "../../utils/index";
 
 
 

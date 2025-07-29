@@ -150,6 +150,34 @@ export class ErrorRecovery {
   }
 
   /**
+   * Wrap async function with error handling
+   */
+  static async withErrorHandling<T>(
+    fn: () => Promise<T>,
+    context: string,
+    options: RecoveryOptions = {}
+  ): Promise<T | void> {
+    try {
+      return await fn();
+    } catch (error) {
+      this.handleError(error as Error, context, options);
+    }
+  }
+
+  /**
+   * Setup graceful shutdown handlers
+   */
+  static setupGracefulShutdown(): void {
+    const cleanup = () => {
+      console.log(chalk.yellow('\n🛑 Gracefully shutting down...'));
+      process.exit(0);
+    };
+
+    process.on('SIGINT', cleanup);
+    process.on('SIGTERM', cleanup);
+  }
+
+  /**
    * Get suggestions based on error message
    */
   private static getSuggestions(errorMessage: string): ErrorSuggestion[] {
@@ -196,87 +224,5 @@ export class ErrorRecovery {
     console.log(chalk.yellow('   4. Check file permissions and paths'));
     
     console.log(chalk.gray('\n   For more help, visit: https://lorm.dev/docs/troubleshooting'));
-  }
-
-  /**
-   * Validate project setup and provide suggestions
-   */
-  static async validateProjectSetup(): Promise<boolean> {
-    const cwd = process.cwd();
-    const issues: string[] = [];
-    const suggestions: ErrorSuggestion[] = [];
-
-    if (!existsSync(resolve(cwd, 'package.json'))) {
-      issues.push('No package.json found');
-      suggestions.push({
-        message: 'Initialize a Node.js project',
-        command: 'npm init -y'
-      });
-    }
-
-    if (!existsSync(resolve(cwd, 'lorm.config.js'))) {
-      issues.push('No lorm.config.js found');
-      suggestions.push({
-        message: 'Initialize Lorm project',
-        command: 'npx @lorm/cli init'
-      });
-    }
-
-    if (!existsSync(resolve(cwd, 'node_modules'))) {
-      issues.push('Dependencies not installed');
-      suggestions.push({
-        message: 'Install project dependencies',
-        command: 'npm install'
-      });
-    }
-
-    if (issues.length > 0) {
-      console.log(chalk.yellow('\n⚠️  Project setup issues detected:'));
-      issues.forEach(issue => {
-        console.log(chalk.yellow(`   • ${issue}`));
-      });
-      
-      this.displaySuggestions(suggestions);
-      return false;
-    }
-
-    return true;
-  }
-
-  /**
-   * Wrap async function with error handling
-   */
-  static async withErrorHandling<T>(
-    fn: () => Promise<T>,
-    context: string,
-    options: RecoveryOptions = {}
-  ): Promise<T | null> {
-    try {
-      return await fn();
-    } catch (error) {
-      this.handleError(error as Error, context, options);
-      return null;
-    }
-  }
-
-  /**
-   * Create a graceful shutdown handler
-   */
-  static setupGracefulShutdown(): void {
-    const cleanup = () => {
-      console.log(chalk.yellow('\n\n🛑 Received shutdown signal, cleaning up...'));
-      process.exit(0);
-    };
-
-    process.on('SIGINT', cleanup);
-    process.on('SIGTERM', cleanup);
-    process.on('uncaughtException', (error) => {
-      console.error(chalk.red('\n💥 Uncaught Exception:'));
-      this.handleError(error, 'Uncaught exception', { exitOnError: true });
-    });
-    process.on('unhandledRejection', (reason) => {
-      console.error(chalk.red('\n💥 Unhandled Promise Rejection:'));
-      this.handleError(reason as Error, 'Unhandled promise rejection', { exitOnError: true });
-    });
   }
 }

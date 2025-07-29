@@ -1,6 +1,6 @@
 import { rpcClient } from "typed-rpc";
-import { findLormTypesPath, checkProjectSetup } from "./type-resolver.js";
-import type { LormRouter } from "./types.js";
+import { findLormTypesPath, checkProjectSetup } from "./type-resolver";
+import type { LormRouter } from "./types";
 
 export function createClient(baseUrl = "http://127.0.0.1:3000") {
   const typesPath = findLormTypesPath();

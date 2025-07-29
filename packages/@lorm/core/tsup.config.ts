@@ -12,7 +12,6 @@ export default defineConfig({
   outDir: 'dist',
   external: [
     '@libsql/client',
-    '@lorm/lib',
     '@neondatabase/serverless',
     'typed-rpc',
     '@planetscale/database',

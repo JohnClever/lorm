@@ -4,8 +4,8 @@ import {
 
   initializeCommand,
   handleCommandError,
-} from "../../utils/index.js";
-import { executeDrizzleKit } from "@lorm/lib";
+} from "../../utils/index";
+import { executeDrizzleKit } from "../../utils/index";
 
 async function validateMigrations(migrationsDir: string): Promise<void> {
   try {

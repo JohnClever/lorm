@@ -1,8 +1,8 @@
 import { createServer, IncomingMessage, ServerResponse } from "node:http";
-import { handleRpc } from "typed-rpc/lib/server.js";
-import { loadConfig, loadRouter, loadSchema } from "./load.js";
-import { createDatabase } from "./database.js";
-import { setDatabase } from "./router.js";
+import { handleRpc } from "typed-rpc/lib/server";
+import { loadConfig, loadRouter, loadSchema } from "./load";
+import { createDatabase } from "./database";
+import { setDatabase } from "./router";
 
 let started = false;
 

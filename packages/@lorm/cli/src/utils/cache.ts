@@ -189,21 +189,3 @@ export class CommandCache {
 }
 
 export const commandCache = new CommandCache();
-
-/**
- * Decorator for caching command results
- */
-
-export function cached(key: string, hashInput?: (...args: any[]) => any) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
-    const originalMethod = descriptor.value;
-
-    descriptor.value = commandCache.wrap(key, originalMethod, hashInput);
-
-    return descriptor;
-  };
-}

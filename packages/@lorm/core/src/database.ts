@@ -1,4 +1,4 @@
-import type { lormConfig } from "@lorm/lib";
+import type { lormConfig } from "./types";
 
 export async function createDatabase(config: lormConfig, schema: any): Promise<any> {
   const { url, adapter = "neon", options = {} } = config.db;

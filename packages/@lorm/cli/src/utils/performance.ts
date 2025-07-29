@@ -208,29 +208,3 @@ export class PerformanceTracker {
     return sanitized;
   }
 }
-
-/**
- * Decorator for automatic performance tracking
- */
-export function performanceTracked(command: string) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-    const originalMethod = descriptor.value;
-    const monitor = new PerformanceMonitor();
-
-    descriptor.value = async function (...args: any[]) {
-      const tracker = monitor.startTracking(command);
-      try {
-        const result = await originalMethod.apply(this, args);
-        tracker.end();
-        return result;
-      } catch (error) {
-        tracker.end();
-        throw error;
-      }
-    };
-
-    return descriptor;
-  };
-}
-
-export const performanceMonitor = new PerformanceMonitor();

@@ -1,5 +1,6 @@
-import { executeDrizzleKit, validateConfigOrExit } from "@lorm/lib";
-import { initializeCommand, handleCommandError } from "../utils/index.js";
+import { executeDrizzleKit } from "../utils/index";
+import { validateConfigOrExit } from "@lorm/core";
+import { initializeCommand, handleCommandError } from "../utils/index";
 import chalk from "chalk";
 
 export async function check(options: { verbose?: boolean; fix?: boolean } = {}): Promise<void> {

@@ -1,4 +1,4 @@
-import { lormDatabase } from "@lorm/lib";
+import { lormDatabase } from "./types";
 import type { ZodTypeAny, z } from "zod";
 
 let globalDb: lormDatabase;

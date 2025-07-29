@@ -37,12 +37,12 @@
   "dependencies": {
     "@inquirer/prompts": "^7.6.0",
     "@lorm/core": "workspace:*",
-    "@lorm/lib": "workspace:*",
     "cac": "^6.7.14",
     "chalk": "^5.4.1",
     "chokidar": "^4.0.3",
     "drizzle-kit": "^0.31.4",
-    "execa": "^9.6.0"
+    "execa": "^9.6.0",
+    "which": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.10",

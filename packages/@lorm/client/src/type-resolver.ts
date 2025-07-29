@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { resolve, dirname, join } from "path";
-import type { LoadedLormTypes } from "./types.js";
+import type { LoadedLormTypes } from "./types";
 
 let setupCache: {
   result: {

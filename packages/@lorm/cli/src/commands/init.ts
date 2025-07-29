@@ -4,13 +4,15 @@ import chalk from "chalk";
 import path from "path";
 
 import {
-  getPackageManager,
+  packageManager as getPackageManager,
   installDependencies,
-  fileExists,
+} from "../utils/index.js";
+import { fileExists } from "@lorm/core";
+import {
   routerTemplate,
   getConfigTemplate,
   getSchemaTemplate,
-} from "@lorm/lib";
+} from "../templates/index.js";
 
 export type DatabaseAdapter =
   | "neon"

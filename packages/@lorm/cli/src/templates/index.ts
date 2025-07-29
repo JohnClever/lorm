@@ -1,4 +1,4 @@
-import { lormConfig } from "../types";
+import type { lormConfig } from "@lorm/core";
 
 export const routerTemplate = `import { defineRouter } from "@lorm/core";
 import { z } from "zod";
@@ -137,6 +137,25 @@ function getAdapterSpecificConfigOptions(adapter: string): string {
   }
 }
 
+function getAdapterSpecificOptions(adapter: string): string {
+  switch (adapter) {
+    case "turso":
+      return `\n      // authToken: process.env.TURSO_AUTH_TOKEN`;
+    case "planetscale":
+      return `\n      // ssl: { rejectUnauthorized: true }`;
+    case "neon":
+      return `\n      // connectionTimeoutMillis: 5000,\n      // ssl: true`;
+    case "postgres":
+      return `\n      // ssl: false,\n      // connectionTimeoutMillis: 5000`;
+    case "mysql":
+      return `\n      // ssl: false,\n      // acquireTimeout: 60000`;
+    case "sqlite":
+      return `\n      // busyTimeout: 5000`;
+    default:
+      return "";
+  }
+}
+
 export const typeTemplate = `// Auto-generated types for Lorm
 
 
@@ -203,31 +222,12 @@ function getAdapterSpecificCredentials(adapter: string): string {
   }
 }
 
-function getAdapterSpecificOptions(adapter: string): string {
-  switch (adapter) {
-    case "sqlite":
-    case "turso":
-      return `\n  driver: 'turso', // or 'better-sqlite3' for local SQLite`;
-    case "mysql":
-    case "planetscale":
-      return `\n  tablesFilter: ["!*_temp"], // Exclude temporary tables`;
-    case "postgres":
-    case "neon":
-      return `\n  schemaFilter: ["public"], // Only include public schema`;
-    default:
-      return "";
-  }
-}
+export const basicTypes = `export type User = {
+  id: string;
+  name: string;
+};
 
-export const basicTypes = `// Auto-generated types for Lorm
-
-
-export type LormRouter = Record<string, never>;
-export type TypedLormRouter = Record<string, never>;
-
-
-declare module '@lorm/client' {
-  interface LormRouterRegistry extends Record<string, never> {}
-  type LormRouter = Record<string, never>;
-}
+export type CreateUserInput = {
+  name: string;
+};
 `;
