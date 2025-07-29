@@ -11,8 +11,8 @@
 [![npm version](https://badge.fury.io/js/%40lorm%2Fcli.svg)](https://badge.fury.io/js/%40lorm%2Fcli)
 [![GitHub stars](https://img.shields.io/github/stars/JohnClever/lorm?style=social)](https://github.com/JohnClever/lorm)
 [![GitHub forks](https://img.shields.io/github/forks/JohnClever/lorm?style=social)](https://github.com/JohnClever/lorm/fork)
-[![Twitter Follow](https://img.shields.io/x/follow/jc_johnclever?style=social)](https://x.com/jc_johnclever)
-[![Discord](https://img.shields.io/discord/https://discord.gg/eUCav29w?color=7289da&label=Discord&logo=discord&logoColor=white)](https://discord.gg/lorm)
+[![Twitter Follow](https://img.shields.io/twitter/follow/jc_johnclever?style=social)](https://x.com/jc_johnclever)
+[![Discord](https://img.shields.io/discord/https://discord.gg/1396855376221307081?color=7289da&label=Discord&logo=discord&logoColor=white)](https://discord.gg/lorm)
 
 </div>
 
