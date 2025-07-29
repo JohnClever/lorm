@@ -9,17 +9,16 @@ export function resolveDrizzleKitBin(): string {
     if (fs.existsSync(localBin)) {
       return localBin;
     }
-  } catch {
-  }
+  } catch {}
 
   try {
     return which.sync("drizzle-kit");
   } catch {
     throw new Error(
       "drizzle-kit not found. Please install it locally or globally:\n" +
-      "  npm install drizzle-kit\n" +
-      "  # or\n" +
-      "  npm install -g drizzle-kit"
+        "  npm install drizzle-kit\n" +
+        "  # or\n" +
+        "  npm install -g drizzle-kit"
     );
   }
 }
@@ -30,15 +29,15 @@ export async function executeDrizzleKit(
   successMessage: string
 ): Promise<void> {
   const drizzleKitBin = resolveDrizzleKitBin();
-  
+
   try {
     console.log(`🚀 [lorm] Running ${command}...`);
-    
+
     await execa(drizzleKitBin, [command], {
       cwd: lormDir,
       stdio: "inherit",
     });
-    
+
     console.log(`✅ [lorm] ${successMessage}`);
   } catch (error) {
     if (error instanceof Error) {

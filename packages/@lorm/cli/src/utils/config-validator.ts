@@ -1,6 +1,6 @@
-import { existsSync } from 'fs';
-import { resolve } from 'path';
 import chalk from 'chalk';
+import { resolve } from 'path';
+import { existsSync } from 'fs';
 
 export interface ValidationResult {
   isValid: boolean;

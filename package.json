@@ -16,7 +16,9 @@
     "release": "pnpm build && changeset publish",
     "size": "turbo run size",
     "size:check": "turbo run size:check",
-    "size:all": "pnpm --filter '@lorm/*' size"
+    "size:all": "pnpm --filter '@lorm/*' size",
+    "clean": "tsx scripts/clean.ts"
+
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.5",

@@ -1,7 +1,7 @@
-import fs from "fs/promises";
 import path from "path";
-import { drizzleConfigTemplate } from "../templates/index";
+import fs from "fs/promises";
 import { loadConfig } from "@lorm/core";
+import { drizzleConfigTemplate } from "@/templates";
 
 export async function validateSchemaFile(schemaPath: string): Promise<void> {
   try {

@@ -1,9 +1,8 @@
-import { executeDrizzleKit } from "../../utils/index";
 import {
- 
+  executeDrizzleKit,
   initializeAdvancedCommand,
   handleAdvancedCommandError,
-} from "../../utils/index";
+} from "@/utils";
 
 export async function pull(): Promise<void> {
   const startTime = Date.now();

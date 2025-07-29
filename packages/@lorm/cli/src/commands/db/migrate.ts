@@ -1,11 +1,10 @@
 import fs from "fs/promises";
 import path from "path";
 import {
-
   initializeCommand,
   handleCommandError,
-} from "../../utils/index";
-import { executeDrizzleKit } from "../../utils/index";
+  executeDrizzleKit,
+} from "@/utils";
 
 async function validateMigrations(migrationsDir: string): Promise<void> {
   try {

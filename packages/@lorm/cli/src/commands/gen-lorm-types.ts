@@ -1,7 +1,7 @@
-import { typeTemplate, basicTypes } from "../templates/index";
-import chokidar from "chokidar";
-import { writeFile, mkdir, readFile, access } from "fs/promises";
 import path from "path";
+import chokidar from "chokidar";
+import { typeTemplate, basicTypes } from "@/templates";
+import { writeFile, mkdir, access } from "fs/promises";
 
 const routerPath = path.resolve("lorm.router.js");
 const lormDir = path.resolve(".lorm");
@@ -42,7 +42,10 @@ export function watchRouter(): void {
       try {
         await generateTypeFile();
       } catch (error) {
-        console.error("[lorm] ❌ Error during type generation:", error instanceof Error ? error.message : String(error));
+        console.error(
+          "[lorm] ❌ Error during type generation:",
+          error instanceof Error ? error.message : String(error)
+        );
       }
     });
 
@@ -50,12 +53,18 @@ export function watchRouter(): void {
       try {
         await generateTypeFile();
       } catch (error) {
-        console.error("[lorm] ❌ Error during type generation:", error instanceof Error ? error.message : String(error));
+        console.error(
+          "[lorm] ❌ Error during type generation:",
+          error instanceof Error ? error.message : String(error)
+        );
       }
     });
 
     watcher.on("error", (error) => {
-      console.error("[lorm] ❌ File watcher error:", error instanceof Error ? error.message : String(error));
+      console.error(
+        "[lorm] ❌ File watcher error:",
+        error instanceof Error ? error.message : String(error)
+      );
     });
 
     console.log("[lorm] 👀 Watching lorm.router.js for changes...");

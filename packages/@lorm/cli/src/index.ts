@@ -1,8 +1,8 @@
 import { cac } from "cac";
 import { readFileSync } from "fs";
-import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
-import { lazyLoaders, preloadModules } from "./utils/lazy-loader";
+import { resolve, dirname } from "path";
+import { lazyLoaders, preloadModules } from "@/utils";
 
 const getLormLib = async () => {
   const {
@@ -10,10 +10,10 @@ const getLormLib = async () => {
     PluginManager,
     PerformanceMonitor,
     ErrorRecovery,
+    validateConfigOrExit,
     displayGeneralHelp,
     displayCommandHelp,
   } = await import("./utils/index.js");
-  const { validateConfigOrExit } = await import("@lorm/core");
   return {
     commandCache: CommandCache,
     PluginManager,

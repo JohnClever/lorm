@@ -1,8 +1,8 @@
-import { executeDrizzleKit } from "../../utils/index";
 import {
+  executeDrizzleKit,
   initializeCommand,
   handleCommandError,
-} from "../../utils/index";
+} from "@/utils";
 
 export async function push(): Promise<void> {
   try {

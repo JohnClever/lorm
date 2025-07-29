@@ -1,5 +1,5 @@
-import { existsSync } from "fs";
 import path from "path";
+import { existsSync } from "fs";
 import { spawn } from "child_process";
 
 export function packageManager(): "pnpm" | "yarn" | "npm" | "bun" {
@@ -48,7 +48,11 @@ export async function installDependencies(
     case "npm":
     default:
       command = "npm";
-      args = ["install", ...(isDev ? ["--save-dev"] : ["--save"]), ...dependencies];
+      args = [
+        "install",
+        ...(isDev ? ["--save-dev"] : ["--save"]),
+        ...dependencies,
+      ];
       break;
   }
 
@@ -63,7 +67,11 @@ export async function installDependencies(
       if (code === 0) {
         resolve();
       } else {
-        reject(new Error(`${command} ${args.join(" ")} failed with exit code ${code}`));
+        reject(
+          new Error(
+            `${command} ${args.join(" ")} failed with exit code ${code}`
+          )
+        );
       }
     });
 

@@ -1,13 +1,7 @@
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  writeFileSync,
-  statSync,
-} from "fs";
+import chalk from "chalk";
 import { resolve } from "path";
 import { createHash } from "crypto";
-import chalk from "chalk";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 
 export interface CacheOptions {
   ttl?: number; // Time to live in milliseconds
@@ -95,8 +89,7 @@ export class CommandCache {
 
       const filePath = this.getFilePath(key);
       writeFileSync(filePath, JSON.stringify(entry, null, 2));
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   /**
@@ -110,8 +103,7 @@ export class CommandCache {
       if (existsSync(filePath)) {
         require("fs").unlinkSync(filePath);
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   /**
@@ -128,8 +120,7 @@ export class CommandCache {
           fs.unlinkSync(resolve(this.cacheDir, file));
         });
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   /**

@@ -1,26 +1,32 @@
-import { executeDrizzleKit } from "../utils/index";
-import { validateConfigOrExit } from "@lorm/core";
-import { initializeCommand, handleCommandError } from "../utils/index";
+import {
+  executeDrizzleKit,
+  initializeCommand,
+  handleCommandError,
+  validateConfigOrExit,
+} from "@/utils";
+
 import chalk from "chalk";
 
-export async function check(options: { verbose?: boolean; fix?: boolean } = {}): Promise<void> {
+export async function check(
+  options: { verbose?: boolean; fix?: boolean } = {}
+): Promise<void> {
   try {
     console.log(chalk.blue("[lorm] 🔍 Checking Lorm project setup..."));
 
-    await validateConfigOrExit({ 
-      requireConfig: true, 
+    await validateConfigOrExit({
+      requireConfig: true,
       requireSchema: true,
-      checkDatabase: false 
+      checkDatabase: false,
     });
 
     if (options.verbose) {
-      console.log(chalk.green('✓ Configuration validation passed'));
+      console.log(chalk.green("✓ Configuration validation passed"));
     }
 
     const { lormDir } = await initializeCommand("schema check");
 
     console.log(chalk.blue("\n[lorm] Running drizzle-kit check..."));
-    
+
     await executeDrizzleKit(
       "check",
       lormDir,
@@ -29,8 +35,14 @@ export async function check(options: { verbose?: boolean; fix?: boolean } = {}):
 
     if (options.fix) {
       console.log(chalk.yellow("\n💡 Auto-fix suggestions:"));
-      console.log(chalk.yellow("  • Run 'npx @lorm/cli db:generate' to create migrations"));
-      console.log(chalk.yellow("  • Run 'npx @lorm/cli gen-types' to update type definitions"));
+      console.log(
+        chalk.yellow("  • Run 'npx @lorm/cli db:generate' to create migrations")
+      );
+      console.log(
+        chalk.yellow(
+          "  • Run 'npx @lorm/cli gen-types' to update type definitions"
+        )
+      );
     }
 
     console.log(chalk.green("\n✅ All checks passed!"));

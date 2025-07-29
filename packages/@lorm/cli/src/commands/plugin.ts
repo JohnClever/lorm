@@ -1,8 +1,8 @@
 import chalk from "chalk";
 import type { CAC } from "cac";
-import { PluginManager } from "../utils/index.js";
 import { promises as fs } from "fs";
 import { resolve, join } from "path";
+import { PluginManager } from "@/utils";
 
 interface PluginListOptions {
   verbose?: boolean;
@@ -25,23 +25,21 @@ interface PluginCreateOptions {
 class PluginCommandUtils {
   static formatPluginInfo(plugin: any, verbose: boolean = false): void {
     console.log(chalk.green(`• ${plugin.name}@${plugin.version}`));
-    
+
     if (plugin.description) {
       console.log(chalk.gray(`  ${plugin.description}`));
     }
-    
+
     if (verbose) {
       console.log(
         chalk.gray(`  Type: ${plugin.isPremium ? "Premium" : "Free"}`)
       );
-      
+
       if (plugin.marketplace?.category) {
-        console.log(
-          chalk.gray(`  Category: ${plugin.marketplace.category}`)
-        );
+        console.log(chalk.gray(`  Category: ${plugin.marketplace.category}`));
       }
     }
-    
+
     console.log("");
   }
 
@@ -49,7 +47,7 @@ class PluginCommandUtils {
     const priceTag = plugin.price
       ? chalk.yellow(`$${plugin.price}`)
       : chalk.green("FREE");
-    
+
     console.log(`${chalk.cyan(plugin.name)}@${plugin.version} ${priceTag}`);
     console.log(chalk.gray(`  ${plugin.description}`));
     console.log(
@@ -57,27 +55,27 @@ class PluginCommandUtils {
         `  Category: ${plugin.category} | Downloads: ${plugin.downloads}`
       )
     );
-    
+
     if (plugin.tags?.length) {
       console.log(chalk.gray(`  Tags: ${plugin.tags.join(", ")}`));
     }
-    
+
     console.log("");
   }
 
   static async handleError(error: any, context: string): Promise<void> {
     console.error(chalk.red(`❌ ${context}: ${error.message || error}`));
-    
+
     if (process.env.DEBUG) {
       console.error(chalk.gray(error.stack));
     }
-    
+
     process.exit(1);
   }
 
   static logSuccess(message: string, details?: string): void {
     console.log(chalk.green(`✅ ${message}`));
-    
+
     if (details) {
       console.log(chalk.gray(`   ${details}`));
     }
@@ -92,13 +90,17 @@ class PluginCommandUtils {
   }
 }
 
-export async function installAction(name: string, options: PluginInstallOptions & { force?: boolean } = {}, pluginManager?: PluginManager): Promise<void> {
+export async function installAction(
+  name: string,
+  options: PluginInstallOptions & { force?: boolean } = {},
+  pluginManager?: PluginManager
+): Promise<void> {
   if (!pluginManager) {
-    const { PluginManager } = await import('../utils/index.js');
-    const chalk = await import('chalk').then(m => m.default);
+    const { PluginManager } = await import("../utils/index.js");
+    const chalk = await import("chalk").then((m) => m.default);
     pluginManager = new PluginManager({
       cli: null as any,
-      version: '0.1.0',
+      version: "0.1.0",
       cwd: process.cwd(),
       utils: {
         chalk,
@@ -108,13 +110,13 @@ export async function installAction(name: string, options: PluginInstallOptions 
       },
     });
   }
-  
+
   if (!name || name.trim() === "") {
     throw new Error("Plugin name is required");
   }
 
   PluginCommandUtils.logInfo(`📦 Installing plugin: ${name}`);
-  
+
   if (options.version) {
     console.log(chalk.gray(`   Version: ${options.version}`));
   }
@@ -134,13 +136,17 @@ export async function installAction(name: string, options: PluginInstallOptions 
   }
 }
 
-export async function searchAction(query: string, options: PluginSearchOptions & { sort?: string } = { limit: 10 }, pluginManager?: PluginManager): Promise<void> {
+export async function searchAction(
+  query: string,
+  options: PluginSearchOptions & { sort?: string } = { limit: 10 },
+  pluginManager?: PluginManager
+): Promise<void> {
   if (!pluginManager) {
-    const { PluginManager } = await import('../utils/index.js');
-    const chalk = await import('chalk').then(m => m.default);
+    const { PluginManager } = await import("../utils/index.js");
+    const chalk = await import("chalk").then((m) => m.default);
     pluginManager = new PluginManager({
       cli: null as any,
-      version: '0.1.0',
+      version: "0.1.0",
       cwd: process.cwd(),
       utils: {
         chalk,
@@ -150,17 +156,20 @@ export async function searchAction(query: string, options: PluginSearchOptions &
       },
     });
   }
-  
+
   if (!query || query.trim() === "") {
     throw new Error("Search query is required");
   }
 
   PluginCommandUtils.logInfo(`🔍 Searching for: ${query}`);
-  
-  const results = await pluginManager.searchMarketplace(query.trim(), JSON.stringify({
-    category: options.category,
-    limit: options.limit || 10
-  }));
+
+  const results = await pluginManager.searchMarketplace(
+    query.trim(),
+    JSON.stringify({
+      category: options.category,
+      limit: options.limit || 10,
+    })
+  );
 
   if (results.length === 0) {
     console.log(chalk.gray("No plugins found matching your search"));
@@ -176,29 +185,34 @@ export async function searchAction(query: string, options: PluginSearchOptions &
   });
 }
 
-export async function testAction(options: { plugin?: string; verbose?: boolean } = {}): Promise<void> {
+export async function testAction(
+  options: { plugin?: string; verbose?: boolean } = {}
+): Promise<void> {
   const pluginPath = options.plugin || process.cwd();
-  
+
   PluginCommandUtils.logInfo(`🧪 Testing plugin at: ${pluginPath}`);
-  
+
   try {
-    const pluginFile = resolve(pluginPath, 'index.js');
-    const pluginExists = await fs.access(pluginFile).then(() => true).catch(() => false);
-    
+    const pluginFile = resolve(pluginPath, "index.js");
+    const pluginExists = await fs
+      .access(pluginFile)
+      .then(() => true)
+      .catch(() => false);
+
     if (!pluginExists) {
       throw new Error(`Plugin file not found: ${pluginFile}`);
     }
-    
+
     const plugin = require(pluginFile);
-    const requiredFields = ['name', 'version'];
-    const missingFields = requiredFields.filter(field => !plugin[field]);
-    
+    const requiredFields = ["name", "version"];
+    const missingFields = requiredFields.filter((field) => !plugin[field]);
+
     if (missingFields.length > 0) {
-      throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+      throw new Error(`Missing required fields: ${missingFields.join(", ")}`);
     }
-    
+
     PluginCommandUtils.logSuccess(`All 1 plugin(s) passed validation`);
-    
+
     if (options.verbose) {
       console.log(chalk.gray(`   Plugin: ${plugin.name}@${plugin.version}`));
       if (plugin.description) {
@@ -206,19 +220,24 @@ export async function testAction(options: { plugin?: string; verbose?: boolean }
       }
     }
   } catch (error) {
-    console.error(chalk.red(`❌ Plugin validation failed: ${(error as Error).message}`));
+    console.error(
+      chalk.red(`❌ Plugin validation failed: ${(error as Error).message}`)
+    );
     throw error;
   }
 }
 
-export async function reloadAction(options: { force?: boolean } = {}, pluginManager?: PluginManager): Promise<void> {
+export async function reloadAction(
+  options: { force?: boolean } = {},
+  pluginManager?: PluginManager
+): Promise<void> {
   if (!pluginManager) {
-    const { PluginManager } = await import('../utils/index.js');
-    const chalk = await import('chalk').then(m => m.default);
-    
+    const { PluginManager } = await import("../utils/index.js");
+    const chalk = await import("chalk").then((m) => m.default);
+
     pluginManager = new PluginManager({
       cli: null as any,
-      version: '0.1.0',
+      version: "0.1.0",
       cwd: process.cwd(),
       utils: {
         chalk,
@@ -228,34 +247,39 @@ export async function reloadAction(options: { force?: boolean } = {}, pluginMana
       },
     });
   }
-  
+
   PluginCommandUtils.logInfo("🔄 Reloading plugins...");
-  
+
   console.log(chalk.gray("   Cleaning up existing plugins..."));
   await pluginManager.cleanup();
-  
+
   console.log(chalk.gray("   Loading plugins..."));
   await pluginManager.loadPlugins();
-  
+
   console.log(chalk.gray("   Registering commands..."));
   pluginManager.registerCommands();
-  
+
   const plugins = pluginManager.getPluginInfo();
-  
+
   PluginCommandUtils.logSuccess(
     `Successfully reloaded ${plugins.length} plugins:`,
-    plugins.length > 0 ? "All plugin commands are now available" : "No plugins currently loaded"
+    plugins.length > 0
+      ? "All plugin commands are now available"
+      : "No plugins currently loaded"
   );
-  
+
   if (plugins.length > 0) {
     console.log(chalk.gray("\nActive plugins:"));
-    plugins.forEach(plugin => {
+    plugins.forEach((plugin) => {
       console.log(chalk.gray(`   • ${plugin.name}@${plugin.version}`));
     });
   }
 }
 
-export function registerPluginCommands(cli: CAC, pluginManager: PluginManager): void {
+export function registerPluginCommands(
+  cli: CAC,
+  pluginManager: PluginManager
+): void {
   registerListCommand(cli, pluginManager);
   registerInstallCommand(cli, pluginManager);
   registerSearchCommand(cli, pluginManager);
@@ -279,7 +303,9 @@ function registerListCommand(cli: CAC, pluginManager: PluginManager): void {
 
         if (plugins.length === 0) {
           console.log(chalk.gray("No plugins installed"));
-          console.log(chalk.gray("Use 'lorm plugin:search <query>' to find plugins"));
+          console.log(
+            chalk.gray("Use 'lorm plugin:search <query>' to find plugins")
+          );
           return;
         }
 
@@ -293,7 +319,6 @@ function registerListCommand(cli: CAC, pluginManager: PluginManager): void {
         await PluginCommandUtils.handleError(error, "Failed to list plugins");
       }
     });
-
 }
 
 function registerInstallCommand(cli: CAC, pluginManager: PluginManager): void {
@@ -301,13 +326,21 @@ function registerInstallCommand(cli: CAC, pluginManager: PluginManager): void {
     .command("plugin:install <name>", "Install plugin from marketplace")
     .option("--version <version>", "Specific version to install")
     .option("--force", "Force reinstall if already installed")
-    .action(async (name: string, options: PluginInstallOptions & { force?: boolean }) => {
-      try {
-        await installAction(name, options, pluginManager);
-      } catch (error) {
-        await PluginCommandUtils.handleError(error, "Failed to install plugin");
+    .action(
+      async (
+        name: string,
+        options: PluginInstallOptions & { force?: boolean }
+      ) => {
+        try {
+          await installAction(name, options, pluginManager);
+        } catch (error) {
+          await PluginCommandUtils.handleError(
+            error,
+            "Failed to install plugin"
+          );
+        }
       }
-    });
+    );
 }
 
 function registerSearchCommand(cli: CAC, pluginManager: PluginManager): void {
@@ -315,17 +348,30 @@ function registerSearchCommand(cli: CAC, pluginManager: PluginManager): void {
     .command("plugin:search <query>", "Search marketplace for plugins")
     .option("--category <category>", "Filter by category")
     .option("--limit <limit>", "Maximum number of results", { default: 10 })
-    .option("--sort <sort>", "Sort by: name, downloads, rating, updated", { default: "downloads" })
-    .action(async (query: string, options: PluginSearchOptions & { sort?: string }) => {
-      try {
-        await searchAction(query, options, pluginManager);
-      } catch (error) {
-        await PluginCommandUtils.handleError(error, "Failed to search plugins");
+    .option("--sort <sort>", "Sort by: name, downloads, rating, updated", {
+      default: "downloads",
+    })
+    .action(
+      async (
+        query: string,
+        options: PluginSearchOptions & { sort?: string }
+      ) => {
+        try {
+          await searchAction(query, options, pluginManager);
+        } catch (error) {
+          await PluginCommandUtils.handleError(
+            error,
+            "Failed to search plugins"
+          );
+        }
       }
-    });
+    );
 }
 
-function registerMarketplaceCommand(cli: CAC, pluginManager: PluginManager): void {
+function registerMarketplaceCommand(
+  cli: CAC,
+  pluginManager: PluginManager
+): void {
   cli
     .command("plugin:marketplace", "Show marketplace information")
     .alias("plugin:market")
@@ -335,7 +381,7 @@ function registerMarketplaceCommand(cli: CAC, pluginManager: PluginManager): voi
 
         PluginCommandUtils.logInfo("🏪 Marketplace Information");
         console.log("");
-        
+
         console.log(
           `Status: ${
             info.enabled ? chalk.green("Enabled") : chalk.red("Disabled")
@@ -372,10 +418,12 @@ function registerMarketplaceCommand(cli: CAC, pluginManager: PluginManager): voi
           );
         }
       } catch (error) {
-        await PluginCommandUtils.handleError(error, "Failed to get marketplace info");
+        await PluginCommandUtils.handleError(
+          error,
+          "Failed to get marketplace info"
+        );
       }
     });
-
 }
 
 function registerLicenseCommand(cli: CAC): void {
@@ -396,23 +444,21 @@ function registerLicenseCommand(cli: CAC): void {
               "Set LORM_LICENSE_KEY environment variable for premium features"
             )
           );
-          console.log(
-            chalk.gray(
-              "Get a license at: https://lorm.dev/pricing"
-            )
-          );
+          console.log(chalk.gray("Get a license at: https://lorm.dev/pricing"));
           return;
         }
 
-        console.log(`License Key: ${chalk.cyan(licenseKey.substring(0, 8) + "...")}`);;
+        console.log(
+          `License Key: ${chalk.cyan(licenseKey.substring(0, 8) + "...")}`
+        );
 
         if (options.validate || true) {
           console.log(chalk.gray("Validating license..."));
-          
+
           try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
-            
+
             const response = await fetch("https://license.lorm.dev/validate", {
               method: "POST",
               headers: {
@@ -420,9 +466,9 @@ function registerLicenseCommand(cli: CAC): void {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({ key: licenseKey }),
-              signal: controller.signal
+              signal: controller.signal,
             });
-            
+
             clearTimeout(timeoutId);
 
             if (response.ok) {
@@ -430,25 +476,32 @@ function registerLicenseCommand(cli: CAC): void {
               PluginCommandUtils.logSuccess("License is valid");
               console.log(`Type: ${chalk.cyan(license.type)}`);
               console.log(`Expires: ${chalk.cyan(license.expiresAt)}`);
-              console.log(`Features: ${chalk.cyan(license.features?.join(", ") || "All")}`);
+              console.log(
+                `Features: ${chalk.cyan(license.features?.join(", ") || "All")}`
+              );
             } else {
               const errorData = await response.json().catch(() => ({}));
-              throw new Error(errorData.message || `Validation failed (${response.status})`);
+              throw new Error(
+                errorData.message || `Validation failed (${response.status})`
+              );
             }
           } catch (error: any) {
-            if (error.name === 'AbortError') {
+            if (error.name === "AbortError") {
               PluginCommandUtils.logWarning("⚠️  License validation timed out");
             } else {
-              PluginCommandUtils.logWarning(`⚠️  Could not validate license: ${error.message}`);
+              PluginCommandUtils.logWarning(
+                `⚠️  Could not validate license: ${error.message}`
+              );
             }
-            console.log(chalk.gray("License validation will be retried when needed"));
+            console.log(
+              chalk.gray("License validation will be retried when needed")
+            );
           }
         }
       } catch (error) {
         await PluginCommandUtils.handleError(error, "Failed to check license");
       }
     });
-
 }
 
 function registerCreateCommand(cli: CAC): void {
@@ -460,113 +513,142 @@ function registerCreateCommand(cli: CAC): void {
     .option("--category <category>", "Plugin category")
     .option("--author <author>", "Plugin author name")
     .option("--description <description>", "Plugin description")
-    .action(async (name: string, options: PluginCreateOptions & { author?: string; description?: string }) => {
-      try {
-        if (!name || name.trim() === "") {
-          throw new Error("Plugin name is required");
-        }
-
-        if (!/^[a-z][a-z0-9-]*$/.test(name)) {
-          throw new Error("Plugin name must start with a letter and contain only lowercase letters, numbers, and hyphens");
-        }
-
-        const pluginDir = resolve(process.cwd(), ".lorm", "plugins");
-        const pluginFile = join(pluginDir, `${name}.js`);
-
+    .action(
+      async (
+        name: string,
+        options: PluginCreateOptions & { author?: string; description?: string }
+      ) => {
         try {
-          await fs.access(pluginFile);
-          throw new Error(`Plugin '${name}' already exists`);
-        } catch (error: any) {
-          if (error.code !== 'ENOENT') {
-            throw error;
+          if (!name || name.trim() === "") {
+            throw new Error("Plugin name is required");
           }
+
+          if (!/^[a-z][a-z0-9-]*$/.test(name)) {
+            throw new Error(
+              "Plugin name must start with a letter and contain only lowercase letters, numbers, and hyphens"
+            );
+          }
+
+          const pluginDir = resolve(process.cwd(), ".lorm", "plugins");
+          const pluginFile = join(pluginDir, `${name}.js`);
+
+          try {
+            await fs.access(pluginFile);
+            throw new Error(`Plugin '${name}' already exists`);
+          } catch (error: any) {
+            if (error.code !== "ENOENT") {
+              throw error;
+            }
+          }
+
+          await fs.mkdir(pluginDir, { recursive: true });
+
+          PluginCommandUtils.logInfo(`🔧 Creating plugin: ${name}`);
+          console.log(chalk.gray(`   Type: ${options.type}`));
+          console.log(chalk.gray(`   Location: ${pluginFile}`));
+
+          const template = generatePluginTemplate(
+            name,
+            options.type,
+            options.category,
+            options.author,
+            options.description
+          );
+
+          await fs.writeFile(pluginFile, template, "utf8");
+
+          PluginCommandUtils.logSuccess(`Created plugin template: ${name}`);
+          console.log("");
+          PluginCommandUtils.logInfo("Next steps:");
+          console.log(
+            chalk.gray("1. Edit the plugin file to add your functionality")
+          );
+          console.log(chalk.gray("2. Test with: lorm plugin:test"));
+          console.log(chalk.gray("3. Load with: lorm plugin:reload"));
+
+          if (options.type !== "free") {
+            console.log(chalk.gray("4. Configure license validation"));
+          }
+        } catch (error) {
+          await PluginCommandUtils.handleError(
+            error,
+            "Failed to create plugin"
+          );
         }
-
-        await fs.mkdir(pluginDir, { recursive: true });
-
-        PluginCommandUtils.logInfo(`🔧 Creating plugin: ${name}`);
-        console.log(chalk.gray(`   Type: ${options.type}`));
-        console.log(chalk.gray(`   Location: ${pluginFile}`));
-
-        const template = generatePluginTemplate(
-          name,
-          options.type,
-          options.category,
-          options.author,
-          options.description
-        );
-
-        await fs.writeFile(pluginFile, template, 'utf8');
-
-        PluginCommandUtils.logSuccess(`Created plugin template: ${name}`);
-        console.log("");
-        PluginCommandUtils.logInfo("Next steps:");
-        console.log(chalk.gray("1. Edit the plugin file to add your functionality"));
-        console.log(chalk.gray("2. Test with: lorm plugin:test"));
-        console.log(chalk.gray("3. Load with: lorm plugin:reload"));
-        
-        if (options.type !== "free") {
-          console.log(chalk.gray("4. Configure license validation"));
-        }
-      } catch (error) {
-        await PluginCommandUtils.handleError(error, "Failed to create plugin");
       }
-    });
-
-
-
-
+    );
 }
 
-function registerUninstallCommand(cli: CAC, pluginManager: PluginManager): void {
+function registerUninstallCommand(
+  cli: CAC,
+  pluginManager: PluginManager
+): void {
   cli
     .command("plugin:uninstall <name>", "Uninstall a plugin")
     .alias("plugin:remove")
     .option("--force", "Force uninstall without confirmation")
     .option("--keep-config", "Keep plugin configuration files")
-    .action(async (name: string, options: { force?: boolean; keepConfig?: boolean }) => {
-      try {
-        if (!name || name.trim() === "") {
-          throw new Error("Plugin name is required");
-        }
-
-        const plugins = pluginManager.getPluginInfo();
-        const plugin = plugins.find(p => p.name === name.trim());
-        
-        if (!plugin) {
-          throw new Error(`Plugin '${name}' is not installed`);
-        }
-
-        if (!options.force) {
-          PluginCommandUtils.logWarning(`Are you sure you want to uninstall '${name}'?`);
-          console.log(chalk.gray("Use --force to skip this confirmation"));
-          return;
-        }
-
-        PluginCommandUtils.logInfo(`🗑️  Uninstalling plugin: ${name}`);
-        
-        const pluginDir = resolve(process.cwd(), ".lorm", "plugins");
-        const pluginFile = join(pluginDir, `${name}.js`);
-        
+    .action(
+      async (
+        name: string,
+        options: { force?: boolean; keepConfig?: boolean }
+      ) => {
         try {
-          await fs.unlink(pluginFile);
-          PluginCommandUtils.logSuccess(`Plugin ${name} uninstalled successfully`);
-          
-          if (!options.keepConfig) {
-            console.log(chalk.gray("Configuration files preserved (use --keep-config=false to remove)"));
+          if (!name || name.trim() === "") {
+            throw new Error("Plugin name is required");
           }
-          
-          console.log(chalk.gray("Run 'lorm plugin:reload' to update active plugins"));
-        } catch (error: any) {
-          if (error.code === 'ENOENT') {
-            throw new Error(`Plugin file not found: ${pluginFile}`);
+
+          const plugins = pluginManager.getPluginInfo();
+          const plugin = plugins.find((p) => p.name === name.trim());
+
+          if (!plugin) {
+            throw new Error(`Plugin '${name}' is not installed`);
           }
-          throw error;
+
+          if (!options.force) {
+            PluginCommandUtils.logWarning(
+              `Are you sure you want to uninstall '${name}'?`
+            );
+            console.log(chalk.gray("Use --force to skip this confirmation"));
+            return;
+          }
+
+          PluginCommandUtils.logInfo(`🗑️  Uninstalling plugin: ${name}`);
+
+          const pluginDir = resolve(process.cwd(), ".lorm", "plugins");
+          const pluginFile = join(pluginDir, `${name}.js`);
+
+          try {
+            await fs.unlink(pluginFile);
+            PluginCommandUtils.logSuccess(
+              `Plugin ${name} uninstalled successfully`
+            );
+
+            if (!options.keepConfig) {
+              console.log(
+                chalk.gray(
+                  "Configuration files preserved (use --keep-config=false to remove)"
+                )
+              );
+            }
+
+            console.log(
+              chalk.gray("Run 'lorm plugin:reload' to update active plugins")
+            );
+          } catch (error: any) {
+            if (error.code === "ENOENT") {
+              throw new Error(`Plugin file not found: ${pluginFile}`);
+            }
+            throw error;
+          }
+        } catch (error) {
+          await PluginCommandUtils.handleError(
+            error,
+            "Failed to uninstall plugin"
+          );
         }
-      } catch (error) {
-        await PluginCommandUtils.handleError(error, "Failed to uninstall plugin");
       }
-    });
+    );
 }
 
 function registerUpdateCommand(cli: CAC, pluginManager: PluginManager): void {
@@ -574,102 +656,148 @@ function registerUpdateCommand(cli: CAC, pluginManager: PluginManager): void {
     .command("plugin:update [name]", "Update plugin(s) to latest version")
     .option("--all", "Update all plugins")
     .option("--check-only", "Only check for updates, don't install")
-    .action(async (name: string | undefined, options: { all?: boolean; checkOnly?: boolean }) => {
-      try {
-        if (!name && !options.all) {
-          PluginCommandUtils.logWarning("Please specify a plugin name or use --all");
-          console.log(chalk.gray("Examples:"));
-          console.log(chalk.gray("  lorm plugin:update my-plugin"));
-          console.log(chalk.gray("  lorm plugin:update --all"));
-          console.log(chalk.gray("  lorm plugin:update --all --check-only"));
-          return;
-        }
+    .action(
+      async (
+        name: string | undefined,
+        options: { all?: boolean; checkOnly?: boolean }
+      ) => {
+        try {
+          if (!name && !options.all) {
+            PluginCommandUtils.logWarning(
+              "Please specify a plugin name or use --all"
+            );
+            console.log(chalk.gray("Examples:"));
+            console.log(chalk.gray("  lorm plugin:update my-plugin"));
+            console.log(chalk.gray("  lorm plugin:update --all"));
+            console.log(chalk.gray("  lorm plugin:update --all --check-only"));
+            return;
+          }
 
-        const plugins = pluginManager.getPluginInfo();
-        
-        if (plugins.length === 0) {
-          PluginCommandUtils.logWarning("No plugins installed");
-          console.log(chalk.gray("Use 'lorm plugin:search <query>' to find plugins"));
-          return;
-        }
+          const plugins = pluginManager.getPluginInfo();
 
-        const pluginsToUpdate = options.all 
-          ? plugins 
-          : plugins.filter(p => p.name === name?.trim());
+          if (plugins.length === 0) {
+            PluginCommandUtils.logWarning("No plugins installed");
+            console.log(
+              chalk.gray("Use 'lorm plugin:search <query>' to find plugins")
+            );
+            return;
+          }
 
-        if (pluginsToUpdate.length === 0) {
-          throw new Error(`Plugin '${name}' is not installed`);
-        }
+          const pluginsToUpdate = options.all
+            ? plugins
+            : plugins.filter((p) => p.name === name?.trim());
 
-        PluginCommandUtils.logInfo(`🔄 ${options.checkOnly ? 'Checking for updates' : 'Updating'} ${pluginsToUpdate.length} plugin(s)...`);
-        
-        let updatesAvailable = 0;
-        let updated = 0;
-        let failed = 0;
+          if (pluginsToUpdate.length === 0) {
+            throw new Error(`Plugin '${name}' is not installed`);
+          }
 
-        for (const plugin of pluginsToUpdate) {
-          try {
-            console.log(chalk.gray(`   Checking ${plugin.name}...`));
-            
-            const hasUpdate = Math.random() > 0.7;
-            
-            if (hasUpdate) {
-              updatesAvailable++;
-              console.log(chalk.yellow(`   📦 Update available for ${plugin.name}`));
-              
-              if (!options.checkOnly) {
-                const success = await pluginManager.installFromMarketplace(plugin.name);
-                if (success) {
-                  console.log(chalk.green(`   ✅ ${plugin.name} updated`));
-                  updated++;
-                } else {
-                  console.log(chalk.red(`   ❌ Failed to update ${plugin.name}`));
-                  failed++;
+          PluginCommandUtils.logInfo(
+            `🔄 ${options.checkOnly ? "Checking for updates" : "Updating"} ${
+              pluginsToUpdate.length
+            } plugin(s)...`
+          );
+
+          let updatesAvailable = 0;
+          let updated = 0;
+          let failed = 0;
+
+          for (const plugin of pluginsToUpdate) {
+            try {
+              console.log(chalk.gray(`   Checking ${plugin.name}...`));
+
+              const hasUpdate = Math.random() > 0.7;
+
+              if (hasUpdate) {
+                updatesAvailable++;
+                console.log(
+                  chalk.yellow(`   📦 Update available for ${plugin.name}`)
+                );
+
+                if (!options.checkOnly) {
+                  const success = await pluginManager.installFromMarketplace(
+                    plugin.name
+                  );
+                  if (success) {
+                    console.log(chalk.green(`   ✅ ${plugin.name} updated`));
+                    updated++;
+                  } else {
+                    console.log(
+                      chalk.red(`   ❌ Failed to update ${plugin.name}`)
+                    );
+                    failed++;
+                  }
                 }
+              } else {
+                console.log(chalk.gray(`   ✅ ${plugin.name} is up to date`));
               }
-            } else {
-              console.log(chalk.gray(`   ✅ ${plugin.name} is up to date`));
+            } catch (error: any) {
+              console.log(
+                chalk.red(
+                  `   ❌ Error checking ${plugin.name}: ${
+                    error.message || error
+                  }`
+                )
+              );
+              failed++;
             }
-          } catch (error: any) {
-            console.log(chalk.red(`   ❌ Error checking ${plugin.name}: ${error.message || error}`));
-            failed++;
           }
-        }
 
-        console.log("");
-        if (options.checkOnly) {
-          if (updatesAvailable > 0) {
-            PluginCommandUtils.logInfo(`${updatesAvailable} update(s) available`);
-            console.log(chalk.gray("Run without --check-only to install updates"));
+          console.log("");
+          if (options.checkOnly) {
+            if (updatesAvailable > 0) {
+              PluginCommandUtils.logInfo(
+                `${updatesAvailable} update(s) available`
+              );
+              console.log(
+                chalk.gray("Run without --check-only to install updates")
+              );
+            } else {
+              PluginCommandUtils.logSuccess("All plugins are up to date");
+            }
           } else {
-            PluginCommandUtils.logSuccess("All plugins are up to date");
+            if (updated > 0) {
+              PluginCommandUtils.logSuccess(
+                `${updated} plugin(s) updated successfully`
+              );
+              console.log(
+                chalk.gray("Run 'lorm plugin:reload' to activate updates")
+              );
+            }
+            if (failed > 0) {
+              PluginCommandUtils.logWarning(
+                `${failed} plugin(s) failed to update`
+              );
+            }
           }
-        } else {
-          if (updated > 0) {
-            PluginCommandUtils.logSuccess(`${updated} plugin(s) updated successfully`);
-            console.log(chalk.gray("Run 'lorm plugin:reload' to activate updates"));
-          }
-          if (failed > 0) {
-            PluginCommandUtils.logWarning(`${failed} plugin(s) failed to update`);
-          }
+        } catch (error) {
+          await PluginCommandUtils.handleError(
+            error,
+            "Failed to update plugin(s)"
+          );
         }
-      } catch (error) {
-        await PluginCommandUtils.handleError(error, "Failed to update plugin(s)");
       }
-    });
+    );
 }
 
 function registerTestCommand(cli: CAC): void {
   cli
     .command("plugin:test [path]", "Test a plugin locally")
     .option("--verbose", "Show detailed test output")
-    .action(async (pluginPath: string | undefined, options: { verbose?: boolean }) => {
-      try {
-        await testAction({ plugin: pluginPath, verbose: options.verbose });
-      } catch (error) {
-        await PluginCommandUtils.handleError(error, "Failed to test plugin(s)");
+    .action(
+      async (
+        pluginPath: string | undefined,
+        options: { verbose?: boolean }
+      ) => {
+        try {
+          await testAction({ plugin: pluginPath, verbose: options.verbose });
+        } catch (error) {
+          await PluginCommandUtils.handleError(
+            error,
+            "Failed to test plugin(s)"
+          );
+        }
       }
-    });
+    );
 }
 
 function registerReloadCommand(cli: CAC, pluginManager: PluginManager): void {
@@ -695,9 +823,13 @@ function generatePluginTemplate(
   const timestamp = new Date().toISOString();
   const categoryComment = category ? `\n * @category ${category}` : "";
   const authorComment = author ? `\n * @author ${author}` : "";
-  const descriptionComment = description ? `\n * @description ${description}` : "";
+  const descriptionComment = description
+    ? `\n * @description ${description}`
+    : "";
 
-  const licenseSection = type !== "free" ? `
+  const licenseSection =
+    type !== "free"
+      ? `
   
   async validateLicense(licenseKey) {
     if (!licenseKey) {
@@ -706,9 +838,12 @@ function generatePluginTemplate(
     
     console.warn('License validation not implemented');
     return true;
-  },` : "";
+  },`
+      : "";
 
-  const premiumFeatures = type !== "free" ? `
+  const premiumFeatures =
+    type !== "free"
+      ? `
     
     'premium-feature': {
       description: 'A premium feature example',
@@ -716,7 +851,8 @@ function generatePluginTemplate(
       handler: async (args) => {
         console.log('Premium feature executed with args:', args);
       }
-    },` : "";
+    },`
+      : "";
 
   return `/**
  * LORM Plugin: ${name}
@@ -727,7 +863,9 @@ function generatePluginTemplate(
 module.exports = {
   name: "${name}",
   version: "1.0.0",
-  type: "${type}",${category ? `\n  category: "${category}",` : ""}${author ? `\n  author: "${author}",` : ""}${description ? `\n  description: "${description}",` : ""}
+  type: "${type}",${category ? `\n  category: "${category}",` : ""}${
+    author ? `\n  author: "${author}",` : ""
+  }${description ? `\n  description: "${description}",` : ""}
   
   metadata: {
     lormVersion: ">=1.0.0",
