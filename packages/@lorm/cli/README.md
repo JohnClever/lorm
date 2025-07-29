@@ -529,5 +529,5 @@ npx @lorm/cli help db:push
 
 ## 📄 License
 
-MIT License - see [LICENSE](../../../LICENSE) for details.
+Apache License - see [LICENSE](../../../LICENSE) for details.
 

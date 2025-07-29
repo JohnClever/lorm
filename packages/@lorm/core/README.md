@@ -103,4 +103,4 @@ We welcome contributions! Please see our [Contributing Guide](../../../CONTRIBUT
 
 ## 📄 License
 
-MIT License - see [LICENSE](../../../LICENSE) for details.
+Apache License - see [LICENSE](../../../LICENSE) for details.

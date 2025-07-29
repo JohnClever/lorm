@@ -117,4 +117,4 @@ Contributions are welcome! Please:
 
 ## License
 
-MIT License - see the [LICENSE](../../LICENSE) file for details.
+Apache License - see the [LICENSE](../../LICENSE) file for details.
