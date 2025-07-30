@@ -94,11 +94,11 @@ export const lazyLoaders = {
     { timeout: 10000 }
   ),
 
-  // Core Lorm functionality
-  lormCore: createLazyLoader(
-    () => import("@lorm/core"),
-    { timeout: 20000, maxRetries: 3 }
-  ),
+  // Core Lorm functionality - removed dynamic import to fix module resolution
+  // lormCore: createLazyLoader(
+  //   () => import("@lorm/core"),
+  //   { timeout: 20000, maxRetries: 3 }
+  // ),
 
   // Styling - lightweight but essential
   chalk: createLazyLoader(
@@ -112,7 +112,7 @@ export type LazyLoaderKey = keyof typeof lazyLoaders;
 // Module priority for cache warming
 export const MODULE_PRIORITIES = {
   high: ['chalk', 'execa'] as LazyLoaderKey[],
-  medium: ['inquirer', 'lormCore'] as LazyLoaderKey[],
+  medium: ['inquirer'] as LazyLoaderKey[],
   low: ['chokidar', 'drizzleKit'] as LazyLoaderKey[],
 } as const;
 

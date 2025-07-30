@@ -2,6 +2,7 @@ import { cac } from "cac";
 import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { resolve, dirname } from "path";
+import { startServer } from "@lorm/core";
 import {
   lazyLoaders,
   preloadModules,
@@ -188,9 +189,8 @@ commandRegistry.register(
     ],
     examples: ["npx @lorm/cli dev", "npx @lorm/cli dev --port 3001"],
     action: async (options: DevCommandOptions) => {
-      await preloadModules(["lormCore", "chokidar"]);
+      await preloadModules(["chokidar"]);
 
-      const { startServer } = await lazyLoaders.lormCore();
       const { watchRouter } = await import("./commands/gen-lorm-types");
 
       watchRouter();

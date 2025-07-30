@@ -3,6 +3,7 @@ import { readFileSync } from "fs";
 import chalk from "chalk";
 import { exists } from "./file-utils";
 import { SecurityValidator, SecurityAuditLogger } from "./security";
+import { loadConfig } from "@lorm/core";
 
 export interface ValidationResult {
   isValid: boolean;
@@ -54,7 +55,6 @@ export async function validateConfig(
     } else {
       // Use loadConfig from @lorm/core which handles both .ts and .js files
       try {
-        const { loadConfig } = await import('@lorm/core');
         const config = await loadConfig();
         if (!config) {
           const configPath = exists(configTsPath) ? configTsPath : exists(configJsPath) ? configJsPath : configMjsPath;
