@@ -1,12 +1,12 @@
 import path from "path";
-import fs from "fs/promises";
 
 import { drizzleConfigTemplate } from "@/templates";
 import { loadConfig } from "@lorm/core";
+import { FileUtils, fileExists } from "./file-utils";
 
 export async function ensureLormDirectory(lormDir: string): Promise<void> {
   try {
-    await fs.mkdir(lormDir, { recursive: true });
+    await FileUtils.ensureDir(lormDir);
     console.log("📁 [lorm] Created .lorm directory");
   } catch (error) {
     throw new Error(
@@ -24,9 +24,9 @@ export async function createSchemaFile(
   try {
     const schemaImport = `export * from "${path
       .join(rootDir, "lorm.schema")
-      .replace(/\\/g, "/")}";`;
+      .replace(/\\\\/g, "/")}";`;
 
-    await fs.writeFile(schemaTargetPath, schemaImport);
+    await FileUtils.writeFile(schemaTargetPath, schemaImport);
     console.log("📄 [lorm] Created schema.js file");
   } catch (error) {
     throw new Error(
@@ -43,7 +43,7 @@ export async function createDrizzleConfig(
 ): Promise<void> {
   try {
     const configContent = drizzleConfigTemplate(config);
-    await fs.writeFile(drizzleConfigPath, configContent);
+    await FileUtils.writeFile(drizzleConfigPath, configContent);
     console.log("⚙️ [lorm] Created drizzle.config.js file");
   } catch (error) {
     throw new Error(
@@ -61,14 +61,8 @@ export async function validateSchemaFileOptional(
   const schemaPathTs = path.join(rootDir, "lorm.schema.ts");
 
   try {
-    const jsExists = await fs
-      .access(schemaPath)
-      .then(() => true)
-      .catch(() => false);
-    const tsExists = await fs
-      .access(schemaPathTs)
-      .then(() => true)
-      .catch(() => false);
+    const jsExists = await fileExists(schemaPath);
+    const tsExists = await fileExists(schemaPathTs);
 
     if (!jsExists && !tsExists) {
       console.warn(

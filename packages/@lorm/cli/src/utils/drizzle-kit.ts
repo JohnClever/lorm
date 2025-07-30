@@ -1,12 +1,12 @@
-import fs from "fs";
 import path from "path";
 import which from "which";
 import { execa } from "execa";
+import { FileUtils } from "./file-utils";
 
 export function resolveDrizzleKitBin(): string {
   try {
     const localBin = path.join(process.cwd(), "node_modules/.bin/drizzle-kit");
-    if (fs.existsSync(localBin)) {
+    if (FileUtils.exists(localBin)) {
       return localBin;
     }
   } catch {}

@@ -1,65 +1,100 @@
 # 🪄 @lorm/cli
 
-Command-line interface for the **Lorm framework** — a zero-config, full-stack mobile framework built for **Mobile Applications**.
+Command-line interface for the **Lorm framework** — a zero-config, full-stack mobile framework built  for mobile applications.
 
-> 📱 Built for **React Native** and **Expo**
-> ✅ Works with **any Drizzle-supported database**: PostgreSQL, MySQL, SQLite, and more
-> 📦 **Optimized Bundle**: ~50KB with enterprise features and performance monitoring
+> 📱 **Mobile-First**: Designed to work with mobile applications (React Native and Expo projects)
+> ✅ **Database Agnostic**: Works with any Drizzle-supported database (PostgreSQL, MySQL, SQLite, and more)
+> 📦 **Project-Scoped**: No global installation required — keeps your mobile project dependencies clean
+> 🚀 **Zero Config**: Get a type-safe backend API in minutes
 ---
 
 ## 📦 Installation
 
-**Step 1: Install the CLI package locally**
+**Install the CLI as a dev dependency in your React Native/Expo project:**
 
 ```bash
-# Using npm
+# Navigate to your React Native or Expo project
+cd my-react-native-app
+
+# Install Lorm CLI locally
 npm install @lorm/cli --save-dev
 
-# Using pnpm
-pnpm add @lorm/cli --save-dev
+# Or with pnpm
+pnpm add @lorm/cli -D
 
-# Using yarn
+# Or with yarn
 yarn add @lorm/cli --dev
 ```
 
-**Step 2: Use the CLI via npx/pnpx**
+**Use the CLI via npx/pnpm dlx (no global installation needed):**
 
 ```bash
 # Using npx (npm)
 npx @lorm/cli <command>
 
-# Using pnpx (pnpm)
-pnpx @lorm/cli <command>
+# Using pnpm dlx (pnpm)
+pnpm dlx @lorm/cli <command>
+
+# Using yarn
+yarn @lorm/cli <command>
 ```
 
-> 💡 **Note**: The CLI is designed for local execution only and does not support global installation. You must first install the package locally in your project, then use npx/pnpx to execute commands. This ensures consistent behavior across different projects and environments.
+> 🎯 **Mobile-First Philosophy**: Lorm CLI is designed to be project-scoped within your mobile application. This ensures version consistency, eliminates global dependency conflicts, and keeps your mobile development environment clean and predictable.
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start for React Native/Expo
 
-1. Install the CLI locally:
+**Prerequisites:** You should have an existing React Native or Expo project.
+
+1. **Navigate to your mobile project and install Lorm CLI:**
    ```bash
+   cd my-react-native-app
    npm install @lorm/cli --save-dev
    ```
 
-2. Initialize a new Lorm project:
+2. **Initialize Lorm in your mobile project:**
    ```bash
    npx @lorm/cli init
    ```
 
-3. Configure your database connection in `lorm.config.js`
+3. **Configure your database connection in `lorm.config.js`**
+   ```javascript
+   // lorm.config.js
+   export default {
+     database: {
+       url: process.env.DATABASE_URL || "your-database-url"
+     }
+   };
+   ```
 
-4. Define your schema in `lorm.schema.js`
+4. **Define your schema in `lorm.schema.js`** (example users table included)
 
-5. Push your schema to the database:
+5. **Push your schema to the database:**
    ```bash
    npx @lorm/cli push
    ```
 
-6. Start the development server:
+6. **Start the development server:**
    ```bash
    npx @lorm/cli dev
+   ```
+
+7. **Install the client in your React Native/Expo app:**
+   ```bash
+   npm install @lorm/client
+   ```
+
+8. **Use type-safe APIs in your mobile app:**
+   ```typescript
+   import { createClient } from '@lorm/client';
+   
+   const client = createClient({
+     url: 'http://localhost:3000' // Your Lorm server
+   });
+   
+   // Fully typed API calls
+   const users = await client.getUsers();
    ```
 
 ---

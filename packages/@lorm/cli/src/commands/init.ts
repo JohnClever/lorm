@@ -6,13 +6,13 @@ import { select, confirm } from "@inquirer/prompts";
 import {
   packageManager as getPackageManager,
   installDependencies,
-} from "../utils/index.js";
+} from "@/utils";
 import {
   routerTemplate,
   getConfigTemplate,
   getSchemaTemplate,
-} from "../templates/index.js";
-import { fileExists } from "../utils/file-exists.js";
+} from "@/templates";
+import { fileExists } from "@/utils/file-utils";
 
 export type DatabaseAdapter =
   | "neon"
@@ -35,43 +35,6 @@ function getClientDependencies(includeClient: boolean = false): string[] {
   }
 
   return baseDependencies;
-}
-
-async function isReactNativeProject(): Promise<boolean> {
-  try {
-    const packageJsonPath = path.join(process.cwd(), "package.json");
-
-    if (!(await fileExists(packageJsonPath))) {
-      console.log(
-        chalk.gray(
-          "📄 No package.json found, assuming non-React Native project"
-        )
-      );
-      return false;
-    }
-
-    const packageJsonContent = await fs.readFile(packageJsonPath, "utf-8");
-    const packageJson = JSON.parse(packageJsonContent);
-
-    const hasReactNative = !!(
-      packageJson.dependencies?.["react-native"] ||
-      packageJson.devDependencies?.["react-native"]
-    );
-
-    if (hasReactNative) {
-      console.log(chalk.blue("📱 React Native project detected"));
-    }
-
-    return hasReactNative;
-  } catch (error) {
-    console.log(
-      chalk.yellow(
-        "⚠️  Could not determine project type, assuming non-React Native:"
-      ),
-      error instanceof Error ? error.message : String(error)
-    );
-    return false;
-  }
 }
 
 async function createConfigFiles(adapter: DatabaseAdapter): Promise<void> {
@@ -173,7 +136,6 @@ async function installProjectDependencies(
 
 function displayCompletionMessage(
   adapter: DatabaseAdapter,
-  isRN: boolean,
   includeClient: boolean
 ): void {
   console.log(chalk.green("\n🎉 LORM project initialized successfully!"));
@@ -260,8 +222,6 @@ export async function initProject(options: InitOptions = {}): Promise<void> {
       return;
     }
 
-    const isRN = await isReactNativeProject();
-
     const adapter = (await select({
       message: "Select your database adapter:",
       choices: [
@@ -310,7 +270,7 @@ export async function initProject(options: InitOptions = {}): Promise<void> {
 
     await createConfigFiles(adapter);
 
-    displayCompletionMessage(adapter, isRN, includeClient);
+    displayCompletionMessage(adapter, includeClient);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error(

@@ -2,7 +2,45 @@ import { cac } from "cac";
 import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { resolve, dirname } from "path";
-import { lazyLoaders, preloadModules } from "@/utils";
+import {
+  lazyLoaders,
+  preloadModules,
+  PerformanceMonitor,
+  warmCache,
+  getCacheStats,
+  HealthChecker,
+  CommandRegistry,
+  createCommand,
+  createDatabaseCommand,
+  createDevelopmentCommand,
+} from "@/utils";
+
+import type {
+  HelpCommandOptions,
+  InitCommandOptions,
+  CheckCommandOptions,
+  HealthCommandOptions,
+  PerformanceCommandOptions,
+  CacheStatsCommandOptions,
+  DevCommandOptions,
+  DbPushCommandOptions,
+  DbGenerateCommandOptions,
+  DbMigrateCommandOptions,
+  DbPullCommandOptions,
+  DbUpCommandOptions,
+  DbStudioCommandOptions,
+  PluginListCommandOptions,
+  PluginInstallCommandOptions,
+  PluginUninstallCommandOptions,
+  PluginEnableCommandOptions,
+  PluginDisableCommandOptions,
+  PluginUpdateCommandOptions,
+  PluginSearchCommandOptions,
+} from "@/types";
+
+import { PluginManager as SimplePluginManager } from "./commands/plugin-manager.js";
+
+const performanceMonitor = new PerformanceMonitor();
 
 const getLormLib = async () => {
   const {
@@ -13,6 +51,8 @@ const getLormLib = async () => {
     validateConfigOrExit,
     displayGeneralHelp,
     displayCommandHelp,
+    displayCategoryHelp,
+    displayQuickStart,
   } = await import("./utils/index.js");
   return {
     commandCache: CommandCache,
@@ -22,6 +62,8 @@ const getLormLib = async () => {
     ErrorRecovery,
     displayGeneralHelp,
     displayCommandHelp,
+    displayCategoryHelp,
+    displayQuickStart,
   };
 };
 
@@ -46,6 +88,9 @@ const __dirname = dirname(__filename);
 const packageJson = JSON.parse(
   readFileSync(resolve(__dirname, "../package.json"), "utf8")
 );
+
+// Initialize enhanced command registry
+const commandRegistry = new CommandRegistry();
 
 let errorRecoveryInitialized = false;
 const initializeErrorRecovery = async () => {
@@ -108,37 +153,40 @@ async function loadPluginsAndParse() {
   }
 }
 
-cli
-  .command("help [command]", "Show detailed help information with examples")
-  .action(async (command) => {
-    const { displayCommandHelp, displayGeneralHelp } = await getLormLib();
-    if (command) {
-      displayCommandHelp(command);
-    } else {
-      displayGeneralHelp();
-    }
-  });
+// Register enhanced commands
+commandRegistry.register(
+  createCommand({
+    name: "help [command]",
+    description: "Show detailed help information with examples",
+    category: "utility",
+    action: async (command: string, options: HelpCommandOptions = {}) => {
+      const { displayCommandHelp, displayGeneralHelp, displayCategoryHelp } =
+        await getLormLib();
+      if (command) {
+        displayCommandHelp(command);
+      } else {
+        displayGeneralHelp();
+      }
+    },
+  })
+);
 
-cli
-  .command(
-    "dev",
-    "Start development server with file watching and type generation"
-  )
-  .option("--port <port>", "Port to run the server on", { default: 3000 })
-  .action(async (options) => {
-    const { PerformanceMonitor, ErrorRecovery, validateConfigOrExit } =
-      await getLormLib();
-    const chalk = await getChalk();
-
-    const startTime = Date.now();
-    const perfMonitor = new PerformanceMonitor();
-    const perfTracker = perfMonitor.startTracking("dev");
-
-    await ErrorRecovery.withErrorHandling(async () => {
-      await validateConfigOrExit({ requireConfig: true, requireSchema: true });
-
-      console.log(chalk.blue("⚡ [lorm] Starting dev server..."));
-
+commandRegistry.register(
+  createDevelopmentCommand({
+    name: "dev",
+    description:
+      "Start development server with file watching and type generation",
+    requiresConfig: true,
+    requiresSchema: true,
+    options: [
+      {
+        flag: "--port <port>",
+        description: "Port to run the server on",
+        defaultValue: 3000,
+      },
+    ],
+    examples: ["npx @lorm/cli dev", "npx @lorm/cli dev --port 3001"],
+    action: async (options: DevCommandOptions) => {
       await preloadModules(["lormCore", "chokidar"]);
 
       const { startServer } = await lazyLoaders.lormCore();
@@ -147,266 +195,513 @@ cli
       watchRouter();
       await startServer();
 
-      console.log(chalk.green(`🚀 Dev server running on port ${options.port}`));
+      console.log(`🚀 Dev server running on port ${options.port}`);
+    },
+  })
+);
 
-      perfTracker.end(options);
-    }, "Development server startup");
-  });
-
-cli
-  .command("init", "Initialize a new Lorm project with configuration files")
-  .option("--force", "Overwrite existing files")
-  .option("--skip-install", "Skip dependency installation")
-  .action(async (options) => {
-    const { PerformanceMonitor, ErrorRecovery } = await getLormLib();
-    const chalk = await getChalk();
-
-    const startTime = Date.now();
-    const perfMonitor = new PerformanceMonitor();
-    const perfTracker = perfMonitor.startTracking("init");
-
-    await ErrorRecovery.withErrorHandling(async () => {
-      console.log(chalk.blue("[lorm] Initializing lorm project..."));
-
+commandRegistry.register(
+  createCommand({
+    name: "init",
+    description: "Initialize a new Lorm project with configuration files",
+    category: "core",
+    options: [
+      { flag: "--force", description: "Overwrite existing files" },
+      { flag: "--skip-install", description: "Skip dependency installation" },
+    ],
+    examples: [
+      "npx @lorm/cli init",
+      "npx @lorm/cli init --force",
+      "npx @lorm/cli init --skip-install",
+    ],
+    action: async (options: InitCommandOptions) => {
       const { initProject } = await import("./commands/init.js");
-
       await initProject(options);
-      console.log(chalk.green("✅ Project initialized successfully!"));
+    },
+  })
+);
 
-      perfTracker.end(options);
-    }, "Project initialization");
-  });
-
-cli
-  .command(
-    "db:push",
-    "Push schema changes directly to the database (destructive)"
-  )
-  .alias("push")
-  .option("--force", "Force push without confirmation")
-  .action(async (options) => {
-    const { PerformanceMonitor, ErrorRecovery, validateConfigOrExit } =
-      await getLormLib();
-    const chalk = await getChalk();
-
-    const startTime = Date.now();
-    const perfMonitor = new PerformanceMonitor();
-    const perfTracker = perfMonitor.startTracking("db:push");
-
-    await ErrorRecovery.withErrorHandling(async () => {
-      await validateConfigOrExit({ requireConfig: true, requireSchema: true });
-      console.log(chalk.blue("[lorm] Pushing schema to database..."));
-
+commandRegistry.register(
+  createDatabaseCommand({
+    name: "db:push",
+    description: "Push schema changes directly to the database (destructive)",
+    aliases: ["push"],
+    requiresSchema: true,
+    options: [
+      { flag: "--force", description: "Force push without confirmation" },
+    ],
+    examples: [
+      "npx @lorm/cli db:push",
+      "npx @lorm/cli push",
+      "npx @lorm/cli db:push --force",
+    ],
+    action: async (options: DbPushCommandOptions) => {
       const { push } = await import("./commands/db/index.js");
-
       await push();
-      console.log(chalk.green("✅ Schema pushed successfully!"));
+    },
+  })
+);
 
-      perfTracker.end(options);
-    }, "Schema push");
-  });
-
-cli
-  .command("db:generate", "Generate migration files from schema changes")
-  .alias("generate")
-  .option("--name <name>", "Custom migration name")
-  .action(async (options) => {
-    const { PerformanceMonitor, ErrorRecovery, validateConfigOrExit } =
-      await getLormLib();
-    const chalk = await getChalk();
-
-    const startTime = Date.now();
-    const perfMonitor = new PerformanceMonitor();
-    const perfTracker = perfMonitor.startTracking("db:generate");
-
-    await ErrorRecovery.withErrorHandling(async () => {
-      await validateConfigOrExit({ requireConfig: true, requireSchema: true });
-      console.log(chalk.blue("[lorm] Generating migration files..."));
-
+commandRegistry.register(
+  createDatabaseCommand({
+    name: "db:generate",
+    description: "Generate migration files from schema changes",
+    aliases: ["generate"],
+    requiresSchema: true,
+    options: [{ flag: "--name <name>", description: "Custom migration name" }],
+    examples: [
+      "npx @lorm/cli db:generate",
+      "npx @lorm/cli generate",
+      "npx @lorm/cli db:generate --name add_users_table",
+    ],
+    action: async (options: DbGenerateCommandOptions) => {
       const { generate } = await import("./commands/db/index.js");
-
       await generate();
-      console.log(chalk.green("✅ Migration files generated!"));
+    },
+  })
+);
 
-      perfTracker.end(options);
-    }, "Migration generation");
-  });
-
-cli
-  .command("db:migrate", "Apply pending database migrations")
-  .alias("migrate")
-  .option("--to <target>", "Migrate to specific migration")
-  .action(async (options) => {
-    const { PerformanceMonitor, ErrorRecovery, validateConfigOrExit } =
-      await getLormLib();
-    const chalk = await getChalk();
-
-    const startTime = Date.now();
-    const perfMonitor = new PerformanceMonitor();
-    const perfTracker = perfMonitor.startTracking("db:migrate");
-
-    await ErrorRecovery.withErrorHandling(async () => {
-      await validateConfigOrExit({ requireConfig: true });
-      console.log(chalk.blue("[lorm] Applying database migrations..."));
-
+commandRegistry.register(
+  createDatabaseCommand({
+    name: "db:migrate",
+    description: "Apply pending database migrations",
+    aliases: ["migrate"],
+    options: [
+      { flag: "--to <target>", description: "Migrate to specific migration" },
+    ],
+    examples: [
+      "npx @lorm/cli db:migrate",
+      "npx @lorm/cli migrate",
+      "npx @lorm/cli db:migrate --to 20231201_001",
+    ],
+    action: async (options: DbMigrateCommandOptions) => {
       const { migrate } = await import("./commands/db/index.js");
-
       await migrate();
-      console.log(chalk.green("✅ Migrations applied successfully!"));
+    },
+  })
+);
 
-      perfTracker.end(options);
-    }, "Migration execution");
-  });
-
-cli
-  .command("db:pull", "Pull and introspect schema from existing database")
-  .alias("pull")
-  .option("--out <dir>", "Output directory for schema files")
-  .action(async (options) => {
-    const { PerformanceMonitor, ErrorRecovery, validateConfigOrExit } =
-      await getLormLib();
-    const chalk = await getChalk();
-
-    const startTime = Date.now();
-    const perfMonitor = new PerformanceMonitor();
-    const perfTracker = perfMonitor.startTracking("db:pull");
-
-    await ErrorRecovery.withErrorHandling(async () => {
-      await validateConfigOrExit({ requireConfig: true });
-      console.log(chalk.blue("[lorm] Pulling schema from database..."));
-
+commandRegistry.register(
+  createDatabaseCommand({
+    name: "db:pull",
+    description: "Pull database schema and generate types",
+    aliases: ["pull"],
+    options: [
+      {
+        flag: "--introspect",
+        description: "Only introspect, don't generate types",
+      },
+    ],
+    examples: [
+      "npx @lorm/cli db:pull",
+      "npx @lorm/cli pull",
+      "npx @lorm/cli db:pull --introspect",
+    ],
+    action: async (options: DbPullCommandOptions) => {
       const { pull } = await import("./commands/db/index.js");
-
       await pull();
-      console.log(chalk.green("✅ Schema pulled successfully!"));
+    },
+  })
+);
 
-      perfTracker.end(options);
-    }, "Schema introspection");
-  });
+commandRegistry.register(
+  createCommand({
+    name: "check",
+    description: "Check configuration and schema validity",
+    category: "core",
+    options: [{ flag: "--fix", description: "Attempt to fix common issues" }],
+    examples: ["npx @lorm/cli check", "npx @lorm/cli check --fix"],
+    action: async (options: CheckCommandOptions) => {
+      const { check } = await import("./commands/check.js");
+      await check(options);
+    },
+  })
+);
 
-cli
-  .command("check", "Check schema consistency and validate configuration")
-  .option("--verbose", "Show detailed validation output")
-  .action(async (options) => {
-    const { PerformanceMonitor, ErrorRecovery } = await getLormLib();
-    const chalk = await getChalk();
-
-    const startTime = Date.now();
-    const perfMonitor = new PerformanceMonitor();
-    const perfTracker = perfMonitor.startTracking("check");
-
-    await ErrorRecovery.withErrorHandling(async () => {
-      console.log(chalk.blue("[lorm] Checking schema consistency..."));
-
-      await getCheckCommand();
-      console.log(chalk.green("✅ Schema check completed!"));
-
-      perfTracker.end(options);
-    }, "Schema validation");
-  });
-
-cli
-  .command("db:up", "Upgrade schema to latest version")
-  .alias("up")
-  .option("--dry-run", "Show what would be upgraded without applying")
-  .action(async (options) => {
-    const { PerformanceMonitor, ErrorRecovery, validateConfigOrExit } =
-      await getLormLib();
-    const chalk = await getChalk();
-
-    const startTime = Date.now();
-    const perfMonitor = new PerformanceMonitor();
-    const perfTracker = perfMonitor.startTracking("db:up");
-
-    await ErrorRecovery.withErrorHandling(async () => {
-      await validateConfigOrExit({ requireConfig: true, requireSchema: true });
-      console.log(chalk.blue("[lorm] Upgrading schema..."));
-
+commandRegistry.register(
+  createDatabaseCommand({
+    name: "db:up",
+    description: "Upgrade schema to latest version",
+    aliases: ["up"],
+    requiresSchema: true,
+    options: [
+      {
+        flag: "--dry-run",
+        description: "Show what would be upgraded without applying",
+      },
+    ],
+    examples: [
+      "npx @lorm/cli db:up",
+      "npx @lorm/cli up",
+      "npx @lorm/cli db:up --dry-run",
+    ],
+    action: async (options: DbUpCommandOptions) => {
       const { up } = await import("./commands/db/index.js");
-
       await up();
-      console.log(chalk.green("✅ Schema upgraded successfully!"));
+    },
+  })
+);
 
-      perfTracker.end(options);
-    }, "Schema upgrade");
-  });
-
-cli
-  .command("db:studio", "Start Drizzle Studio for database management")
-  .alias("studio")
-  .option("--port <port>", "Port for Drizzle Studio", { default: 4983 })
-  .option("--host <host>", "Host for Drizzle Studio", { default: "localhost" })
-  .action(async (options) => {
-    const { PerformanceMonitor, ErrorRecovery, validateConfigOrExit } =
-      await getLormLib();
-    const chalk = await getChalk();
-
-    const startTime = Date.now();
-    const perfMonitor = new PerformanceMonitor();
-    const perfTracker = perfMonitor.startTracking("db:studio");
-
-    await ErrorRecovery.withErrorHandling(async () => {
-      await validateConfigOrExit({ requireConfig: true });
-      console.log(chalk.blue("[lorm] Starting Drizzle Studio..."));
-
+commandRegistry.register(
+  createDatabaseCommand({
+    name: "db:studio",
+    description: "Open database studio for visual management",
+    aliases: ["studio"],
+    options: [
+      {
+        flag: "--port <port>",
+        description: "Port for studio server",
+        defaultValue: 4983,
+      },
+      {
+        flag: "--host <host>",
+        description: "Host for studio server",
+        defaultValue: "localhost",
+      },
+    ],
+    examples: [
+      "npx @lorm/cli db:studio",
+      "npx @lorm/cli studio",
+      "npx @lorm/cli db:studio --port 5000",
+    ],
+    action: async (options: DbStudioCommandOptions) => {
       const { studio } = await import("./commands/db/index.js");
-
       await studio();
-      console.log(
-        chalk.green(
-          `🎨 Drizzle Studio running on ${options.host}:${options.port}`
-        )
-      );
+    },
+  })
+);
 
-      perfTracker.end(options);
-    }, "Drizzle Studio startup");
-  });
+commandRegistry.register(
+  createCommand({
+    name: "perf",
+    description: "Show performance metrics and diagnostics",
+    category: "development",
+    options: [
+      { flag: "--clear", description: "Clear performance history" },
+      { flag: "--export <file>", description: "Export metrics to file" },
+    ],
+    examples: [
+      "npx @lorm/cli perf",
+      "npx @lorm/cli perf --clear",
+      "npx @lorm/cli perf --export metrics.json",
+    ],
+    action: async (options: PerformanceCommandOptions) => {
+      const { PerformanceMonitor } = await getLormLib();
+      const chalk = await getChalk();
 
-cli
-  .command("perf", "Show CLI performance metrics and diagnostics")
-  .option("--clear", "Clear performance metrics")
-  .action(async (options) => {
-    const { PerformanceMonitor } = await getLormLib();
-    const chalk = await getChalk();
+      const perfMonitor = new PerformanceMonitor();
 
-    const perfMonitor = new PerformanceMonitor();
-    if (options.clear) {
-      perfMonitor.clearMetrics();
-      console.log(chalk.green("✅ Performance metrics cleared!"));
-    } else {
+      if (options.clear) {
+        await perfMonitor.clearMetrics();
+        console.log(chalk.green("✅ Performance history cleared!"));
+        return;
+      }
+
+      const report = await perfMonitor.generateReport();
       perfMonitor.displayReport();
-    }
-  });
+
+      if (options.export) {
+        console.log(chalk.blue(`📊 Metrics exported to ${options.export}`));
+      }
+    },
+  })
+);
+
+commandRegistry.register(
+  createCommand({
+    name: "health",
+    description: "Run health checks and system diagnostics",
+    category: "development",
+    aliases: ["doctor"],
+    options: [
+      { flag: "--system", description: "Show system information" },
+      { flag: "--json", description: "Output results in JSON format" },
+    ],
+    examples: [
+      "npx @lorm/cli health",
+      "npx @lorm/cli doctor",
+      "npx @lorm/cli health --system",
+      "npx @lorm/cli health --json",
+    ],
+    action: async (options: HealthCommandOptions) => {
+      const healthChecker = new HealthChecker();
+
+      if (options.system) {
+        const systemInfo = await healthChecker.getSystemInfo();
+        healthChecker.displaySystemInfo(systemInfo);
+      }
+
+      const results = await healthChecker.runAllChecks();
+
+      if (options.json) {
+        console.log(JSON.stringify(results, null, 2));
+      } else {
+        healthChecker.displayResults(results);
+      }
+
+      // Exit with error code if any checks failed
+      const hasFailures = results.some((r) => r.status === "fail");
+      if (hasFailures) {
+        process.exit(1);
+      }
+    },
+  })
+);
+
+commandRegistry.register(
+  createCommand({
+    name: "doctor",
+    description: "Alias for health command - run comprehensive diagnostics",
+    category: "development",
+    action: async (options: HealthCommandOptions) => {
+      // Redirect to health command
+      const healthChecker = new HealthChecker();
+      const systemInfo = await healthChecker.getSystemInfo();
+      const results = await healthChecker.runAllChecks();
+
+      healthChecker.displaySystemInfo(systemInfo);
+      healthChecker.displayResults(results);
+
+      const hasFailures = results.some((r) => r.status === "fail");
+      if (hasFailures) {
+        process.exit(1);
+      }
+    },
+  })
+);
+
+// Plugin management commands
+commandRegistry.register(
+  createCommand({
+    name: "plugin:list",
+    description: "List installed plugins",
+    category: "plugin",
+    aliases: ["plugins"],
+    options: [
+      { flag: "--installed", description: "Show only installed plugins" },
+      { flag: "--enabled", description: "Show only enabled plugins" },
+    ],
+    examples: [
+      "npx @lorm/cli plugin:list",
+      "npx @lorm/cli plugins",
+      "npx @lorm/cli plugin:list --enabled",
+    ],
+    action: async (options: PluginListCommandOptions) => {
+      const pluginManager = new SimplePluginManager();
+      const plugins = await pluginManager.listPlugins({
+        installed: options.installed,
+        enabled: options.enabled,
+      });
+      pluginManager.displayPlugins(plugins);
+    },
+  })
+);
+
+commandRegistry.register(
+  createCommand({
+    name: "plugin:install",
+    description: "Install a plugin from npm, git, or local path",
+    category: "plugin",
+    options: [
+      {
+        flag: "--force",
+        description: "Force installation even if plugin exists",
+      },
+    ],
+    examples: [
+      "npx @lorm/cli plugin:install @lorm/plugin-example",
+      "npx @lorm/cli plugin:install github:user/lorm-plugin",
+      "npx @lorm/cli plugin:install ./local-plugin",
+      "npx @lorm/cli plugin:install @lorm/plugin-example --force",
+    ],
+    action: async (options: PluginInstallCommandOptions) => {
+      const nameOrPath = options._?.[0];
+      if (!nameOrPath) {
+        console.error("❌ Plugin name or path is required");
+        process.exit(1);
+      }
+
+      const pluginManager = new SimplePluginManager();
+      await pluginManager.installPlugin(nameOrPath, { force: options.force });
+    },
+  })
+);
+
+commandRegistry.register(
+  createCommand({
+    name: "plugin:uninstall",
+    description: "Uninstall a plugin",
+    category: "plugin",
+    examples: ["npx @lorm/cli plugin:uninstall @lorm/plugin-example"],
+    action: async (options: PluginUninstallCommandOptions) => {
+      const name = options._?.[0];
+      if (!name) {
+        console.error("❌ Plugin name is required");
+        process.exit(1);
+      }
+
+      const pluginManager = new SimplePluginManager();
+      await pluginManager.uninstallPlugin(name);
+    },
+  })
+);
+
+commandRegistry.register(
+  createCommand({
+    name: "plugin:enable",
+    description: "Enable a plugin",
+    category: "plugin",
+    examples: ["npx @lorm/cli plugin:enable @lorm/plugin-example"],
+    action: async (options: PluginEnableCommandOptions) => {
+      const name = options._?.[0];
+      if (!name) {
+        console.error("❌ Plugin name is required");
+        process.exit(1);
+      }
+
+      const pluginManager = new SimplePluginManager();
+      await pluginManager.enablePlugin(name);
+    },
+  })
+);
+
+commandRegistry.register(
+  createCommand({
+    name: "plugin:disable",
+    description: "Disable a plugin",
+    category: "plugin",
+    examples: ["npx @lorm/cli plugin:disable @lorm/plugin-example"],
+    action: async (options: PluginDisableCommandOptions) => {
+      const name = options._?.[0];
+      if (!name) {
+        console.error("❌ Plugin name is required");
+        process.exit(1);
+      }
+
+      const pluginManager = new SimplePluginManager();
+      await pluginManager.disablePlugin(name);
+    },
+  })
+);
+
+commandRegistry.register(
+  createCommand({
+    name: "plugin:update",
+    description: "Update a plugin to the latest version",
+    category: "plugin",
+    examples: ["npx @lorm/cli plugin:update @lorm/plugin-example"],
+    action: async (options: PluginUpdateCommandOptions) => {
+      const name = options._?.[0];
+      if (!name) {
+        console.error("❌ Plugin name is required");
+        process.exit(1);
+      }
+
+      const pluginManager = new SimplePluginManager();
+      await pluginManager.updatePlugin(name);
+    },
+  })
+);
+
+commandRegistry.register(
+  createCommand({
+    name: "plugin:search",
+    description: "Search for available plugins",
+    category: "plugin",
+    examples: [
+      "npx @lorm/cli plugin:search auth",
+      "npx @lorm/cli plugin:search database",
+    ],
+    action: async (options: PluginSearchCommandOptions) => {
+      const query = options._?.[0];
+      if (!query) {
+        console.error("❌ Search query is required");
+        process.exit(1);
+      }
+
+      const pluginManager = new SimplePluginManager();
+      const plugins = await pluginManager.searchPlugins(query);
+      pluginManager.displayPlugins(plugins);
+    },
+  })
+);
+
+// Apply all registered commands to the CLI
+commandRegistry.applyToCAC(cli);
 
 if (process.argv.includes("--help") || process.argv.includes("-h")) {
-  const args = process.argv.slice(2);
-  const command = args.find((arg) => !arg.startsWith("-"));
-
   (async () => {
-    const { displayCommandHelp, displayGeneralHelp } = await getLormLib();
-    if (command && command !== "--help" && command !== "-h") {
-      displayCommandHelp(command);
-    } else {
-      displayGeneralHelp();
-    }
+    const { displayGeneralHelp } = await getLormLib();
+    displayGeneralHelp();
     process.exit(0);
   })();
 }
 
-cli.on("command:*", async (unknownCommand) => {
+cli.on("command:*", async () => {
   const chalk = await getChalk();
-  console.log(chalk.red(`❌ Unknown command: ${unknownCommand}`));
+  console.error(chalk.red(`Unknown command: ${cli.args[0]}`));
   console.log(
-    chalk.blue("\n📖 Run 'lorm help' to see all available commands.")
+    chalk.gray("\nRun 'npx @lorm/cli help' to see available commands")
   );
   process.exit(1);
 });
 
 cli.version(packageJson.version);
 
-loadPluginsAndParse();
+const main = async () => {
+  const tracker = performanceMonitor.startTracking("cli-startup");
+
+  try {
+    // Warm cache for critical modules
+    await warmCache("high");
+
+    await loadPluginsAndParse();
+
+    // Add cache stats command for debugging
+    cli
+      .command("cache:stats", "Show cache statistics")
+      .action(async (options: CacheStatsCommandOptions) => {
+        const chalk = await getChalk();
+        const stats = getCacheStats();
+        console.log(chalk.blue("\n📊 Cache Statistics:"));
+
+        console.log(chalk.green(`✅ Cached modules (${stats.cached.length}):`));
+        stats.cached.forEach((module) => {
+          console.log(`  ${module}`);
+        });
+
+        if (stats.loading.length > 0) {
+          console.log(
+            chalk.yellow(`⏳ Loading modules (${stats.loading.length}):`)
+          );
+          stats.loading.forEach((module) => {
+            console.log(`  ${module}`);
+          });
+        }
+
+        if (stats.errors.length > 0) {
+          console.log(
+            chalk.red(`❌ Modules with errors (${stats.errors.length}):`)
+          );
+          stats.errors.forEach(({ module, error }) => {
+            console.log(`  ${module}: ${error}`);
+          });
+        }
+      });
+
+    tracker.end(undefined, true);
+  } catch (error) {
+    tracker.recordError();
+    tracker.end(undefined, false);
+    throw error;
+  }
+};
+
+main().catch(console.error);
 
 export const check = async () => {
   const { check } = await import("./commands/check.js");
   return check;
 };
+
+export { performanceMonitor };

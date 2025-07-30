@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import type { CAC } from "cac";
 import { resolve } from "path";
-import { existsSync, readFileSync, readdirSync } from "fs";
+import { FileUtils } from "./file-utils";
 
 export interface PluginContext {
   cli: CAC;
@@ -221,9 +221,9 @@ export class PluginManager {
     const pluginPaths: string[] = [];
 
     const nodeModulesPath = resolve(this.context.cwd, "node_modules");
-    if (existsSync(nodeModulesPath)) {
+    if (FileUtils.exists(nodeModulesPath)) {
       try {
-        const packages = readdirSync(nodeModulesPath);
+        const packages = FileUtils.readDirSync(nodeModulesPath);
         for (const pkg of packages) {
           if (
             pkg.startsWith("lorm-plugin-") ||
@@ -238,9 +238,9 @@ export class PluginManager {
     }
 
     const localPluginsPath = resolve(this.context.cwd, ".lorm", "plugins");
-    if (existsSync(localPluginsPath)) {
+    if (FileUtils.exists(localPluginsPath)) {
       try {
-        const localPlugins = readdirSync(localPluginsPath);
+        const localPlugins = FileUtils.readDirSync(localPluginsPath);
         for (const plugin of localPlugins) {
           pluginPaths.push(resolve(localPluginsPath, plugin));
         }
@@ -254,11 +254,11 @@ export class PluginManager {
 
   private async loadPlugin(pluginPath: string): Promise<void> {
     const packageJsonPath = resolve(pluginPath, "package.json");
-    if (!existsSync(packageJsonPath)) {
+    if (!FileUtils.exists(packageJsonPath)) {
       throw new Error("Plugin package.json not found");
     }
 
-    const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
+    const packageJson = FileUtils.readJsonSync(packageJsonPath);
     const pluginName = packageJson.name;
 
     if (this.config.disabled?.includes(pluginName)) {
@@ -269,7 +269,7 @@ export class PluginManager {
     const mainFile = packageJson.main || "index.js";
     const pluginMainPath = resolve(pluginPath, mainFile);
 
-    if (!existsSync(pluginMainPath)) {
+    if (!FileUtils.exists(pluginMainPath)) {
       throw new Error(`Plugin main file not found: ${mainFile}`);
     }
 
@@ -403,7 +403,7 @@ export class PluginManager {
   private loadConfig(): PluginConfig {
     const configPath = resolve(this.context.cwd, ".lorm", "plugins.json");
 
-    if (!existsSync(configPath)) {
+    if (!FileUtils.exists(configPath)) {
       return {
         plugins: [],
         disabled: [],
@@ -416,7 +416,7 @@ export class PluginManager {
     }
 
     try {
-      return JSON.parse(readFileSync(configPath, "utf-8"));
+      return FileUtils.readJsonSync(configPath);
     } catch (error) {
       console.warn(
         chalk.yellow("⚠️  Failed to load plugin config, using defaults")

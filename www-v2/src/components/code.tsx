@@ -6,28 +6,58 @@
 // ============================================================================
 
 export const installationCodes = {
-  npm: `npm install -g @lorm/cli`,
-  pnpm: `pnpm add -g @lorm/cli`,
-  yarn: `yarn global add @lorm/cli`,
-  bun: `bun install -g @lorm/cli`
+  npm: `# Navigate to your React Native/Expo project
+cd my-react-native-app
+
+# Install Lorm CLI as dev dependency
+npm install @lorm/cli --save-dev`,
+  pnpm: `# Navigate to your React Native/Expo project
+cd my-react-native-app
+
+# Install Lorm CLI as dev dependency
+pnpm add @lorm/cli --D`,
+  yarn: `# Navigate to your React Native/Expo project
+cd my-react-native-app
+
+# Install Lorm CLI as dev dependency
+yarn add @lorm/cli --dev`,
+  bun: `# Navigate to your React Native/Expo project
+cd my-react-native-app
+
+# Install Lorm CLI as dev dependency
+bun add @lorm/cli --dev`
 };
 
-export const globalInstallCode = `npm install -g @lorm/cli`;
+export const projectScopedInstallCode = `# Navigate to your React Native/Expo project
+cd my-react-native-app
+
+# Install Lorm CLI as dev dependency
+npm install @lorm/cli --save-dev`;
 
 export const localInstallCode = `npm install @lorm/cli --save-dev`;
 
 export const clientInstallCode = `npm install @lorm/client`;
 
-export const quickStartCode = `# Initialize your project
-cd my-app
-lorm init
-# Push your schema
-lorm push
-# Start development server
-lorm dev`;
+export const quickStartCode = `# Navigate to your React Native/Expo project
+cd my-react-native-app
 
-export const initCode = `cd my-app
-lorm init`;
+# Install Lorm CLI locally
+npm install @lorm/cli --save-dev
+
+# Initialize Lorm in your project
+npx @lorm/cli init
+
+# Push your schema
+npx @lorm/cli push
+
+# Start development server
+npx @lorm/cli dev`;
+
+export const initCode = `# Navigate to your React Native/Expo project
+cd my-react-native-app
+
+# Initialize Lorm in your project
+npx @lorm/cli init`;
 
 export const packageJsonCode = `{
   "dependencies": {

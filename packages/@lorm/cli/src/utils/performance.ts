@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import { join } from "path";
 import { performance } from "perf_hooks";
-import { writeFileSync, readFileSync, existsSync, mkdirSync } from "fs";
+import { FileUtils } from "./file-utils";
 
 export interface PerformanceMetric {
   command: string;
@@ -9,6 +9,14 @@ export interface PerformanceMetric {
   timestamp: number;
   memoryUsage: NodeJS.MemoryUsage;
   options?: Record<string, any>;
+  cacheStats?: {
+    hits: number;
+    misses: number;
+    size: number;
+  };
+  moduleLoadTimes?: Record<string, number>;
+  errorCount?: number;
+  success: boolean;
 }
 
 export interface PerformanceReport {
@@ -28,8 +36,8 @@ export class PerformanceMonitor {
 
   constructor() {
     const lormDir = join(process.cwd(), ".lorm");
-    if (!existsSync(lormDir)) {
-      mkdirSync(lormDir, { recursive: true });
+    if (!FileUtils.exists(lormDir)) {
+      FileUtils.ensureDirSync(lormDir);
     }
     this.metricsFile = join(lormDir, "performance-metrics.json");
   }
@@ -155,31 +163,50 @@ export class PerformanceMonitor {
 
   private loadMetrics(): PerformanceMetric[] {
     try {
-      if (!existsSync(this.metricsFile)) {
+      if (!FileUtils.exists(this.metricsFile)) {
         return [];
       }
-      const data = readFileSync(this.metricsFile, "utf-8");
-      return JSON.parse(data);
+      return FileUtils.readJsonSync<PerformanceMetric[]>(this.metricsFile);
     } catch (error) {
       return [];
     }
   }
 
   private saveMetrics(metrics: PerformanceMetric[]): void {
-    writeFileSync(this.metricsFile, JSON.stringify(metrics, null, 2));
+    FileUtils.writeJsonSync(this.metricsFile, metrics);
   }
 }
 
 export class PerformanceTracker {
   private startTime: number;
   private startMemory: NodeJS.MemoryUsage;
+  private moduleLoadTimes: Record<string, number> = {};
+  private errorCount = 0;
+  private cacheHits = 0;
+  private cacheMisses = 0;
 
   constructor(private command: string, private monitor: PerformanceMonitor) {
     this.startTime = performance.now();
     this.startMemory = process.memoryUsage();
   }
 
-  end(options?: Record<string, any>): void {
+  trackModuleLoad(moduleName: string, loadTime: number): void {
+    this.moduleLoadTimes[moduleName] = loadTime;
+  }
+
+  recordCacheHit(): void {
+    this.cacheHits++;
+  }
+
+  recordCacheMiss(): void {
+    this.cacheMisses++;
+  }
+
+  recordError(): void {
+    this.errorCount++;
+  }
+
+  end(options?: Record<string, any>, success: boolean = true): void {
     const endTime = performance.now();
     const endMemory = process.memoryUsage();
 
@@ -189,6 +216,17 @@ export class PerformanceTracker {
       timestamp: Date.now(),
       memoryUsage: endMemory,
       options: options ? this.sanitizeOptions(options) : undefined,
+      cacheStats: {
+        hits: this.cacheHits,
+        misses: this.cacheMisses,
+        size: this.cacheHits + this.cacheMisses,
+      },
+      moduleLoadTimes:
+        Object.keys(this.moduleLoadTimes).length > 0
+          ? this.moduleLoadTimes
+          : undefined,
+      errorCount: this.errorCount,
+      success,
     };
 
     this.monitor.recordMetric(metric);

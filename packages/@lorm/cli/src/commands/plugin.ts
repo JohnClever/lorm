@@ -129,7 +129,7 @@ export async function installAction(
   if (success) {
     PluginCommandUtils.logSuccess(
       `Plugin ${name} installed successfully`,
-      "Run 'lorm plugin:reload' to activate"
+      "Run 'npx @lorm/cli plugin:reload' to activate"
     );
   } else {
     throw new Error(`Installation failed for plugin ${name}`);
@@ -304,7 +304,7 @@ function registerListCommand(cli: CAC, pluginManager: PluginManager): void {
         if (plugins.length === 0) {
           console.log(chalk.gray("No plugins installed"));
           console.log(
-            chalk.gray("Use 'lorm plugin:search <query>' to find plugins")
+            chalk.gray("Use 'npx @lorm/cli plugin:search <query>' to find plugins")
           );
           return;
         }
@@ -563,8 +563,8 @@ function registerCreateCommand(cli: CAC): void {
           console.log(
             chalk.gray("1. Edit the plugin file to add your functionality")
           );
-          console.log(chalk.gray("2. Test with: lorm plugin:test"));
-          console.log(chalk.gray("3. Load with: lorm plugin:reload"));
+          console.log(chalk.gray("2. Test with: npx @lorm/cli plugin:test"));
+          console.log(chalk.gray("3. Load with: npx @lorm/cli plugin:reload"));
 
           if (options.type !== "free") {
             console.log(chalk.gray("4. Configure license validation"));
@@ -633,7 +633,7 @@ function registerUninstallCommand(
             }
 
             console.log(
-              chalk.gray("Run 'lorm plugin:reload' to update active plugins")
+              chalk.gray("Run 'npx @lorm/cli plugin:reload' to update active plugins")
             );
           } catch (error: any) {
             if (error.code === "ENOENT") {
@@ -667,9 +667,9 @@ function registerUpdateCommand(cli: CAC, pluginManager: PluginManager): void {
               "Please specify a plugin name or use --all"
             );
             console.log(chalk.gray("Examples:"));
-            console.log(chalk.gray("  lorm plugin:update my-plugin"));
-            console.log(chalk.gray("  lorm plugin:update --all"));
-            console.log(chalk.gray("  lorm plugin:update --all --check-only"));
+            console.log(chalk.gray("  npx @lorm/cli plugin:update my-plugin"));
+            console.log(chalk.gray("  npx @lorm/cli plugin:update --all"));
+            console.log(chalk.gray("  npx @lorm/cli plugin:update --all --check-only"));
             return;
           }
 
@@ -678,7 +678,7 @@ function registerUpdateCommand(cli: CAC, pluginManager: PluginManager): void {
           if (plugins.length === 0) {
             PluginCommandUtils.logWarning("No plugins installed");
             console.log(
-              chalk.gray("Use 'lorm plugin:search <query>' to find plugins")
+              chalk.gray("Use 'npx @lorm/cli plugin:search <query>' to find plugins")
             );
             return;
           }
@@ -760,7 +760,7 @@ function registerUpdateCommand(cli: CAC, pluginManager: PluginManager): void {
                 `${updated} plugin(s) updated successfully`
               );
               console.log(
-                chalk.gray("Run 'lorm plugin:reload' to activate updates")
+                chalk.gray("Run 'npx @lorm/cli plugin:reload' to activate updates")
               );
             }
             if (failed > 0) {

@@ -14,7 +14,7 @@ async function validateMigrations(migrationsDir: string): Promise<void> {
     if (migrationFiles.length === 0) {
       console.warn(
         "⚠️ [lorm] No migration files found.\n" +
-          "Run 'lorm generate' first to create migration files."
+          "Run 'npx @lorm/cli generate' first to create migration files."
       );
     } else {
       console.log(`📄 [lorm] Found ${migrationFiles.length} migration file(s)`);
@@ -22,7 +22,7 @@ async function validateMigrations(migrationsDir: string): Promise<void> {
   } catch {
     console.warn(
       "⚠️ [lorm] Migrations directory not found.\n" +
-        "Run 'lorm generate' first to create migration files."
+        "Run 'npx @lorm/cli generate' first to create migration files."
     );
   }
 }

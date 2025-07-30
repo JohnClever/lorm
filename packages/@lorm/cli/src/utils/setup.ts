@@ -1,11 +1,11 @@
 import path from "path";
-import fs from "fs/promises";
 import { loadConfig } from "@lorm/core";
 import { drizzleConfigTemplate } from "@/templates";
+import { FileUtils } from "./file-utils";
 
 export async function validateSchemaFile(schemaPath: string): Promise<void> {
   try {
-    await fs.access(schemaPath);
+    await FileUtils.access(schemaPath);
     console.log("✅ [lorm] Schema file found");
   } catch {
     throw new Error(
@@ -23,7 +23,7 @@ export async function setupLormDirectory(
   config: any
 ): Promise<void> {
   try {
-    await fs.mkdir(lormDir, { recursive: true });
+    await FileUtils.ensureDir(lormDir);
     console.log("📁 [lorm] Created .lorm directory");
 
     const schemaPath = path.join(rootDir, "lorm.schema.js");
@@ -32,10 +32,10 @@ export async function setupLormDirectory(
     const schemaImport = `export * from "${path
       .join(rootDir, "lorm.schema")
       .replace(/\\/g, "/")}";`;
-    await fs.writeFile(schemaTargetPath, schemaImport);
+    await FileUtils.writeFile(schemaTargetPath, schemaImport);
     console.log("📝 [lorm] Generated schema import file");
 
-    await fs.writeFile(drizzleConfigPath, drizzleConfigTemplate(config));
+    await FileUtils.writeFile(drizzleConfigPath, drizzleConfigTemplate(config));
     console.log("⚙️ [lorm] Generated drizzle config file");
   } catch (error) {
     throw new Error(`[lorm] Failed to setup .lorm directory: ${error}`);

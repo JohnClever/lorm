@@ -11,6 +11,14 @@ export interface CommandHelp {
   usage: string;
   examples: CommandExample[];
   options?: { flag: string; description: string; default?: string }[];
+  category?: string;
+  relatedCommands?: string[];
+}
+
+export interface CommandCategory {
+  name: string;
+  description: string;
+  commands: string[];
 }
 
 export const COMMAND_HELP: Record<string, CommandHelp> = {
@@ -18,6 +26,8 @@ export const COMMAND_HELP: Record<string, CommandHelp> = {
     name: "init",
     description: "Initialize a new Lorm project with configuration files",
     usage: "npx @lorm/cli init [options]",
+    category: "Project Setup",
+    relatedCommands: ["check", "dev"],
     examples: [
       {
         command: "npx @lorm/cli init",
@@ -42,6 +52,8 @@ export const COMMAND_HELP: Record<string, CommandHelp> = {
     description:
       "Start development server with file watching and type generation",
     usage: "npx @lorm/cli dev [options]",
+    category: "Development",
+    relatedCommands: ["check", "db:studio"],
     examples: [
       {
         command: "npx @lorm/cli dev",
@@ -64,6 +76,8 @@ export const COMMAND_HELP: Record<string, CommandHelp> = {
     name: "db:push",
     description: "Push schema changes directly to the database (destructive)",
     usage: "npx @lorm/cli db:push [options]",
+    category: "Database",
+    relatedCommands: ["db:generate", "db:migrate"],
     examples: [
       {
         command: "npx @lorm/cli db:push",
@@ -82,6 +96,8 @@ export const COMMAND_HELP: Record<string, CommandHelp> = {
     name: "db:generate",
     description: "Generate migration files from schema changes",
     usage: "npx @lorm/cli db:generate [options]",
+    category: "Database",
+    relatedCommands: ["db:migrate", "db:push"],
     examples: [
       {
         command: "npx @lorm/cli db:generate",
@@ -98,6 +114,8 @@ export const COMMAND_HELP: Record<string, CommandHelp> = {
     name: "db:migrate",
     description: "Apply pending database migrations",
     usage: "npx @lorm/cli db:migrate [options]",
+    category: "Database",
+    relatedCommands: ["db:generate", "db:studio"],
     examples: [
       {
         command: "npx @lorm/cli db:migrate",
@@ -116,6 +134,8 @@ export const COMMAND_HELP: Record<string, CommandHelp> = {
     name: "db:pull",
     description: "Pull and introspect schema from existing database",
     usage: "npx @lorm/cli db:pull [options]",
+    category: "Database",
+    relatedCommands: ["db:generate", "check"],
     examples: [
       {
         command: "npx @lorm/cli db:pull",
@@ -134,6 +154,8 @@ export const COMMAND_HELP: Record<string, CommandHelp> = {
     name: "db:studio",
     description: "Start Drizzle Studio for database management",
     usage: "npx @lorm/cli db:studio [options]",
+    category: "Database",
+    relatedCommands: ["dev", "db:migrate"],
     examples: [
       {
         command: "npx @lorm/cli db:studio",
@@ -161,6 +183,8 @@ export const COMMAND_HELP: Record<string, CommandHelp> = {
     name: "check",
     description: "Check schema consistency and validate configuration",
     usage: "npx @lorm/cli check [options]",
+    category: "Validation",
+    relatedCommands: ["init", "dev"],
     examples: [
       {
         command: "npx @lorm/cli check",
@@ -214,8 +238,43 @@ export function displayCommandHelp(commandName: string): void {
     console.log(`    ${chalk.gray(example.description)}`);
   });
 
+  if (help.relatedCommands && help.relatedCommands.length > 0) {
+    console.log(chalk.bold("\nRelated Commands:"));
+    help.relatedCommands.forEach((cmd) => {
+      const relatedHelp = COMMAND_HELP[cmd];
+      if (relatedHelp) {
+        console.log(`  ${chalk.cyan(cmd.padEnd(15))} ${chalk.gray(relatedHelp.description)}`);
+      }
+    });
+  }
+
+  console.log();
+  console.log(chalk.gray(`💡 Run 'npx @lorm/cli help' to see all commands`));
   console.log();
 }
+
+export const COMMAND_CATEGORIES: CommandCategory[] = [
+  {
+    name: "Project Setup",
+    description: "Initialize and configure your Lorm project",
+    commands: ["init"]
+  },
+  {
+    name: "Development",
+    description: "Development server and tools",
+    commands: ["dev"]
+  },
+  {
+    name: "Database",
+    description: "Database schema and migration management",
+    commands: ["db:push", "db:generate", "db:migrate", "db:pull", "db:studio"]
+  },
+  {
+    name: "Validation",
+    description: "Project validation and health checks",
+    commands: ["check"]
+  }
+];
 
 /**
  * Display general help with all available commands
@@ -227,29 +286,107 @@ export function displayGeneralHelp(): void {
   console.log(chalk.bold("Usage:"));
   console.log("  npx @lorm/cli <command> [options]\n");
 
-  console.log(chalk.bold("Available Commands:"));
+  // Quick Start Guide
+  console.log(chalk.bold("🚀 Quick Start:"));
+  console.log(`  ${chalk.cyan('npx @lorm/cli init')}        ${chalk.gray('Initialize a new project')}`);
+  console.log(`  ${chalk.cyan('npx @lorm/cli dev')}         ${chalk.gray('Start development server')}`);
+  console.log(`  ${chalk.cyan('npx @lorm/cli db:push')}     ${chalk.gray('Push schema to database')}`);
+  console.log();
 
-  const commands = Object.values(COMMAND_HELP);
-  const maxNameLength = Math.max(...commands.map((cmd) => cmd.name.length));
-
-  commands.forEach((cmd) => {
-    console.log(
-      `  ${chalk.cyan(cmd.name.padEnd(maxNameLength + 2))} ${chalk.gray(
-        cmd.description
-      )}`
-    );
+  // Categorized Commands
+  COMMAND_CATEGORIES.forEach(category => {
+    console.log(chalk.bold(`📁 ${category.name}:`));
+    console.log(chalk.gray(`   ${category.description}`));
+    
+    category.commands.forEach(cmdName => {
+      const cmd = COMMAND_HELP[cmdName];
+      if (cmd) {
+        console.log(`   ${chalk.cyan(cmdName.padEnd(15))} ${chalk.gray(cmd.description)}`);
+      }
+    });
+    console.log();
   });
 
-  console.log("\n" + chalk.bold("Examples:"));
-  console.log("  npx @lorm/cli init              Initialize a new project");
-  console.log("  npx @lorm/cli dev               Start development server");
-  console.log("  npx @lorm/cli db:push           Push schema to database");
-  console.log(
-    "  npx @lorm/cli help <command>    Get help for specific command"
+  // Global Options
+  console.log(chalk.bold("🔧 Global Options:"));
+  console.log(`  ${chalk.yellow('--help, -h'.padEnd(20))} ${chalk.gray('Show help for command')}`);
+  console.log(`  ${chalk.yellow('--version, -v'.padEnd(20))} ${chalk.gray('Show version number')}`);
+  console.log(`  ${chalk.yellow('--verbose'.padEnd(20))} ${chalk.gray('Enable verbose output')}`);
+  console.log(`  ${chalk.yellow('--quiet, -q'.padEnd(20))} ${chalk.gray('Suppress non-error output')}`);
+  console.log();
+
+  // Footer
+  console.log(chalk.bold("📚 Resources:"));
+  console.log(`  ${chalk.blue('Documentation:')} https://lorm.dev/docs`);
+  console.log(`  ${chalk.blue('GitHub:')} https://github.com/lorm-dev/lorm`);
+  console.log(`  ${chalk.blue('Discord:')} https://discord.gg/lorm`);
+  console.log();
+  
+  console.log(chalk.gray("💡 Run 'npx @lorm/cli help <command>' for detailed command help"));
+  console.log();
+}
+
+/**
+ * Display help for a specific category
+ */
+export function displayCategoryHelp(categoryName: string): void {
+  const category = COMMAND_CATEGORIES.find(cat => 
+    cat.name.toLowerCase() === categoryName.toLowerCase()
   );
 
-  console.log(
-    "\n" + chalk.gray("For more information, visit: https://lorm.dev/docs")
-  );
+  if (!category) {
+    console.error(chalk.red(`Unknown category: ${categoryName}`));
+    console.log(chalk.gray('Available categories:'));
+    COMMAND_CATEGORIES.forEach(cat => {
+      console.log(`  ${chalk.cyan(cat.name)} - ${chalk.gray(cat.description)}`);
+    });
+    return;
+  }
+
+  console.log(chalk.bold.blue(`\n📁 ${category.name}`));
+  console.log(chalk.gray(category.description));
+  console.log();
+
+  category.commands.forEach(cmdName => {
+    const cmd = COMMAND_HELP[cmdName];
+    if (cmd) {
+      console.log(chalk.bold(cmd.name));
+      console.log(`  ${chalk.gray(cmd.description)}`);
+      console.log(`  ${chalk.cyan(cmd.usage)}`);
+      console.log();
+    }
+  });
+
+  console.log(chalk.gray(`💡 Run 'npx @lorm/cli help <command>' for detailed command help`));
+  console.log();
+}
+
+/**
+ * Display quick start guide
+ */
+export function displayQuickStart(): void {
+  console.log(chalk.bold.blue('\n🚀 Lorm CLI Quick Start Guide'));
+  console.log(chalk.gray('Get up and running with Lorm in minutes\n'));
+
+  console.log(chalk.bold('1. Initialize your project:'));
+  console.log(`   ${chalk.cyan('npx @lorm/cli init')}`);
+  console.log(chalk.gray('   This creates lorm.config.js, lorm.schema.js, and installs dependencies\n'));
+
+  console.log(chalk.bold('2. Set up your database:'));
+  console.log(`   ${chalk.cyan('npx @lorm/cli db:push')}`);
+  console.log(chalk.gray('   This pushes your schema to the database\n'));
+
+  console.log(chalk.bold('3. Start developing:'));
+  console.log(`   ${chalk.cyan('npx @lorm/cli dev')}`);
+  console.log(chalk.gray('   This starts the development server with hot reloading\n'));
+
+  console.log(chalk.bold('4. Optional - Open database studio:'));
+  console.log(`   ${chalk.cyan('npx @lorm/cli db:studio')}`);
+  console.log(chalk.gray('   This opens Drizzle Studio for database management\n'));
+
+  console.log(chalk.bold('📚 Next Steps:'));
+  console.log(`  • Read the docs: ${chalk.blue('https://lorm.dev/docs')}`);
+  console.log(`  • Join our Discord: ${chalk.blue('https://discord.gg/lorm')}`);
+  console.log(`  • Check out examples: ${chalk.blue('https://github.com/lorm-dev/examples')}`);
   console.log();
 }

@@ -14,7 +14,7 @@ import { CodeBlock } from '@/components/code-block';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 import {
-  globalInstallCode,
+  projectScopedInstallCode,
   localInstallCode,
   initCode,
   packageJsonCode,
@@ -30,16 +30,14 @@ export default function InstallationPage() {
     <DocsPage toc={[
       { title: 'Prerequisites', url: '#prerequisites', depth: 2 },
       { title: '1. Install the CLI', url: '#install-cli', depth: 2 },
-      { title: 'Global Installation (Recommended)', url: '#global-installation', depth: 3 },
-      { title: 'Local Installation', url: '#local-installation', depth: 3 },
       { title: '2. Initialize Your Project', url: '#initialize-project', depth: 2 },
       { title: '3. Generated Files', url: '#generated-files', depth: 2 },
-      { title: '4. Frontend Client Setup', url: '#frontend-client-setup', depth: 2 },
+      { title: '4. Mobile Client Setup', url: '#mobile-client-setup', depth: 2 },
       { title: 'Next Steps', url: '#next-steps', depth: 2 }
     ]}>
-      <DocsTitle>Installation</DocsTitle>
+      <DocsTitle>Installation for React Native & Expo</DocsTitle>
       <DocsDescription>
-        Get started with Lorm in minutes. Follow this guide to set up your development environment.
+        Get started with Lorm in your React Native or Expo project in minutes. This guide shows you how to add a type-safe backend to your mobile app.
       </DocsDescription>
       <DocsBody>
         <div className="space-y-8">
@@ -68,9 +66,9 @@ export default function InstallationPage() {
               <Card>
                 <CardHeader>
                   <Smartphone className="size-8 text-purple-500 mb-2" />
-                  <CardTitle>TypeScript Frontend</CardTitle>
+                  <CardTitle>React Native or Expo</CardTitle>
                   <CardDescription>
-                    React Native, React, Svelte, Vue, or any TS framework
+                    An existing React Native or Expo project with TypeScript
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -79,39 +77,32 @@ export default function InstallationPage() {
 
           {/* CLI Installation */}
           <div className="space-y-4">
-            <h2 id="install-cli" className="text-2xl font-bold">1. Install the CLI</h2>
+            <h2 id="install-cli" className="text-2xl font-bold">1. Install the CLI in Your Mobile Project</h2>
+            <p className="text-muted-foreground mb-3">
+              Navigate to your existing React Native or Expo project and install Lorm CLI as a development dependency. This keeps your project dependencies clean and ensures version consistency.
+            </p>
+            <CodeBlock code={projectScopedInstallCode} language="bash" />
             
-            <div className="space-y-4">
-              <div>
-                <h3 id="global-installation" className="text-lg font-semibold mb-2">Global Installation (Recommended)</h3>
-                <p className="text-muted-foreground mb-3">
-                  Install the CLI globally to use the <code>lorm</code> command anywhere:
-                </p>
-                <CodeBlock code={globalInstallCode} language="bash" />
-              </div>
-              
-              <div>
-                <h3 id="local-installation" className="text-lg font-semibold mb-2">Local Installation</h3>
-                <p className="text-muted-foreground mb-3">
-                  Or install locally as a dev dependency:
-                </p>
-                <CodeBlock code={localInstallCode} language="bash" />
-              </div>
-            </div>
+            <Alert>
+              <CheckCircle className="h-4 w-4" />
+              <AlertDescription>
+                <strong>Project-Scoped Installation:</strong> Lorm CLI is designed to be installed locally in each project. This eliminates global dependency conflicts and ensures consistent behavior across different projects and team members.
+              </AlertDescription>
+            </Alert>
           </div>
 
           {/* Project Setup */}
           <div className="space-y-4">
-            <h2 id="initialize-project" className="text-2xl font-bold">2. Initialize Your Project</h2>
+            <h2 id="initialize-project" className="text-2xl font-bold">2. Initialize Lorm in Your Mobile Project</h2>
             <p className="text-muted-foreground">
-              Navigate to your project directory and initialize Lorm:
+              Run the initialization command using npx to set up Lorm in your React Native or Expo project:
             </p>
             <CodeBlock code={initCode} language="bash" />
             
             <Alert>
               <CheckCircle className="h-4 w-4" />
               <AlertDescription>
-                This command will install required dependencies and create the necessary configuration files.
+                This command will install required dependencies (<code>@lorm/core</code>, <code>@lorm/schema</code>, <code>zod</code>) and create configuration files for your mobile backend.
               </AlertDescription>
             </Alert>
           </div>
@@ -149,18 +140,25 @@ export default function InstallationPage() {
             </div>
           </div>
 
-          {/* Frontend Setup */}
+          {/* Mobile Client Setup */}
           <div className="space-y-4">
-            <h2 id="frontend-client-setup" className="text-2xl font-bold">4. Frontend Client Setup</h2>
+            <h2 id="mobile-client-setup" className="text-2xl font-bold">4. Mobile Client Setup</h2>
             <p className="text-muted-foreground">
-              Install the client package in your frontend application:
+              Install the client package in your React Native or Expo application to connect to your Lorm backend:
             </p>
             <CodeBlock code={clientInstallCode} language="bash" />
             
             <div className="mt-4">
-              <h3 className="text-lg font-semibold mb-2">Basic Usage</h3>
+              <h3 className="text-lg font-semibold mb-2">Basic Usage in React Native/Expo</h3>
               <CodeBlock code={clientUsageCode} language="typescript" />
             </div>
+            
+            <Alert>
+              <Smartphone className="h-4 w-4" />
+              <AlertDescription>
+                The <code>@lorm/client</code> provides full TypeScript support and works seamlessly with React Native and Expo projects. All API calls are automatically typed based on your backend schema.
+              </AlertDescription>
+            </Alert>
           </div>
 
           {/* Next Steps */}
@@ -175,18 +173,18 @@ export default function InstallationPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Badge variant="outline">lorm push</Badge>
+                  <Badge variant="outline">npx @lorm/cli push</Badge>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader>
                   <CardTitle>Start Development</CardTitle>
                   <CardDescription>
-                    Launch the development server with hot reload
+                    Launch the development server for your mobile app
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Badge variant="outline">lorm dev</Badge>
+                  <Badge variant="outline">npx @lorm/cli dev</Badge>
                 </CardContent>
               </Card>
             </div>
@@ -195,7 +193,7 @@ export default function InstallationPage() {
           <Alert>
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              Make sure to set your <code>DATABASE_URL</code> environment variable before running <code>lorm push</code>.
+              Make sure to set your <code>DATABASE_URL</code> environment variable before running <code>npx @lorm/cli push</code>. Your React Native/Expo app will connect to the Lorm server running on <code>http://localhost:3000</code>.
             </AlertDescription>
           </Alert>
         </div>

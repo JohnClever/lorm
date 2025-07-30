@@ -1,7 +1,7 @@
 import path from "path";
 import chokidar from "chokidar";
 import { typeTemplate, basicTypes } from "@/templates";
-import { writeFile, mkdir, access } from "fs/promises";
+import { FileUtils } from "@/utils/file-utils";
 
 const routerPath = path.resolve("lorm.router.js");
 const lormDir = path.resolve(".lorm");
@@ -9,17 +9,17 @@ const typesPath = path.resolve(".lorm/types.d.ts");
 
 export async function generateTypeFile(): Promise<void> {
   try {
-    await mkdir(lormDir, { recursive: true });
+    await FileUtils.ensureDir(lormDir);
 
     try {
-      await access(routerPath);
+      await FileUtils.access(routerPath);
       console.log("[lorm] 🔄 Generating types from router...");
 
-      await writeFile(typesPath, typeTemplate, "utf8");
+      await FileUtils.writeFile(typesPath, typeTemplate);
 
       console.log("[lorm] ✅ Types generated successfully at .lorm/types.d.ts");
     } catch (routerError) {
-      await writeFile(typesPath, basicTypes, "utf8");
+      await FileUtils.writeFile(typesPath, basicTypes);
       console.log(
         "[lorm] ⚠️  Router not found, created basic types. Create lorm.router.js to get full type safety."
       );

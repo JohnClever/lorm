@@ -16,8 +16,16 @@ export { ErrorRecovery } from "./error-recovery";
 
 export {
   COMMAND_HELP,
+  COMMAND_CATEGORIES,
   displayCommandHelp,
   displayGeneralHelp,
+  displayCategoryHelp,
+  displayQuickStart,
+} from "./help-system";
+export type {
+  CommandExample,
+  CommandHelp,
+  CommandCategory,
 } from "./help-system";
 
 export { CommandCache } from "./cache";
@@ -46,4 +54,25 @@ export {
   handleAdvancedCommandError,
 } from "./advanced-setup";
 
-export { lazyLoaders, preloadModules } from "./lazy-loader";
+export {
+  lazyLoaders,
+  preloadModules,
+  warmCache,
+  getCacheStats,
+} from "./lazy-loader";
+
+export { FileUtils, fileExists } from "./file-utils";
+export type {
+  FileStats,
+  ReadOptions,
+  WriteOptions,
+  DirectoryOptions,
+} from "./file-utils";
+export {
+  CommandRegistry,
+  createCommand,
+  createDatabaseCommand,
+  createDevelopmentCommand,
+} from "./command-registry";
+
+export { HealthChecker } from "./health-check.js";
