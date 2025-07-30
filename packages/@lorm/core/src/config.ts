@@ -12,15 +12,46 @@ export const defineConfig = (config: lormConfig): lormConfig => config;
 
 async function loadTypeScriptConfig(configPath: string): Promise<any> {
   try {
-    // Use tsx directly with -e flag to evaluate the import
-    const result = execSync(`npx tsx -e "import config from '${configPath}'; console.log(JSON.stringify(config));"`, { 
-      encoding: 'utf8',
-      cwd: process.cwd(),
-      stdio: ['pipe', 'pipe', 'pipe']
-    });
-    
-    const configData = JSON.parse(result.trim());
-    return { default: configData };
+    // First try to use tsx if available
+    try {
+      const result = execSync(`npx tsx -e "import config from '${configPath}'; console.log(JSON.stringify(config));"`, { 
+        encoding: 'utf8',
+        cwd: process.cwd(),
+        stdio: ['pipe', 'pipe', 'pipe']
+      });
+      
+      const configData = JSON.parse(result.trim());
+      return { default: configData };
+    } catch (tsxError) {
+      // If tsx fails, try to compile and run with node using a simpler approach
+      const tempJsPath = configPath.replace('.ts', '.temp.mjs');
+      
+      try {
+        const { readFileSync } = await import('fs');
+        // Simple TypeScript to JavaScript conversion for config files
+        const tsContent = readFileSync(configPath, 'utf8');
+        const jsContent = tsContent
+          .replace(/import\s+{[^}]+}\s+from\s+["'][^"']+["'];?/g, '') // Remove imports
+          .replace(/export\s+default\s+/, 'export default '); // Keep ES module export
+        
+        writeFileSync(tempJsPath, jsContent);
+        
+        // Import the module
+        const configModule = await import(pathToFileURL(tempJsPath).href);
+        
+        // Clean up temp file
+        unlinkSync(tempJsPath);
+        
+        return configModule;
+      } catch (fallbackError) {
+        // Clean up temp file if it exists
+        try {
+          unlinkSync(tempJsPath);
+        } catch {}
+        
+        throw new Error(`Failed to load TypeScript config. Please install tsx: npm install --save-dev tsx`);
+      }
+    }
   } catch (error) {
     throw new Error(`Failed to load TypeScript config: ${error instanceof Error ? error.message : String(error)}`);
   }

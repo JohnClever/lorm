@@ -23,7 +23,18 @@ export interface ServerOptions {
 
 export const configSchema = z.object({
   db: z.object({
-    url: z.string().url(),
+    url: z.string().refine((val) => {
+      // Allow environment variable expressions or valid URLs
+      if (val.includes('process.env') || val.startsWith('$')) {
+        return true;
+      }
+      try {
+        new URL(val);
+        return true;
+      } catch {
+        return false;
+      }
+    }, { message: "Must be a valid URL or environment variable expression" }),
     adapter: z.enum(["neon", "postgres", "mysql", "sqlite", "planetscale", "turso"]).default("neon").optional(),
     options: z.record(z.any()).optional(),
   }),

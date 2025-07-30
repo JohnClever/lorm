@@ -245,7 +245,7 @@ export class HealthChecker {
       const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf-8'));
       const dependencies = { ...packageJson.dependencies, ...packageJson.devDependencies };
       
-      const requiredDeps = ['drizzle-orm'];
+      const requiredDeps: string[] = [];
       const missingDeps = requiredDeps.filter(dep => !dependencies[dep]);
       
       if (missingDeps.length === 0) {

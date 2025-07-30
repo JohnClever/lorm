@@ -130,7 +130,7 @@ export async function validateConfig(
   } else if (checkDependencies) {
     try {
       const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
-      const requiredDeps = ["@lorm/core", "drizzle-orm"];
+      const requiredDeps = ["@lorm/core"];
       const missingDeps = requiredDeps.filter(
         (dep) =>
           !packageJson.dependencies?.[dep] &&

@@ -41,7 +41,9 @@
     "chalk": "^5.4.1",
     "chokidar": "^4.0.3",
     "drizzle-kit": "^0.31.4",
-    "execa": "^9.6.0"
+    "drizzle-orm": "^0.44.4",
+    "execa": "^9.6.0",
+    "which": "^5.0.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.10",
