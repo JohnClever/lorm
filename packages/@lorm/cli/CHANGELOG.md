@@ -1,5 +1,11 @@
 # @lorm/cli
 
+## 0.1.66
+
+### Patch Changes
+
+- 8297732: y
+
 ## 0.1.65
 
 ### Patch Changes
