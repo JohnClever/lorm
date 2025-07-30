@@ -15,6 +15,9 @@ build/
 # LORM generated files
 .lorm/
 
+# Test applications
+LormTestApp/
+
 # Environment variables
 .env
 .env.local

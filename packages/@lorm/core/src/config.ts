@@ -30,9 +30,16 @@ async function loadTypeScriptConfig(configPath: string): Promise<any> {
         const { readFileSync } = await import('fs');
         // Simple TypeScript to JavaScript conversion for config files
         const tsContent = readFileSync(configPath, 'utf8');
-        const jsContent = tsContent
-          .replace(/import\s+{[^}]+}\s+from\s+["'][^"']+["'];?/g, '') // Remove imports
-          .replace(/export\s+default\s+/, 'export default '); // Keep ES module export
+        
+        // Create a simple defineConfig function and convert the config
+        const jsContent = `
+// Simple defineConfig implementation
+const defineConfig = (config) => config;
+
+${tsContent
+  .replace(/import\s+{[^}]+}\s+from\s+["'][^"']+["'];?/g, '') // Remove imports
+  .replace(/export\s+default\s+/, 'export default ')}
+`;
         
         writeFileSync(tempJsPath, jsContent);
         
