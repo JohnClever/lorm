@@ -1,14 +1,16 @@
 # 🪄 @lorm/cli
 
-Command-line interface for the **Lorm framework** — a zero-config, full-stack mobile framework built for mobile applications with **enterprise-grade type safety** and **performance monitoring**.
+Command-line interface for the **Lorm framework** — a zero-config, full-stack mobile framework built for mobile applications with **enterprise-grade type safety**, **security**, and **performance monitoring**.
 
 > 📱 **Mobile-First**: Designed to work with mobile applications (React Native and Expo projects)
 > ✅ **Database Agnostic**: Works with any Drizzle-supported database (PostgreSQL, MySQL, SQLite, and more)
 > 📦 **Project-Scoped**: No global installation required — keeps your mobile project dependencies clean
 > 🚀 **Zero Config**: Get a type-safe backend API in minutes
+> 🛡️ **Enterprise Security**: Zero-trust input validation, audit logging, and rate limiting
 > ⚡️ **Performance Monitoring**: Built-in command execution tracking and optimization
 > 🔧 **Health Checks**: Comprehensive system validation and diagnostics
 > 🧩 **Plugin System**: Extensible architecture with plugin management
+> 🔒 **Production-Safe**: Multi-layer security for dangerous operations
 ---
 
 ## 📦 Installation
@@ -189,6 +191,75 @@ Performance monitoring and command execution analytics.
 - Monitors system resource utilization
 
 **Best for:** Performance optimization, debugging slow commands, and usage analytics
+
+---
+
+## 🛡️ Enterprise Security Features
+
+The Lorm CLI implements **enterprise-grade security** with multiple layers of protection:
+
+### 🔒 Input Validation & Sanitization
+- **Zero-Trust Validation**: All user inputs validated using Zod schemas
+- **Command Injection Prevention**: Advanced protection against malicious command execution
+- **Path Traversal Protection**: Secure file system operations with path validation
+- **Database URL Validation**: Ensures only safe database connections are allowed
+
+### 🚨 Security Audit System
+- **Complete Audit Trails**: Every security event is logged with timestamps and context
+- **Command Execution Logging**: Track all CLI command executions for compliance
+- **Dangerous Operation Monitoring**: Special logging for high-risk operations
+- **Security Event Analysis**: Detailed security event categorization and reporting
+
+### ⚡ Rate Limiting & Abuse Prevention
+- **Intelligent Throttling**: Command-specific rate limits prevent system abuse
+- **Adaptive Rate Limiting**: Dynamic limits based on command type and system load
+- **Rate Limit Monitoring**: Real-time rate limit status and statistics
+- **Graceful Degradation**: User-friendly rate limit notifications
+
+### 🔐 Production Safety
+- **Multi-Layer Protection**: Multiple confirmation steps for dangerous operations
+- **Environment Detection**: Automatic production environment safety checks
+- **Local-Only Restrictions**: Critical operations restricted to local databases
+- **Safety Confirmations**: Interactive confirmations for destructive commands
+
+### 📊 Security Monitoring
+```bash
+# View security audit logs
+npx @lorm/cli security:logs
+
+# Run security audit
+npx @lorm/cli security:audit
+
+# Check rate limit status
+npx @lorm/cli cache:stats
+```
+
+---
+
+## 🐛 Recent Bug Fixes & Improvements
+
+### ✅ Database Connection Error Handling (Latest)
+**Issue Fixed**: CLI was incorrectly reporting "✅ Schema pushed successfully!" even when database connections failed.
+
+**Solution Implemented**:
+- **Enhanced Error Detection**: Improved `executeDrizzleKit` function to properly capture and analyze drizzle-kit output
+- **Connection Error Recognition**: Added specific detection for ECONNREFUSED, authentication failures, and other database connectivity issues
+- **Accurate Status Reporting**: Fixed success/failure reporting mechanism to prevent false positive messages
+- **Clear Error Messages**: Ensured that database connection failures now correctly display actionable error messages
+
+**Impact**: Users now receive accurate feedback about database operations, preventing confusion and ensuring reliable deployment processes.
+
+### 🔧 Type Safety Improvements
+- **Fixed Static Context Errors**: Resolved TypeScript compilation issues in `rate-limiter.ts`
+- **Improved Import Handling**: Corrected Chalk import and static property references
+- **Zero `any` Types**: Achieved 100% TypeScript coverage with strict mode enabled
+
+### 🚀 Performance Enhancements
+- **Optimized Bundle Sizes**: Reduced package sizes while maintaining full functionality
+- **Improved Command Execution**: Enhanced performance monitoring and caching systems
+- **Memory Management**: Better memory usage tracking and optimization
+
+---
 
 ### 🧩 Plugin Commands
 

@@ -357,7 +357,6 @@ export class PluginManager {
       rating?: number;
     }>
   > {
-    // Mock implementation for now
     const mockResults = [
       {
         name: `${query}-plugin`,

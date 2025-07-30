@@ -9,7 +9,6 @@ import type {
 
 export interface HelpCommandOptions extends BaseCommandOptions {
   command?: string;
-  /** Positional arguments from CAC */
   _?: string[];
 }
 
@@ -28,3 +27,18 @@ export interface PerformanceCommandOptions
     ClearableCommandOptions {}
 
 export interface CacheStatsCommandOptions extends BaseCommandOptions {}
+
+export interface SecurityLogsCommandOptions extends BaseCommandOptions {
+  lines?: number;
+  level?: 'info' | 'warn' | 'error' | 'critical';
+  follow?: boolean;
+  json?: boolean;
+  search?: string;
+}
+
+export interface SecurityAuditCommandOptions extends BaseCommandOptions {
+  verbose?: boolean;
+  json?: boolean;
+  fix?: boolean;
+  severity?: 'low' | 'medium' | 'high' | 'critical';
+}

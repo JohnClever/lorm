@@ -75,4 +75,7 @@ export {
   createDevelopmentCommand,
 } from "./command-registry";
 
-export { HealthChecker } from "./health-check.js";
+export { HealthChecker } from "./health-check";
+
+export { SecurityValidator, SecurityAuditLogger } from "./security";
+export { RateLimiter } from "./rate-limiter";

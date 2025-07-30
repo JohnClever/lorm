@@ -179,6 +179,33 @@ export const COMMAND_HELP: Record<string, CommandHelp> = {
       },
     ],
   },
+  "db:drop": {
+    name: "db:drop",
+    description: "⚠️  Drop all tables and data (DANGER ZONE)",
+    usage: "npx @lorm/cli db:drop [options]",
+    category: "Database",
+    relatedCommands: ["db:push", "db:migrate"],
+    options: [
+      {
+        flag: "--force",
+        description: "Skip confirmation prompts (use with extreme caution)",
+      },
+      {
+        flag: "--confirm",
+        description: "Confirm destructive operation",
+      },
+    ],
+    examples: [
+      {
+        command: "npx @lorm/cli db:drop",
+        description: "Drop all tables with safety confirmations",
+      },
+      {
+        command: "npx @lorm/cli db:drop --force",
+        description: "⚠️  Force drop without confirmations (DANGEROUS)",
+      },
+    ],
+  },
   check: {
     name: "check",
     description: "Check schema consistency and validate configuration",
@@ -197,6 +224,69 @@ export const COMMAND_HELP: Record<string, CommandHelp> = {
     ],
     options: [
       { flag: "--verbose", description: "Show detailed validation output" },
+    ],
+  },
+  "security:logs": {
+    name: "security:logs",
+    description: "View and monitor security logs with filtering options",
+    usage: "npx @lorm/cli security:logs [options]",
+    category: "Security",
+    relatedCommands: ["security:audit", "check"],
+    examples: [
+      {
+        command: "npx @lorm/cli security:logs",
+        description: "View recent security logs",
+      },
+      {
+        command: "npx @lorm/cli security:logs --level error",
+        description: "Show only error-level security events",
+      },
+      {
+        command: "npx @lorm/cli security:logs --search 'db_drop'",
+        description: "Search for specific security events",
+      },
+      {
+        command: "npx @lorm/cli security:logs --json",
+        description: "Output logs in JSON format",
+      },
+    ],
+    options: [
+      { flag: "--lines <number>", description: "Number of log lines to display", default: "50" },
+      { flag: "--level <level>", description: "Filter by log level (info, warn, error, critical)" },
+      { flag: "--follow", description: "Follow log output in real-time" },
+      { flag: "--json", description: "Output in JSON format" },
+      { flag: "--search <term>", description: "Search for specific terms in logs" },
+    ],
+  },
+  "security:audit": {
+    name: "security:audit",
+    description: "Run comprehensive security audit and vulnerability scan",
+    usage: "npx @lorm/cli security:audit [options]",
+    category: "Security",
+    relatedCommands: ["security:logs", "check"],
+    examples: [
+      {
+        command: "npx @lorm/cli security:audit",
+        description: "Run basic security audit",
+      },
+      {
+        command: "npx @lorm/cli security:audit --verbose",
+        description: "Run audit with detailed output",
+      },
+      {
+        command: "npx @lorm/cli security:audit --json",
+        description: "Output audit results in JSON format",
+      },
+      {
+        command: "npx @lorm/cli security:audit --fix",
+        description: "Automatically fix detected security issues",
+      },
+    ],
+    options: [
+      { flag: "--verbose", description: "Show detailed audit information" },
+      { flag: "--json", description: "Output results in JSON format" },
+      { flag: "--fix", description: "Automatically fix detected issues" },
+      { flag: "--severity <level>", description: "Filter by severity level (low, medium, high, critical)" },
     ],
   },
 };
@@ -243,7 +333,11 @@ export function displayCommandHelp(commandName: string): void {
     help.relatedCommands.forEach((cmd) => {
       const relatedHelp = COMMAND_HELP[cmd];
       if (relatedHelp) {
-        console.log(`  ${chalk.cyan(cmd.padEnd(15))} ${chalk.gray(relatedHelp.description)}`);
+        console.log(
+          `  ${chalk.cyan(cmd.padEnd(15))} ${chalk.gray(
+            relatedHelp.description
+          )}`
+        );
       }
     });
   }
@@ -257,28 +351,37 @@ export const COMMAND_CATEGORIES: CommandCategory[] = [
   {
     name: "Project Setup",
     description: "Initialize and configure your Lorm project",
-    commands: ["init"]
+    commands: ["init"],
   },
   {
     name: "Development",
     description: "Development server and tools",
-    commands: ["dev"]
+    commands: ["dev"],
   },
   {
     name: "Database",
     description: "Database schema and migration management",
-    commands: ["db:push", "db:generate", "db:migrate", "db:pull", "db:studio"]
+    commands: [
+      "db:push",
+      "db:generate",
+      "db:migrate",
+      "db:pull",
+      "db:studio",
+      "db:drop",
+    ],
   },
   {
     name: "Validation",
     description: "Project validation and health checks",
-    commands: ["check"]
-  }
+    commands: ["check"],
+  },
+  {
+    name: "Security",
+    description: "Security monitoring and audit tools",
+    commands: ["security:logs", "security:audit"],
+  },
 ];
 
-/**
- * Display general help with all available commands
- */
 export function displayGeneralHelp(): void {
   console.log(chalk.bold.blue("\n🚀 Lorm CLI - Mobile-first framework"));
   console.log(chalk.gray("Build full-stack, type-safe mobile apps fast\n"));
@@ -286,58 +389,85 @@ export function displayGeneralHelp(): void {
   console.log(chalk.bold("Usage:"));
   console.log("  npx @lorm/cli <command> [options]\n");
 
-  // Quick Start Guide
   console.log(chalk.bold("🚀 Quick Start:"));
-  console.log(`  ${chalk.cyan('npx @lorm/cli init')}        ${chalk.gray('Initialize a new project')}`);
-  console.log(`  ${chalk.cyan('npx @lorm/cli dev')}         ${chalk.gray('Start development server')}`);
-  console.log(`  ${chalk.cyan('npx @lorm/cli db:push')}     ${chalk.gray('Push schema to database')}`);
+  console.log(
+    `  ${chalk.cyan("npx @lorm/cli init")}        ${chalk.gray(
+      "Initialize a new project"
+    )}`
+  );
+  console.log(
+    `  ${chalk.cyan("npx @lorm/cli dev")}         ${chalk.gray(
+      "Start development server"
+    )}`
+  );
+  console.log(
+    `  ${chalk.cyan("npx @lorm/cli db:push")}     ${chalk.gray(
+      "Push schema to database"
+    )}`
+  );
   console.log();
 
-  // Categorized Commands
-  COMMAND_CATEGORIES.forEach(category => {
+  COMMAND_CATEGORIES.forEach((category) => {
     console.log(chalk.bold(`📁 ${category.name}:`));
     console.log(chalk.gray(`   ${category.description}`));
-    
-    category.commands.forEach(cmdName => {
+
+    category.commands.forEach((cmdName) => {
       const cmd = COMMAND_HELP[cmdName];
       if (cmd) {
-        console.log(`   ${chalk.cyan(cmdName.padEnd(15))} ${chalk.gray(cmd.description)}`);
+        console.log(
+          `   ${chalk.cyan(cmdName.padEnd(15))} ${chalk.gray(cmd.description)}`
+        );
       }
     });
     console.log();
   });
 
-  // Global Options
   console.log(chalk.bold("🔧 Global Options:"));
-  console.log(`  ${chalk.yellow('--help, -h'.padEnd(20))} ${chalk.gray('Show help for command')}`);
-  console.log(`  ${chalk.yellow('--version, -v'.padEnd(20))} ${chalk.gray('Show version number')}`);
-  console.log(`  ${chalk.yellow('--verbose'.padEnd(20))} ${chalk.gray('Enable verbose output')}`);
-  console.log(`  ${chalk.yellow('--quiet, -q'.padEnd(20))} ${chalk.gray('Suppress non-error output')}`);
+  console.log(
+    `  ${chalk.yellow("--help, -h".padEnd(20))} ${chalk.gray(
+      "Show help for command"
+    )}`
+  );
+  console.log(
+    `  ${chalk.yellow("--version, -v".padEnd(20))} ${chalk.gray(
+      "Show version number"
+    )}`
+  );
+  console.log(
+    `  ${chalk.yellow("--verbose".padEnd(20))} ${chalk.gray(
+      "Enable verbose output"
+    )}`
+  );
+  console.log(
+    `  ${chalk.yellow("--quiet, -q".padEnd(20))} ${chalk.gray(
+      "Suppress non-error output"
+    )}`
+  );
   console.log();
 
-  // Footer
   console.log(chalk.bold("📚 Resources:"));
-  console.log(`  ${chalk.blue('Documentation:')} https://lorm.dev/docs`);
-  console.log(`  ${chalk.blue('GitHub:')} https://github.com/lorm-dev/lorm`);
-  console.log(`  ${chalk.blue('Discord:')} https://discord.gg/lorm`);
+  console.log(`  ${chalk.blue("Documentation:")} https://lorm.dev/docs`);
+  console.log(`  ${chalk.blue("GitHub:")} https://github.com/lorm-dev/lorm`);
+  console.log(`  ${chalk.blue("Discord:")} https://discord.gg/lorm`);
   console.log();
-  
-  console.log(chalk.gray("💡 Run 'npx @lorm/cli help <command>' for detailed command help"));
+
+  console.log(
+    chalk.gray(
+      "💡 Run 'npx @lorm/cli help <command>' for detailed command help"
+    )
+  );
   console.log();
 }
 
-/**
- * Display help for a specific category
- */
 export function displayCategoryHelp(categoryName: string): void {
-  const category = COMMAND_CATEGORIES.find(cat => 
-    cat.name.toLowerCase() === categoryName.toLowerCase()
+  const category = COMMAND_CATEGORIES.find(
+    (cat) => cat.name.toLowerCase() === categoryName.toLowerCase()
   );
 
   if (!category) {
     console.error(chalk.red(`Unknown category: ${categoryName}`));
-    console.log(chalk.gray('Available categories:'));
-    COMMAND_CATEGORIES.forEach(cat => {
+    console.log(chalk.gray("Available categories:"));
+    COMMAND_CATEGORIES.forEach((cat) => {
       console.log(`  ${chalk.cyan(cat.name)} - ${chalk.gray(cat.description)}`);
     });
     return;
@@ -347,7 +477,7 @@ export function displayCategoryHelp(categoryName: string): void {
   console.log(chalk.gray(category.description));
   console.log();
 
-  category.commands.forEach(cmdName => {
+  category.commands.forEach((cmdName) => {
     const cmd = COMMAND_HELP[cmdName];
     if (cmd) {
       console.log(chalk.bold(cmd.name));
@@ -357,36 +487,49 @@ export function displayCategoryHelp(categoryName: string): void {
     }
   });
 
-  console.log(chalk.gray(`💡 Run 'npx @lorm/cli help <command>' for detailed command help`));
+  console.log(
+    chalk.gray(
+      `💡 Run 'npx @lorm/cli help <command>' for detailed command help`
+    )
+  );
   console.log();
 }
 
-/**
- * Display quick start guide
- */
 export function displayQuickStart(): void {
-  console.log(chalk.bold.blue('\n🚀 Lorm CLI Quick Start Guide'));
-  console.log(chalk.gray('Get up and running with Lorm in minutes\n'));
+  console.log(chalk.bold.blue("\n🚀 Lorm CLI Quick Start Guide"));
+  console.log(chalk.gray("Get up and running with Lorm in minutes\n"));
 
-  console.log(chalk.bold('1. Initialize your project:'));
-  console.log(`   ${chalk.cyan('npx @lorm/cli init')}`);
-  console.log(chalk.gray('   This creates lorm.config.js, lorm.schema.js, and installs dependencies\n'));
+  console.log(chalk.bold("1. Initialize your project:"));
+  console.log(`   ${chalk.cyan("npx @lorm/cli init")}`);
+  console.log(
+    chalk.gray(
+      "   This creates lorm.config.js, lorm.schema.js, and installs dependencies\n"
+    )
+  );
 
-  console.log(chalk.bold('2. Set up your database:'));
-  console.log(`   ${chalk.cyan('npx @lorm/cli db:push')}`);
-  console.log(chalk.gray('   This pushes your schema to the database\n'));
+  console.log(chalk.bold("2. Set up your database:"));
+  console.log(`   ${chalk.cyan("npx @lorm/cli db:push")}`);
+  console.log(chalk.gray("   This pushes your schema to the database\n"));
 
-  console.log(chalk.bold('3. Start developing:'));
-  console.log(`   ${chalk.cyan('npx @lorm/cli dev')}`);
-  console.log(chalk.gray('   This starts the development server with hot reloading\n'));
+  console.log(chalk.bold("3. Start developing:"));
+  console.log(`   ${chalk.cyan("npx @lorm/cli dev")}`);
+  console.log(
+    chalk.gray("   This starts the development server with hot reloading\n")
+  );
 
-  console.log(chalk.bold('4. Optional - Open database studio:'));
-  console.log(`   ${chalk.cyan('npx @lorm/cli db:studio')}`);
-  console.log(chalk.gray('   This opens Drizzle Studio for database management\n'));
+  console.log(chalk.bold("4. Optional - Open database studio:"));
+  console.log(`   ${chalk.cyan("npx @lorm/cli db:studio")}`);
+  console.log(
+    chalk.gray("   This opens Drizzle Studio for database management\n")
+  );
 
-  console.log(chalk.bold('📚 Next Steps:'));
-  console.log(`  • Read the docs: ${chalk.blue('https://lorm.dev/docs')}`);
-  console.log(`  • Join our Discord: ${chalk.blue('https://discord.gg/lorm')}`);
-  console.log(`  • Check out examples: ${chalk.blue('https://github.com/lorm-dev/examples')}`);
+  console.log(chalk.bold("📚 Next Steps:"));
+  console.log(`  • Read the docs: ${chalk.blue("https://lorm.dev/docs")}`);
+  console.log(`  • Join our Discord: ${chalk.blue("https://discord.gg/lorm")}`);
+  console.log(
+    `  • Check out examples: ${chalk.blue(
+      "https://github.com/lorm-dev/examples"
+    )}`
+  );
   console.log();
 }

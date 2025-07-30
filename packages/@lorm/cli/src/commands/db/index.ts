@@ -4,3 +4,4 @@ export { migrate } from './migrate';
 export { pull } from './pull';
 export { studio } from './studio';
 export { up } from './up';
+export { drop } from './drop';

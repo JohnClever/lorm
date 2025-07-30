@@ -1,4 +1,3 @@
-import path from "path";
 import chalk from "chalk";
 import { promises as fs } from "fs";
 import { select, confirm } from "@inquirer/prompts";

@@ -9,12 +9,12 @@ const gzipAsync = promisify(gzip);
 const gunzipAsync = promisify(gunzip);
 
 export interface CacheOptions {
-  ttl?: number; // Time to live in milliseconds
-  maxSize?: number; // Maximum cache size in bytes
+  ttl?: number;
+  maxSize?: number;
   enabled?: boolean;
-  compression?: boolean; // Enable gzip compression for large entries
-  compressionThreshold?: number; // Compress entries larger than this size
-  maxMemoryEntries?: number; // Maximum entries to keep in memory
+  compression?: boolean;
+  compressionThreshold?: number;
+  maxMemoryEntries?: number;
 }
 
 export interface CacheEntry<T = any> {
@@ -27,9 +27,6 @@ export interface CacheEntry<T = any> {
   lastAccessed?: number;
 }
 
-/**
- * Enhanced file-based cache for CLI operations with compression and LRU eviction
- */
 export class CommandCache {
   private cacheDir: string;
   private options: Required<CacheOptions>;
@@ -38,11 +35,11 @@ export class CommandCache {
 
   constructor(options: CacheOptions = {}) {
     this.options = {
-      ttl: 5 * 60 * 1000, // 5 minutes default
-      maxSize: 10 * 1024 * 1024, // 10MB default
+      ttl: 5 * 60 * 1000,
+      maxSize: 10 * 1024 * 1024,
       enabled: process.env.LORM_CACHE !== "false",
       compression: true,
-      compressionThreshold: 1024, // 1KB threshold
+      compressionThreshold: 1024,
       maxMemoryEntries: 100,
       ...options,
     };
@@ -51,14 +48,10 @@ export class CommandCache {
     this.ensureCacheDir();
   }
 
-  /**
-   * Get cached result for a command
-   */
   async get<T>(key: string, inputHash?: string): Promise<T | null> {
     if (!this.options.enabled) return null;
 
     try {
-      // Check memory cache first
       const memEntry = this.memoryCache.get(key);
       if (memEntry && this.isValid(memEntry, inputHash)) {
         this.updateAccessOrder(key);
@@ -67,17 +60,19 @@ export class CommandCache {
         return memEntry.data;
       }
 
-      // Check file cache
       const filePath = this.getFilePath(key);
       if (!FileUtils.exists(filePath)) return null;
 
       let fileContent: string;
       let entry: CacheEntry<T>;
 
-      // Handle compressed files
-      if (filePath.endsWith('.gz')) {
-        const compressedData = await FileUtils.decompressFile(await FileUtils.readFile(filePath, { encoding: undefined as any }) as any);
-        fileContent = compressedData.toString('utf8');
+      if (filePath.endsWith(".gz")) {
+        const compressedData = await FileUtils.decompressFile(
+          (await FileUtils.readFile(filePath, {
+            encoding: undefined as any,
+          })) as any
+        );
+        fileContent = compressedData.toString("utf8");
       } else {
         fileContent = FileUtils.readFileSync(filePath);
       }
@@ -85,11 +80,9 @@ export class CommandCache {
       entry = JSON.parse(fileContent);
 
       if (this.isValid(entry, inputHash)) {
-        // Update access metadata
         entry.accessCount = (entry.accessCount || 0) + 1;
         entry.lastAccessed = Date.now();
-        
-        // Add to memory cache with LRU management
+
         this.addToMemoryCache(key, entry);
         return entry.data;
       }
@@ -101,15 +94,12 @@ export class CommandCache {
     }
   }
 
-  /**
-   * Set cached result for a command
-   */
   async set<T>(key: string, data: T, inputHash?: string): Promise<void> {
     if (!this.options.enabled) return;
 
     try {
       const serializedData = JSON.stringify(data);
-      const dataSize = Buffer.byteLength(serializedData, 'utf8');
+      const dataSize = Buffer.byteLength(serializedData, "utf8");
 
       if (dataSize > this.options.maxSize) {
         console.warn(chalk.yellow("⚠️  Cache entry too large, skipping cache"));
@@ -125,18 +115,20 @@ export class CommandCache {
         lastAccessed: Date.now(),
       };
 
-      // Add to memory cache with LRU management
       this.addToMemoryCache(key, entry);
 
-      // Write to file with optional compression
       const filePath = this.getFilePath(key);
       const entryJson = JSON.stringify(entry, null, 2);
-      const shouldCompress = this.options.compression && 
-                            Buffer.byteLength(entryJson, 'utf8') > this.options.compressionThreshold;
+      const shouldCompress =
+        this.options.compression &&
+        Buffer.byteLength(entryJson, "utf8") >
+          this.options.compressionThreshold;
 
       if (shouldCompress) {
-        const compressed = await gzipAsync(Buffer.from(entryJson, 'utf8'));
-        await FileUtils.writeFile(filePath + '.gz', compressed as any, { encoding: undefined as any });
+        const compressed = await gzipAsync(Buffer.from(entryJson, "utf8"));
+        await FileUtils.writeFile(filePath + ".gz", compressed as any, {
+          encoding: undefined as any,
+        });
         entry.compressed = true;
       } else {
         FileUtils.writeFileSync(filePath, entryJson);
@@ -146,30 +138,23 @@ export class CommandCache {
     }
   }
 
-  /**
-   * Delete cached entry
-   */
   delete(key: string): void {
     this.memoryCache.delete(key);
     this.removeFromAccessOrder(key);
 
     try {
       const filePath = this.getFilePath(key);
-      // Delete both compressed and uncompressed versions
       if (FileUtils.exists(filePath)) {
         FileUtils.deleteFileSync(filePath);
       }
-      if (FileUtils.exists(filePath + '.gz')) {
-        FileUtils.deleteFileSync(filePath + '.gz');
+      if (FileUtils.exists(filePath + ".gz")) {
+        FileUtils.deleteFileSync(filePath + ".gz");
       }
     } catch (error) {
       // Silently fail
     }
   }
 
-  /**
-   * Clear all cache
-   */
   clear(): void {
     this.memoryCache.clear();
     this.accessOrder = [];
@@ -190,20 +175,14 @@ export class CommandCache {
     }
   }
 
-  /**
-   * Add entry to memory cache with LRU eviction
-   */
   private addToMemoryCache<T>(key: string, entry: CacheEntry<T>): void {
-    // Remove if already exists to update position
     if (this.memoryCache.has(key)) {
       this.removeFromAccessOrder(key);
     }
 
-    // Add to memory cache
     this.memoryCache.set(key, entry);
     this.accessOrder.push(key);
 
-    // Evict least recently used entries if over limit
     while (this.memoryCache.size > this.options.maxMemoryEntries) {
       const lruKey = this.accessOrder.shift();
       if (lruKey) {
@@ -212,17 +191,11 @@ export class CommandCache {
     }
   }
 
-  /**
-   * Update access order for LRU
-   */
   private updateAccessOrder(key: string): void {
     this.removeFromAccessOrder(key);
     this.accessOrder.push(key);
   }
 
-  /**
-   * Remove key from access order array
-   */
   private removeFromAccessOrder(key: string): void {
     const index = this.accessOrder.indexOf(key);
     if (index > -1) {
@@ -230,16 +203,10 @@ export class CommandCache {
     }
   }
 
-  /**
-   * Create hash for input data
-   */
   createHash(input: any): string {
     return createHash("md5").update(JSON.stringify(input)).digest("hex");
   }
 
-  /**
-   * Get cache statistics
-   */
   getStats(): {
     memoryEntries: number;
     totalSize: number;
@@ -270,15 +237,15 @@ export class CommandCache {
       memoryEntries: this.memoryCache.size,
       totalSize,
       hitRate: totalAccesses > 0 ? totalHits / totalAccesses : 0,
-      compressionRatio: this.memoryCache.size > 0 ? compressedEntries / this.memoryCache.size : 0,
+      compressionRatio:
+        this.memoryCache.size > 0
+          ? compressedEntries / this.memoryCache.size
+          : 0,
       oldestEntry: this.memoryCache.size > 0 ? oldestTimestamp : null,
       newestEntry: this.memoryCache.size > 0 ? newestTimestamp : null,
     };
   }
 
-  /**
-   * Cleanup expired entries
-   */
   cleanup(): void {
     const now = Date.now();
     const expiredKeys: string[] = [];
@@ -289,12 +256,9 @@ export class CommandCache {
       }
     }
 
-    expiredKeys.forEach(key => this.delete(key));
+    expiredKeys.forEach((key) => this.delete(key));
   }
 
-  /**
-   * Wrap a function with caching
-   */
   wrap<T extends any[], R>(
     key: string,
     fn: (...args: T) => Promise<R>,

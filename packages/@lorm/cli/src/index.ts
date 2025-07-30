@@ -22,6 +22,8 @@ import type {
   HealthCommandOptions,
   PerformanceCommandOptions,
   CacheStatsCommandOptions,
+  SecurityLogsCommandOptions,
+  SecurityAuditCommandOptions,
   DevCommandOptions,
   DbPushCommandOptions,
   DbGenerateCommandOptions,
@@ -29,6 +31,7 @@ import type {
   DbPullCommandOptions,
   DbUpCommandOptions,
   DbStudioCommandOptions,
+  DbDropCommandOptions,
   PluginListCommandOptions,
   PluginInstallCommandOptions,
   PluginUninstallCommandOptions,
@@ -38,7 +41,7 @@ import type {
   PluginSearchCommandOptions,
 } from "@/types";
 
-import { PluginManager as SimplePluginManager } from "./commands/plugin-manager.js";
+import { PluginManager as SimplePluginManager } from "./commands/plugin-manager";
 
 const performanceMonitor = new PerformanceMonitor();
 
@@ -53,7 +56,7 @@ const getLormLib = async () => {
     displayCommandHelp,
     displayCategoryHelp,
     displayQuickStart,
-  } = await import("./utils/index.js");
+  } = await import("./utils/index");
   return {
     commandCache: CommandCache,
     PluginManager,
@@ -89,7 +92,6 @@ const packageJson = JSON.parse(
   readFileSync(resolve(__dirname, "../package.json"), "utf8")
 );
 
-// Initialize enhanced command registry
 const commandRegistry = new CommandRegistry();
 
 let errorRecoveryInitialized = false;
@@ -153,7 +155,6 @@ async function loadPluginsAndParse() {
   }
 }
 
-// Register enhanced commands
 commandRegistry.register(
   createCommand({
     name: "help [command]",
@@ -190,7 +191,7 @@ commandRegistry.register(
       await preloadModules(["lormCore", "chokidar"]);
 
       const { startServer } = await lazyLoaders.lormCore();
-      const { watchRouter } = await import("./commands/gen-lorm-types.js");
+      const { watchRouter } = await import("./commands/gen-lorm-types");
 
       watchRouter();
       await startServer();
@@ -215,7 +216,7 @@ commandRegistry.register(
       "npx @lorm/cli init --skip-install",
     ],
     action: async (options: InitCommandOptions) => {
-      const { initProject } = await import("./commands/init.js");
+      const { initProject } = await import("./commands/init");
       await initProject(options);
     },
   })
@@ -236,7 +237,7 @@ commandRegistry.register(
       "npx @lorm/cli db:push --force",
     ],
     action: async (options: DbPushCommandOptions) => {
-      const { push } = await import("./commands/db/index.js");
+      const { push } = await import("./commands/db/index");
       await push();
     },
   })
@@ -255,7 +256,7 @@ commandRegistry.register(
       "npx @lorm/cli db:generate --name add_users_table",
     ],
     action: async (options: DbGenerateCommandOptions) => {
-      const { generate } = await import("./commands/db/index.js");
+      const { generate } = await import("./commands/db/index");
       await generate();
     },
   })
@@ -275,7 +276,7 @@ commandRegistry.register(
       "npx @lorm/cli db:migrate --to 20231201_001",
     ],
     action: async (options: DbMigrateCommandOptions) => {
-      const { migrate } = await import("./commands/db/index.js");
+      const { migrate } = await import("./commands/db/index");
       await migrate();
     },
   })
@@ -298,7 +299,7 @@ commandRegistry.register(
       "npx @lorm/cli db:pull --introspect",
     ],
     action: async (options: DbPullCommandOptions) => {
-      const { pull } = await import("./commands/db/index.js");
+      const { pull } = await import("./commands/db/index");
       await pull();
     },
   })
@@ -312,7 +313,7 @@ commandRegistry.register(
     options: [{ flag: "--fix", description: "Attempt to fix common issues" }],
     examples: ["npx @lorm/cli check", "npx @lorm/cli check --fix"],
     action: async (options: CheckCommandOptions) => {
-      const { check } = await import("./commands/check.js");
+      const { check } = await import("./commands/check");
       await check(options);
     },
   })
@@ -336,7 +337,7 @@ commandRegistry.register(
       "npx @lorm/cli db:up --dry-run",
     ],
     action: async (options: DbUpCommandOptions) => {
-      const { up } = await import("./commands/db/index.js");
+      const { up } = await import("./commands/db/index");
       await up();
     },
   })
@@ -365,8 +366,36 @@ commandRegistry.register(
       "npx @lorm/cli db:studio --port 5000",
     ],
     action: async (options: DbStudioCommandOptions) => {
-      const { studio } = await import("./commands/db/index.js");
+      const { studio } = await import("./commands/db/index");
       await studio();
+    },
+  })
+);
+
+commandRegistry.register(
+  createDatabaseCommand({
+    name: "db:drop",
+    description: "⚠️  Drop all tables and data (DANGER ZONE)",
+    aliases: ["drop"],
+    requiresSchema: false,
+    options: [
+      {
+        flag: "--force",
+        description: "Skip confirmation prompts (use with extreme caution)",
+      },
+      {
+        flag: "--confirm",
+        description: "Confirm destructive operation",
+      },
+    ],
+    examples: [
+      "npx @lorm/cli db:drop",
+      "npx @lorm/cli drop",
+      "npx @lorm/cli db:drop --force",
+    ],
+    action: async (options: DbDropCommandOptions) => {
+      const { drop } = await import("./commands/db/index");
+      await drop(options);
     },
   })
 );
@@ -439,7 +468,6 @@ commandRegistry.register(
         healthChecker.displayResults(results);
       }
 
-      // Exit with error code if any checks failed
       const hasFailures = results.some((r) => r.status === "fail");
       if (hasFailures) {
         process.exit(1);
@@ -454,7 +482,6 @@ commandRegistry.register(
     description: "Alias for health command - run comprehensive diagnostics",
     category: "development",
     action: async (options: HealthCommandOptions) => {
-      // Redirect to health command
       const healthChecker = new HealthChecker();
       const systemInfo = await healthChecker.getSystemInfo();
       const results = await healthChecker.runAllChecks();
@@ -470,7 +497,6 @@ commandRegistry.register(
   })
 );
 
-// Plugin management commands
 commandRegistry.register(
   createCommand({
     name: "plugin:list",
@@ -626,7 +652,84 @@ commandRegistry.register(
   })
 );
 
-// Apply all registered commands to the CLI
+commandRegistry.register(
+  createCommand({
+    name: "security:logs",
+    description: "Display security audit logs",
+    category: "security",
+    options: [
+      {
+        flag: "-n, --lines <number>",
+        description: "Number of lines to display",
+        defaultValue: 50,
+      },
+      {
+        flag: "-l, --level <level>",
+        description: "Filter by log level (info, warn, error, critical)",
+      },
+      {
+        flag: "-f, --follow",
+        description: "Follow log output in real-time",
+      },
+      {
+        flag: "-j, --json",
+        description: "Output in JSON format",
+      },
+      {
+        flag: "-s, --search <term>",
+        description: "Search for specific term in logs",
+      },
+    ],
+    examples: [
+      "npx @lorm/cli security:logs",
+      "npx @lorm/cli security:logs --lines 100",
+      "npx @lorm/cli security:logs --level error",
+      "npx @lorm/cli security:logs --search 'db_drop'",
+      "npx @lorm/cli security:logs --json",
+    ],
+    action: async (options: SecurityLogsCommandOptions) => {
+      const { securityLogs } = await import("@/commands/security/logs");
+      await securityLogs(options);
+    },
+  })
+);
+
+commandRegistry.register(
+  createCommand({
+    name: "security:audit",
+    description: "Perform comprehensive security analysis",
+    category: "security",
+    options: [
+      {
+        flag: "-v, --verbose",
+        description: "Show detailed audit information",
+      },
+      {
+        flag: "-j, --json",
+        description: "Output in JSON format",
+      },
+      {
+        flag: "--fix",
+        description: "Attempt to fix security issues automatically",
+      },
+      {
+        flag: "--severity <level>",
+        description: "Filter by severity level (low, medium, high, critical)",
+      },
+    ],
+    examples: [
+      "npx @lorm/cli security:audit",
+      "npx @lorm/cli security:audit --verbose",
+      "npx @lorm/cli security:audit --json",
+      "npx @lorm/cli security:audit --severity high",
+    ],
+    action: async (options: SecurityAuditCommandOptions) => {
+      const { securityAudit } = await import("./commands/security/audit");
+      await securityAudit(options);
+    },
+  })
+);
+
 commandRegistry.applyToCAC(cli);
 
 if (process.argv.includes("--help") || process.argv.includes("-h")) {
@@ -652,12 +755,10 @@ const main = async () => {
   const tracker = performanceMonitor.startTracking("cli-startup");
 
   try {
-    // Warm cache for critical modules
     await warmCache("high");
 
     await loadPluginsAndParse();
 
-    // Add cache stats command for debugging
     cli
       .command("cache:stats", "Show cache statistics")
       .action(async (options: CacheStatsCommandOptions) => {
@@ -689,6 +790,8 @@ const main = async () => {
         }
       });
 
+
+
     tracker.end(undefined, true);
   } catch (error) {
     tracker.recordError();
@@ -700,7 +803,7 @@ const main = async () => {
 main().catch(console.error);
 
 export const check = async () => {
-  const { check } = await import("./commands/check.js");
+  const { check } = await import("./commands/check");
   return check;
 };
 

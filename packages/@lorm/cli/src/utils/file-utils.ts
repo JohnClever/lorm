@@ -8,9 +8,10 @@ import {
   statSync,
   unlinkSync,
 } from "fs";
-import { resolve, dirname, join } from "path";
+import { resolve, dirname, join, normalize } from "path";
 import { gzip, gunzip } from "zlib";
 import { promisify } from "util";
+import { SecurityValidator, SecurityAuditLogger } from './security';
 
 const gzipAsync = promisify(gzip);
 const gunzipAsync = promisify(gunzip);
@@ -117,9 +118,23 @@ export async function writeFile(
 ): Promise<void> {
   const { createDir = true, encoding = "utf8" } = options;
 
+  const pathValidation = SecurityValidator.validateFilePath(path, process.cwd());
+  if (!pathValidation.isValid) {
+    await SecurityAuditLogger.logSecurityEvent('file_write_blocked', {
+      path: SecurityValidator.sanitizeOutput(path),
+      errors: pathValidation.errors
+    }, 'error');
+    throw new Error(`File write blocked: ${pathValidation.errors.join(', ')}`);
+  }
+
   if (createDir) {
     await ensureDir(dirname(path));
   }
+
+  await SecurityAuditLogger.logSecurityEvent('file_write', {
+    path: SecurityValidator.sanitizeOutput(path),
+    size: content.length
+  });
 
   return fs.writeFile(path, content, { encoding, ...options });
 }
@@ -131,9 +146,23 @@ export function writeFileSync(
 ): void {
   const { createDir = true, encoding = "utf8" } = options;
 
+  const pathValidation = SecurityValidator.validateFilePath(path, process.cwd());
+  if (!pathValidation.isValid) {
+    SecurityAuditLogger.logSecurityEvent('file_write_blocked', {
+      path: SecurityValidator.sanitizeOutput(path),
+      errors: pathValidation.errors
+    }, 'error').catch(() => {});
+    throw new Error(`File write blocked: ${pathValidation.errors.join(', ')}`);
+  }
+
   if (createDir) {
     ensureDirSync(dirname(path));
   }
+
+  SecurityAuditLogger.logSecurityEvent('file_write', {
+    path: SecurityValidator.sanitizeOutput(path),
+    size: content.length
+  }).catch(() => {});
 
   fsWriteFileSync(path, content, { encoding, ...options });
 }
@@ -171,6 +200,19 @@ export async function appendFile(
 }
 
 export async function deleteFile(path: string): Promise<void> {
+  const pathValidation = SecurityValidator.validateFilePath(path, process.cwd());
+  if (!pathValidation.isValid) {
+    await SecurityAuditLogger.logSecurityEvent('file_delete_blocked', {
+      path: SecurityValidator.sanitizeOutput(path),
+      errors: pathValidation.errors
+    }, 'error');
+    throw new Error(`File delete blocked: ${pathValidation.errors.join(', ')}`);
+  }
+
+  await SecurityAuditLogger.logSecurityEvent('file_delete', {
+    path: SecurityValidator.sanitizeOutput(path)
+  }, 'warn');
+
   try {
     await fs.unlink(path);
   } catch (error: any) {

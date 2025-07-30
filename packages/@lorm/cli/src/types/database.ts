@@ -20,3 +20,8 @@ export interface DbStudioCommandOptions extends CommonCommandOptions {
   port?: number;
   host?: string;
 }
+
+export interface DbDropCommandOptions extends CommonCommandOptions {
+  force?: boolean;
+  confirm?: boolean;
+}
