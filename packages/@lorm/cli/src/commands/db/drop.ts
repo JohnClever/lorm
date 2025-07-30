@@ -6,7 +6,7 @@ import {
   handleCommandError,
 } from '@/utils';
 import { SecurityValidator, SecurityAuditLogger } from '@/utils';
-import { RateLimiter } from '@/utils/rate-limiter.js';
+import { RateLimiter } from '@/utils/rate-limiter';
 
 export interface DropOptions {
   force?: boolean;

@@ -43,22 +43,31 @@ export async function validateConfig(
   const cwd = process.cwd();
 
   if (requireConfig) {
-    const configPath = resolve(cwd, "lorm.config.js");
-    if (!exists(configPath)) {
+    const configTsPath = resolve(cwd, "lorm.config.ts");
+    const configJsPath = resolve(cwd, "lorm.config.js");
+    const configMjsPath = resolve(cwd, "lorm.config.mjs");
+    
+    if (!exists(configTsPath) && !exists(configJsPath) && !exists(configMjsPath)) {
       errors.push(
-        "lorm.config.js not found. Run `npx @lorm/cli init` to create it."
+        "lorm.config.js, lorm.config.mjs, or lorm.config.ts not found. Run `npx @lorm/cli init` to create it."
       );
     } else {
+      // Use loadConfig from @lorm/core which handles both .ts and .js files
       try {
-        const config = await import(configPath);
-        if (!config.default && !config.lormConfig) {
-          warnings.push(
-            "lorm.config.js exists but may not export a valid configuration."
-          );
+        const { loadConfig } = await import('@lorm/core');
+        const config = await loadConfig();
+        if (!config) {
+          const configPath = exists(configTsPath) ? configTsPath : exists(configJsPath) ? configJsPath : configMjsPath;
+        const configType = configPath.endsWith('.ts') ? 'lorm.config.ts' : configPath.endsWith('.mjs') ? 'lorm.config.mjs' : 'lorm.config.js';
+        warnings.push(
+          `${configType} exists but may not export a valid configuration.`
+        );
         }
       } catch (error) {
+        const configPath = exists(configTsPath) ? configTsPath : exists(configJsPath) ? configJsPath : configMjsPath;
+        const configType = configPath.endsWith('.ts') ? 'lorm.config.ts' : configPath.endsWith('.mjs') ? 'lorm.config.mjs' : 'lorm.config.js';
         errors.push(
-          `Invalid lorm.config.js: ${
+          `Invalid ${configType}: ${
             error instanceof Error ? error.message : String(error)
           }`
         );
@@ -67,19 +76,43 @@ export async function validateConfig(
   }
 
   if (requireSchema) {
-    const schemaPath = resolve(cwd, "lorm.schema.js");
-    if (!exists(schemaPath)) {
+    const newTsSchemaPath = resolve(cwd, "lorm/schema/index.ts");
+    const newJsSchemaPath = resolve(cwd, "lorm/schema/index.js");
+    const newMjsSchemaPath = resolve(cwd, "lorm/schema/index.mjs");
+    const legacySchemaPath = resolve(cwd, "lorm.schema.js");
+    
+    if (!exists(newTsSchemaPath) && !exists(newJsSchemaPath) && !exists(newMjsSchemaPath) && !exists(legacySchemaPath)) {
       errors.push(
-        "lorm.schema.js not found. Run `npx @lorm/cli init` to create it."
+        "Schema file not found. Expected lorm/schema/index.ts, lorm/schema/index.js, lorm/schema/index.mjs, or lorm.schema.js"
+      );
+    } else if (exists(legacySchemaPath) && !exists(newTsSchemaPath) && !exists(newJsSchemaPath) && !exists(newMjsSchemaPath)) {
+      suggestions.push(
+        "Consider migrating to new structure: lorm/schema/index.ts"
+      );
+    } else if ((exists(newJsSchemaPath) || exists(newMjsSchemaPath)) && !exists(newTsSchemaPath)) {
+      suggestions.push(
+        "Consider using TypeScript: lorm/schema/index.ts"
       );
     }
   }
 
   if (requireRouter) {
-    const routerPath = resolve(cwd, "lorm.router.js");
-    if (!exists(routerPath)) {
+    const newTsRouterPath = resolve(cwd, "lorm/router/index.ts");
+    const newJsRouterPath = resolve(cwd, "lorm/router/index.js");
+    const newMjsRouterPath = resolve(cwd, "lorm/router/index.mjs");
+    const legacyRouterPath = resolve(cwd, "lorm.router.js");
+    
+    if (!exists(newTsRouterPath) && !exists(newJsRouterPath) && !exists(newMjsRouterPath) && !exists(legacyRouterPath)) {
       warnings.push(
-        "lorm.router.js not found. Some features may not work correctly."
+        "Router file not found. Some features may not work correctly."
+      );
+    } else if (exists(legacyRouterPath) && !exists(newTsRouterPath) && !exists(newJsRouterPath) && !exists(newMjsRouterPath)) {
+      suggestions.push(
+        "Consider migrating to new structure: lorm/router/index.ts"
+      );
+    } else if ((exists(newJsRouterPath) || exists(newMjsRouterPath)) && !exists(newTsRouterPath)) {
+      suggestions.push(
+        "Consider using TypeScript: lorm/router/index.ts"
       );
     }
   }

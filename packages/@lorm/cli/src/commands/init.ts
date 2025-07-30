@@ -6,12 +6,9 @@ import {
   packageManager as getPackageManager,
   installDependencies,
 } from "@/utils";
-import {
-  routerTemplate,
-  getConfigTemplate,
-  getSchemaTemplate,
-} from "@/templates";
+import { languageHandler } from "@/utils/language-handler";
 import { fileExists } from "@/utils/file-utils";
+import { templateManager } from "@/utils/template-manager";
 
 export type DatabaseAdapter =
   | "neon"
@@ -39,35 +36,51 @@ function getClientDependencies(includeClient: boolean = false): string[] {
 async function createConfigFiles(adapter: DatabaseAdapter): Promise<void> {
   console.log(chalk.blue("📝 Generating configuration files..."));
 
-  const files = [
-    {
-      name: "lorm.config.js",
-      content: getConfigTemplate(adapter),
-      description: "configuration",
-    },
-    { name: "lorm.router.js", content: routerTemplate, description: "router" },
-    {
-      name: "lorm.schema.js",
-      content: getSchemaTemplate(adapter),
-      description: "schema",
-    },
-  ];
+  try {
+    // Get file paths based on detected language
+    const filePaths = await languageHandler.getFilePaths();
+    const languageInfo = await languageHandler.detectLanguage();
 
-  for (const file of files) {
-    try {
-      await fs.writeFile(file.name, file.content);
-      console.log(chalk.green(`✅ Created ${file.name}`));
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      console.error(
-        chalk.red(`❌ Failed to create ${file.name}:`),
-        errorMessage
-      );
-      throw new Error(
-        `Failed to create ${file.description} file: ${errorMessage}`
-      );
+    // Create config file
+    const configContent = await templateManager.generateConfigTemplate({ adapter });
+    await fs.writeFile(filePaths.config, configContent);
+    console.log(chalk.green(`✅ Created ${filePaths.config}`));
+
+    // Create lorm directory structure
+    await fs.mkdir("lorm", { recursive: true });
+    await fs.mkdir("lorm/router", { recursive: true });
+    await fs.mkdir("lorm/schema", { recursive: true });
+    console.log(chalk.green(`✅ Created lorm/ directory structure`));
+
+    // Create router file
+    const routerContent = await templateManager.generateRouterTemplate({ 
+      isMjs: filePaths.router.endsWith('.mjs') 
+    });
+    await fs.writeFile(filePaths.router, routerContent);
+    console.log(chalk.green(`✅ Created ${filePaths.router}`));
+
+    // Create schema file
+    const schemaContent = await templateManager.generateSchemaTemplate(adapter);
+    await fs.writeFile(filePaths.schema, schemaContent);
+    console.log(chalk.green(`✅ Created ${filePaths.schema}`));
+
+    // Log project type information
+    if (languageInfo.isTypeScript) {
+      console.log(chalk.blue("🔷 Generated TypeScript files with full type safety"));
+    } else {
+      console.log(chalk.blue("🟨 Generated JavaScript files (consider upgrading to TypeScript for better DX)"));
     }
+
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : String(error);
+    console.error(
+      chalk.red(`❌ Failed to create configuration files:`),
+      errorMessage
+    );
+    throw new Error(
+      `Failed to create configuration files: ${errorMessage}`
+    );
   }
 }
 
@@ -133,15 +146,17 @@ async function installProjectDependencies(
   }
 }
 
-function displayCompletionMessage(
+async function displayCompletionMessage(
   adapter: DatabaseAdapter,
   includeClient: boolean
-): void {
+): Promise<void> {
   console.log(chalk.green("\n🎉 LORM project initialized successfully!"));
   console.log(chalk.blue("\n📖 Next steps:"));
-  console.log(chalk.white("1. Update your database URL in lorm.config.js"));
-  console.log(chalk.white("2. Define your schema in lorm.schema.js"));
-  console.log(chalk.white("3. Create your API routes in lorm.router.js"));
+  
+  const filePaths = await languageHandler.getFilePaths();
+  console.log(chalk.white(`1. Update your database URL in ${filePaths.config}`));
+  console.log(chalk.white(`2. Define your schema in ${filePaths.schema}`));
+  console.log(chalk.white(`3. Create your API routes in ${filePaths.router}`));
   console.log(chalk.white("4. Start your development server"));
 
   if (includeClient) {
@@ -212,7 +227,9 @@ export async function initProject(options: InitOptions = {}): Promise<void> {
       chalk.gray(`   Options: force=${force}, skipInstall=${skipInstall}`)
     );
 
-    if (!force && (await fileExists("lorm.config.js"))) {
+    // Check for existing config files (both .js and .ts)
+    const configExists = (await fileExists("lorm.config.js")) || (await fileExists("lorm.config.ts")) || (await fileExists("lorm.config.mjs"));
+    if (!force && configExists) {
       console.log(
         chalk.yellow(
           "⚠️  LORM project already initialized. Use --force to overwrite."
@@ -269,7 +286,7 @@ export async function initProject(options: InitOptions = {}): Promise<void> {
 
     await createConfigFiles(adapter);
 
-    displayCompletionMessage(adapter, includeClient);
+    await displayCompletionMessage(adapter, includeClient);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error(

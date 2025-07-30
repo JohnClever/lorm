@@ -2,17 +2,19 @@ import path from "path";
 import { loadConfig } from "@lorm/core";
 import { drizzleConfigTemplate } from "@/templates";
 import { FileUtils } from "./file-utils";
+import { languageHandler } from "./language-handler";
 
-export async function validateSchemaFile(schemaPath: string): Promise<void> {
-  try {
-    await FileUtils.access(schemaPath);
-    console.log("✅ [lorm] Schema file found");
-  } catch {
-    throw new Error(
-      `[lorm] Schema file not found at ${schemaPath}.\n` +
-        "Please create a lorm.schema.js file in your project root or run 'npx @lorm/cli init' first."
-    );
-  }
+/**
+ * Detects if the React Native project uses TypeScript by checking for tsconfig.json
+ * @returns Promise<boolean> - true if TypeScript is detected, false otherwise
+ */
+export async function detectTypeScript(): Promise<boolean> {
+  const languageInfo = await languageHandler.detectLanguage();
+  return languageInfo.isTypeScript;
+}
+
+export async function validateSchemaFile(): Promise<string> {
+  return await languageHandler.findSchemaFile();
 }
 
 export async function setupLormDirectory(
@@ -26,12 +28,12 @@ export async function setupLormDirectory(
     await FileUtils.ensureDir(lormDir);
     console.log("📁 [lorm] Created .lorm directory");
 
-    const schemaPath = path.join(rootDir, "lorm.schema.js");
-    await validateSchemaFile(schemaPath);
-
-    const schemaImport = `export * from "${path
-      .join(rootDir, "lorm.schema")
-      .replace(/\\/g, "/")}";`;
+    const schemaPath = await validateSchemaFile();
+    
+    // Generate the correct import path using the language handler
+    const relativePath = languageHandler.generateRelativeImport(schemaTargetPath, schemaPath);
+    const schemaImport = `export * from "${relativePath}";`;
+    
     await FileUtils.writeFile(schemaTargetPath, schemaImport);
     console.log("📝 [lorm] Generated schema import file");
 

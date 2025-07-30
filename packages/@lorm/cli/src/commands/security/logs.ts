@@ -1,7 +1,7 @@
 import chalk from 'chalk';
-import { readFile, exists } from '../../utils/file-utils';
-import { SecurityAuditLogger } from '../../utils/security';
-import { BaseCommandOptions } from '../../types';
+import { readFile, exists } from '@/utils/file-utils';
+import { SecurityAuditLogger } from '@/utils/security';
+import { BaseCommandOptions } from '@/types';
 
 export interface SecurityLogsCommandOptions extends BaseCommandOptions {
   lines?: number;

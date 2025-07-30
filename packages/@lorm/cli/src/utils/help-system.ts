@@ -503,7 +503,7 @@ export function displayQuickStart(): void {
   console.log(`   ${chalk.cyan("npx @lorm/cli init")}`);
   console.log(
     chalk.gray(
-      "   This creates lorm.config.js, lorm.schema.js, and installs dependencies\n"
+      "   This creates lorm.config.js, lorm/schema/index.ts, lorm/router/index.ts, and installs dependencies\n"
     )
   );
 

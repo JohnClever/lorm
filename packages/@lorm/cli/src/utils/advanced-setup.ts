@@ -22,9 +22,21 @@ export async function createSchemaFile(
   rootDir: string
 ): Promise<void> {
   try {
-    const schemaImport = `export * from "${path
-      .join(rootDir, "lorm.schema")
-      .replace(/\\\\/g, "/")}";`;
+    // Try to find the schema file in the new structure first
+    const newSchemaPath = path.join(rootDir, "lorm/schema/index");
+    const legacySchemaPath = path.join(rootDir, "lorm.schema");
+    
+    let schemaImport: string;
+    
+    // Check if new structure exists
+    const newTsExists = await fileExists(path.join(rootDir, "lorm/schema/index.ts"));
+    const newJsExists = await fileExists(path.join(rootDir, "lorm/schema/index.js"));
+    
+    if (newTsExists || newJsExists) {
+      schemaImport = `export * from "${newSchemaPath.replace(/\\\\/g, "/")}";`;
+    } else {
+      schemaImport = `export * from "${legacySchemaPath.replace(/\\\\/g, "/")}";`;
+    }
 
     await FileUtils.writeFile(schemaTargetPath, schemaImport);
     console.log("📄 [lorm] Created schema.js file");
@@ -57,17 +69,27 @@ export async function createDrizzleConfig(
 export async function validateSchemaFileOptional(
   rootDir: string
 ): Promise<void> {
-  const schemaPath = path.join(rootDir, "lorm.schema.js");
-  const schemaPathTs = path.join(rootDir, "lorm.schema.ts");
+  const newSchemaPath = path.join(rootDir, "lorm/schema/index.ts");
+  const newSchemaPathJs = path.join(rootDir, "lorm/schema/index.js");
+  const legacySchemaPath = path.join(rootDir, "lorm.schema.js");
+  const legacySchemaPathTs = path.join(rootDir, "lorm.schema.ts");
 
   try {
-    const jsExists = await fileExists(schemaPath);
-    const tsExists = await fileExists(schemaPathTs);
+    const newTsExists = await fileExists(newSchemaPath);
+    const newJsExists = await fileExists(newSchemaPathJs);
+    const legacyJsExists = await fileExists(legacySchemaPath);
+    const legacyTsExists = await fileExists(legacySchemaPathTs);
 
-    if (!jsExists && !tsExists) {
+    if (!newTsExists && !newJsExists && !legacyJsExists && !legacyTsExists) {
       console.warn(
-        "⚠️ [lorm] Warning: lorm.schema.js or lorm.schema.ts not found. " +
+        "⚠️ [lorm] Warning: Schema file not found. " +
+          "Expected lorm/schema/index.ts, lorm/schema/index.js, lorm.schema.js, or lorm.schema.ts. " +
           "Make sure to create your schema file."
+      );
+    } else if ((legacyJsExists || legacyTsExists) && !newTsExists && !newJsExists) {
+      console.warn(
+        "⚠️ [lorm] Warning: Using legacy schema structure. " +
+          "Consider migrating to lorm/schema/index.ts for better organization."
       );
     }
   } catch (error) {

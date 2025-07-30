@@ -194,7 +194,9 @@ commandRegistry.register(
       const { watchRouter } = await import("./commands/gen-lorm-types");
 
       watchRouter();
-      await startServer();
+      await startServer(options.port, {
+        host: 'localhost'
+      });
 
       console.log(`🚀 Dev server running on port ${options.port}`);
     },

@@ -20,11 +20,11 @@ export function createClient(baseUrl = "http://127.0.0.1:3000") {
         "[lorm] ⚠️  No Lorm project detected. Run `npx @lorm/cli init` to set up your project."
       );
       console.info(
-        "[lorm] 💡 Then create routes in lorm.router.js and run `npx @lorm/cli dev` for type generation."
+        "[lorm] 💡 Then create routes in lorm/router/index.ts and run `npx @lorm/cli dev` for type generation."
       );
     } else if (!setup.hasRouter) {
       console.warn(
-        "[lorm] ⚠️  No router found. Create lorm.router.js and run `npx @lorm/cli dev` to get started."
+        "[lorm] ⚠️  No router found. Create lorm/router/index.ts and run `npx @lorm/cli dev` to get started."
       );
       console.info(
         "[lorm] 💡 Define your API routes using defineRouter() for type-safe client calls."

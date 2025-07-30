@@ -33,6 +33,7 @@ export class HealthChecker {
       this.checkNpmVersion.bind(this),
       this.checkConfigFile.bind(this),
       this.checkSchemaFile.bind(this),
+      this.checkRouterFile.bind(this),
       this.checkDependencies.bind(this),
       this.checkDatabaseConnection.bind(this),
       this.checkMemoryUsage.bind(this)
@@ -125,6 +126,7 @@ export class HealthChecker {
     const configPaths = [
       'lorm.config.ts',
       'lorm.config.js',
+      'lorm.config.mjs',
       'drizzle.config.ts',
       'drizzle.config.js',
     ];
@@ -153,6 +155,11 @@ export class HealthChecker {
 
   private async checkSchemaFile(): Promise<HealthCheckResult> {
     const schemaPaths = [
+      'lorm/schema/index.ts',
+      'lorm/schema/index.js',
+      'lorm/schema/index.mjs',
+      'lorm.schema.js',
+      'lorm.schema.ts',
       'src/schema.ts',
       'src/db/schema.ts',
       'schema.ts',
@@ -162,10 +169,19 @@ export class HealthChecker {
     for (const schemaPath of schemaPaths) {
       try {
         await fs.access(schemaPath);
+        let status: 'pass' | 'warn' = 'pass';
+        let message = `Schema file found: ${schemaPath}`;
+        
+        // Add suggestions for legacy paths
+        if (schemaPath === 'lorm.schema.js' || schemaPath === 'lorm.schema.ts') {
+          status = 'warn';
+          message += ' (consider migrating to lorm/schema/index.ts)';
+        }
+        
         return {
           name: 'Schema File',
-          status: 'pass',
-          message: `Schema file found: ${schemaPath}`,
+          status,
+          message,
           details: { path: schemaPath },
         };
       } catch {
@@ -178,6 +194,46 @@ export class HealthChecker {
       status: 'warn',
       message: 'No schema file found in common locations',
       details: { searchedPaths: schemaPaths },
+    };
+  }
+
+  private async checkRouterFile(): Promise<HealthCheckResult> {
+    const routerPaths = [
+      'lorm/router/index.ts',
+      'lorm/router/index.js',
+      'lorm/router/index.mjs',
+      'lorm.router.js',
+      'lorm.router.ts',
+    ];
+
+    for (const routerPath of routerPaths) {
+      try {
+        await fs.access(routerPath);
+        let status: 'pass' | 'warn' = 'pass';
+        let message = `Router file found: ${routerPath}`;
+        
+        // Add suggestions for legacy paths
+        if (routerPath === 'lorm.router.js' || routerPath === 'lorm.router.ts') {
+          status = 'warn';
+          message += ' (consider migrating to lorm/router/index.ts)';
+        }
+        
+        return {
+          name: 'Router File',
+          status,
+          message,
+          details: { path: routerPath },
+        };
+      } catch {
+        // Continue to next path
+      }
+    }
+
+    return {
+      name: 'Router File',
+      status: 'warn',
+      message: 'No router file found. Router is optional but recommended for API endpoints.',
+      details: { searchedPaths: routerPaths },
     };
   }
 

@@ -1,25 +1,22 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: ['src/index.ts'],
+  entry: ['src/simple-cli.ts'],
   format: ['esm', 'cjs'],
   dts: true,
   clean: true,
-  splitting: true, // Enable code splitting to reduce bundle size
-  sourcemap: true,
-  minify: false, // Disable minification for debugging
+  splitting: false, // Disable splitting for simpler output
+  sourcemap: false,
+  minify: true, // Enable minification for smaller bundle
   target: 'es2020',
   outDir: 'dist',
-  shims: true, // Add shims for import.meta and other ESM features in CJS
-  treeshake: true, // Enable tree shaking
+  shims: true,
+  treeshake: true,
   external: [
     '@inquirer/prompts',
     '@lorm/core',
     'cac',
     'chalk',
-    'chokidar',
-    'drizzle-kit',
-    'execa',
-    'which'
+    'drizzle-kit'
   ],
 });
