@@ -1,5 +1,11 @@
 # @lorm-enterprise/core
 
+## 0.1.7
+
+### Patch Changes
+
+- 2102eb3: y
+
 ## 0.1.6
 
 ### Patch Changes
