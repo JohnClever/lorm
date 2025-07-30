@@ -1,5 +1,13 @@
 # @lorm/cli
 
+## 0.1.63
+
+### Patch Changes
+
+- 727c864: y
+- Updated dependencies [727c864]
+  - @lorm/core@0.1.6
+
 ## 0.1.62
 
 ### Patch Changes
