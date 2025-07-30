@@ -1,20 +1,21 @@
 import { CAC } from "cac";
 import { PerformanceMonitor, PerformanceTracker } from "./performance";
 import { ErrorRecovery, RecoveryOptions } from "./error-recovery";
+import { BaseCommandOptions } from "../types/common.js";
 import chalk from "chalk";
 
-export interface CommandConfig {
+export interface CommandConfig<T extends BaseCommandOptions = BaseCommandOptions> {
   name: string;
   description: string;
   aliases?: string[];
   options?: Array<{
     flag: string;
     description: string;
-    defaultValue?: any;
+    defaultValue?: string | number | boolean;
   }>;
   requiresConfig?: boolean;
   requiresSchema?: boolean;
-  action: (options: any, ...args: any[]) => Promise<void>;
+  action: (options: T, ...args: string[]) => Promise<void>;
   examples?: string[];
   category?: 'core' | 'database' | 'development' | 'utility' | 'plugin';
 }
@@ -26,14 +27,14 @@ export interface ValidationConfig {
 
 export class CommandRegistry {
   private performanceMonitor: PerformanceMonitor;
-  private commands: Map<string, CommandConfig> = new Map();
+  private commands: Map<string, CommandConfig<BaseCommandOptions>> = new Map();
 
   constructor() {
     this.performanceMonitor = new PerformanceMonitor();
   }
 
-  register(config: CommandConfig): void {
-    this.commands.set(config.name, config);
+  register<T extends BaseCommandOptions>(config: CommandConfig<T>): void {
+    this.commands.set(config.name, config as CommandConfig<BaseCommandOptions>);
   }
 
   applyToCAC(cli: CAC): void {
@@ -69,13 +70,14 @@ export class CommandRegistry {
     }
   }
 
-  private async executeWithEnhancements(
-    config: CommandConfig,
-    args: any[],
+  private async executeWithEnhancements<T extends BaseCommandOptions>(
+    config: CommandConfig<T>,
+    args: unknown[],
     validation: ValidationConfig
   ): Promise<void> {
     const tracker = this.performanceMonitor.startTracking(config.name);
-    const options = args[args.length - 1] || {}; // Options are always the last argument
+    const options = (args[args.length - 1] || {}) as T; // Options are always the last argument
+    const otherArgs = args.slice(0, -1) as string[]; // All arguments except the last one (options)
     
     try {
       const { validateConfigOrExit } = await import("./config-validator.js");
@@ -87,7 +89,7 @@ export class CommandRegistry {
 
         console.log(chalk.blue(`[lorm] ${this.getStartMessage(config.name)}...`));
 
-        await config.action(...(args as [any, ...any[]]));
+        await config.action(options, ...otherArgs);
 
         console.log(chalk.green(`✅ ${this.getSuccessMessage(config.name)}!`));
 
@@ -100,8 +102,8 @@ export class CommandRegistry {
     }
   }
 
-  getCommandsByCategory(): Record<string, CommandConfig[]> {
-    const categories: Record<string, CommandConfig[]> = {
+  getCommandsByCategory(): Record<string, CommandConfig<BaseCommandOptions>[]> {
+    const categories: Record<string, CommandConfig<BaseCommandOptions>[]> = {
       core: [],
       database: [],
       development: [],
@@ -117,11 +119,11 @@ export class CommandRegistry {
     return categories;
   }
 
-  getCommand(name: string): CommandConfig | undefined {
+  getCommand(name: string): CommandConfig<BaseCommandOptions> | undefined {
     return this.commands.get(name);
   }
 
-  getAllCommands(): CommandConfig[] {
+  getAllCommands(): CommandConfig<BaseCommandOptions>[] {
     return Array.from(this.commands.values());
   }
 
@@ -171,26 +173,28 @@ export class CommandRegistry {
   }
 }
 
-export function createCommand(config: CommandConfig): CommandConfig {
+export function createCommand<T extends BaseCommandOptions>(
+  config: CommandConfig<T>
+): CommandConfig<T> {
   return {
     category: 'utility',
     ...config,
   };
 }
 
-export function createDatabaseCommand(
-  config: Omit<CommandConfig, 'category' | 'requiresConfig'>
-): CommandConfig {
+export function createDatabaseCommand<T extends BaseCommandOptions>(
+  config: Omit<CommandConfig<T>, 'category' | 'requiresConfig'>
+): CommandConfig<T> {
   return {
     ...config,
     category: 'database',
     requiresConfig: true,
-  };
+  } as CommandConfig<T>;
 }
 
-export function createDevelopmentCommand(
-  config: Omit<CommandConfig, 'category'>
-): CommandConfig {
+export function createDevelopmentCommand<T extends BaseCommandOptions>(
+  config: Omit<CommandConfig<T>, 'category'>
+): CommandConfig<T> {
   return {
     ...config,
     category: 'development',

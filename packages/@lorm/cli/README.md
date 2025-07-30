@@ -1,11 +1,14 @@
 # 🪄 @lorm/cli
 
-Command-line interface for the **Lorm framework** — a zero-config, full-stack mobile framework built  for mobile applications.
+Command-line interface for the **Lorm framework** — a zero-config, full-stack mobile framework built for mobile applications with **enterprise-grade type safety** and **performance monitoring**.
 
 > 📱 **Mobile-First**: Designed to work with mobile applications (React Native and Expo projects)
 > ✅ **Database Agnostic**: Works with any Drizzle-supported database (PostgreSQL, MySQL, SQLite, and more)
 > 📦 **Project-Scoped**: No global installation required — keeps your mobile project dependencies clean
 > 🚀 **Zero Config**: Get a type-safe backend API in minutes
+> ⚡️ **Performance Monitoring**: Built-in command execution tracking and optimization
+> 🔧 **Health Checks**: Comprehensive system validation and diagnostics
+> 🧩 **Plugin System**: Extensible architecture with plugin management
 ---
 
 ## 📦 Installation
@@ -101,7 +104,9 @@ yarn @lorm/cli <command>
 
 ## 📋 Commands
 
-### Core Commands
+The Lorm CLI provides **44+ commands** organized into logical categories with **comprehensive type safety**, **performance monitoring**, and **detailed help system**.
+
+### 🎯 Core Commands
 
 #### `npx @lorm/cli init`
 Initialize a new Lorm project with configuration files and directory structure.
@@ -142,18 +147,71 @@ Start development server with file watching, automatic type generation, and hot 
 ---
 
 #### `npx @lorm/cli check`
-Validate schema consistency, configuration files, and project structure.
+Validate schema consistency, configuration files, and project structure with **comprehensive health diagnostics**.
 
 **What it does:**
 
-- Validates your schema definitions
+- Validates your schema definitions with type safety
 - Checks for potential migration conflicts
 - Identifies schema inconsistencies
-- Provides recommendations for fixes
+- Provides detailed recommendations for fixes
+- Performs system health checks and diagnostics
+- Validates TypeScript configuration and dependencies
 
-**Best for:** Pre-deployment validation and debugging
+**Best for:** Pre-deployment validation, debugging, and system health monitoring
 
 ---
+
+### 🔧 Utility Commands
+
+#### `npx @lorm/cli health`
+Comprehensive system health check and diagnostics.
+
+**What it does:**
+
+- Validates project configuration and dependencies
+- Checks database connectivity and schema consistency
+- Monitors system resources and performance
+- Provides detailed diagnostic reports
+- Identifies potential issues and optimization opportunities
+
+**Best for:** System monitoring, troubleshooting, and performance optimization
+
+#### `npx @lorm/cli perf`
+Performance monitoring and command execution analytics.
+
+**What it does:**
+
+- Displays detailed performance metrics for all CLI commands
+- Shows execution times, success rates, and error statistics
+- Provides performance optimization recommendations
+- Tracks command usage patterns and trends
+- Monitors system resource utilization
+
+**Best for:** Performance optimization, debugging slow commands, and usage analytics
+
+### 🧩 Plugin Commands
+
+#### `npx @lorm/cli plugin:list`
+List all available and installed plugins.
+
+#### `npx @lorm/cli plugin:install <name>`
+Install a new plugin from the registry.
+
+#### `npx @lorm/cli plugin:uninstall <name>`
+Uninstall an existing plugin.
+
+#### `npx @lorm/cli plugin:enable <name>`
+Enable a disabled plugin.
+
+#### `npx @lorm/cli plugin:disable <name>`
+Disable an active plugin.
+
+#### `npx @lorm/cli plugin:update [name]`
+Update plugins to their latest versions.
+
+#### `npx @lorm/cli plugin:search <query>`
+Search for plugins in the registry.
 
 ## 🗄️ Database Commands
 
@@ -310,6 +368,38 @@ npx @lorm/cli db:drop
 # or
 npx @lorm/cli drop
 ```
+
+---
+
+## 🎯 Type Safety & Performance
+
+### **100% Type Safety**
+The Lorm CLI is built with **comprehensive TypeScript integration**:
+
+- **Zero `any` types** throughout the codebase
+- **Generic command interfaces** with proper type constraints
+- **Compile-time validation** for all command options and arguments
+- **Full IntelliSense support** for enhanced developer experience
+
+### **Performance Monitoring**
+Built-in performance tracking for all CLI operations:
+
+- **Command execution timing** with millisecond precision
+- **Success/failure rate tracking** for reliability monitoring
+- **Resource usage monitoring** for optimization insights
+- **Performance analytics** with detailed metrics and trends
+
+### **Enhanced Error Handling**
+- **Graceful error recovery** with helpful suggestions
+- **Detailed error diagnostics** with context-aware messages
+- **User-friendly error formatting** with actionable recommendations
+- **Comprehensive logging** for debugging and troubleshooting
+
+### **Help System**
+- **Categorized commands** (Core, Database, Development, Utility, Plugin)
+- **Detailed command descriptions** with examples and use cases
+- **Interactive help** with `npx @lorm/cli help <command>`
+- **Beautiful formatting** with colors and structured output
 
 ---
 

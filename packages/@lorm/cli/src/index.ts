@@ -159,7 +159,7 @@ commandRegistry.register(
     name: "help [command]",
     description: "Show detailed help information with examples",
     category: "utility",
-    action: async (command: string, options: HelpCommandOptions = {}) => {
+    action: async (options: HelpCommandOptions, command?: string) => {
       const { displayCommandHelp, displayGeneralHelp, displayCategoryHelp } =
         await getLormLib();
       if (command) {
