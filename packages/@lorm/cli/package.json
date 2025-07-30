@@ -39,7 +39,9 @@
     "@lorm/core": "workspace:*",
     "cac": "^6.7.14",
     "chalk": "^5.4.1",
-    "drizzle-kit": "^0.31.4"
+    "chokidar": "^4.0.3",
+    "drizzle-kit": "^0.31.4",
+    "execa": "^9.6.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.10",
