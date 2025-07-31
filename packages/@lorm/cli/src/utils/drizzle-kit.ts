@@ -1,44 +1,43 @@
 import path from "path";
-import which from "which";
-import { execa } from "execa";
+import * as which from "which";
+import { execa, type ExecaError } from "execa";
 import { FileUtils } from "./file-utils";
-
 export function resolveDrizzleKitBin(): string {
+  try {
+    const cliPackageDir = path.resolve(__dirname, "../../..");
+    const bundledBin = path.join(cliPackageDir, "node_modules/.bin/drizzle-kit");
+    if (FileUtils.exists(bundledBin)) {
+      return bundledBin;
+    }
+  } catch {}
   try {
     const localBin = path.join(process.cwd(), "node_modules/.bin/drizzle-kit");
     if (FileUtils.exists(localBin)) {
       return localBin;
     }
   } catch {}
-
   try {
     return which.sync("drizzle-kit");
   } catch {
     throw new Error(
-      "drizzle-kit not found. Please install it locally or globally:\n" +
-        "  npm install drizzle-kit\n" +
-        "  # or\n" +
-        "  npm install -g drizzle-kit"
+      "drizzle-kit not found. This is an internal error - the CLI should bundle drizzle-kit.\n" +
+        "Please report this issue at: https://github.com/JohnClever/lorm/issues"
     );
   }
 }
-
 export async function executeDrizzleKit(
   command: string,
   lormDir: string,
   successMessage: string
 ): Promise<void> {
   const drizzleKitBin = resolveDrizzleKitBin();
-
   try {
     console.log(`🚀 [lorm] Running ${command}...`);
-
     const result = await execa(drizzleKitBin, [command], {
       cwd: lormDir,
       stdio: "pipe",
       reject: true,
     });
-
     const output = result.stdout + result.stderr;
     if (
       output.includes("ECONNREFUSED") ||
@@ -50,7 +49,6 @@ export async function executeDrizzleKit(
         `Database connection failed: Unable to connect to database. Please ensure your database server is running and the DATABASE_URL is correct.`
       );
     }
-
     if (
       output.includes("authentication failed") ||
       output.includes("password authentication failed") ||
@@ -60,20 +58,17 @@ export async function executeDrizzleKit(
         `Database authentication failed: Please check your database credentials in DATABASE_URL.`
       );
     }
-
     if (output.includes("database") && output.includes("does not exist")) {
       throw new Error(
         `Database does not exist: Please create the database first or check your DATABASE_URL.`
       );
     }
-
     if (result.stdout) {
       console.log(result.stdout);
     }
     if (result.stderr) {
       console.error(result.stderr);
     }
-
     console.log(`✅ [lorm] ${successMessage}`);
   } catch (error) {
     if (error instanceof Error) {
@@ -84,11 +79,11 @@ export async function executeDrizzleKit(
       ) {
         throw error;
       }
-
       if ("exitCode" in error && "stdout" in error && "stderr" in error) {
-        const execaError = error as any;
-        const output = (execaError.stdout || "") + (execaError.stderr || "");
-
+        const execaError = error as ExecaError;
+        const stdout = typeof execaError.stdout === 'string' ? execaError.stdout : '';
+        const stderr = typeof execaError.stderr === 'string' ? execaError.stderr : '';
+        const output = stdout + stderr;
         if (
           output.includes("ECONNREFUSED") ||
           output.includes("connection refused") ||
@@ -98,12 +93,10 @@ export async function executeDrizzleKit(
             `Database connection failed: Unable to connect to database. Please ensure your database server is running and the DATABASE_URL is correct.`
           );
         }
-
         throw new Error(
           `[lorm] Failed to ${command}: ${execaError.message}\n${output}`
         );
       }
-
       throw new Error(`[lorm] Failed to ${command}: ${error.message}`);
     }
     throw new Error(`[lorm] Failed to ${command}: ${error}`);

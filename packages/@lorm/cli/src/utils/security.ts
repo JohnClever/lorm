@@ -1,23 +1,9 @@
 import { URL } from "url";
 import { resolve, normalize, isAbsolute } from "path";
 import chalk from "chalk";
+import { SecurityValidationResult, DatabaseUrlInfo } from '../types.js';
 
-export interface SecurityValidationResult {
-  isValid: boolean;
-  errors: string[];
-  warnings: string[];
-  suggestions: string[];
-}
-
-export interface DatabaseUrlInfo {
-  protocol: string;
-  hostname: string;
-  port: string | null;
-  database: string;
-  isLocal: boolean;
-  isSecure: boolean;
-}
-
+export type { SecurityValidationResult, DatabaseUrlInfo };
 export class SecurityValidator {
   private static readonly DANGEROUS_PATTERNS = [
     /[;&|`$(){}\[\]]/,
@@ -26,21 +12,18 @@ export class SecurityValidator {
     /data:/i,
     /vbscript:/i,
   ];
-
   private static readonly LOCAL_HOSTS = [
     "localhost",
     "127.0.0.1",
     "::1",
     "0.0.0.0",
   ];
-
   private static readonly SECURE_PROTOCOLS = [
     "https:",
     "postgresql:",
     "mysql:",
     "file:",
   ];
-
   static validateInput(
     input: string,
     context: string = "input"
@@ -48,7 +31,6 @@ export class SecurityValidator {
     const errors: string[] = [];
     const warnings: string[] = [];
     const suggestions: string[] = [];
-
     for (const pattern of this.DANGEROUS_PATTERNS) {
       if (pattern.test(input)) {
         errors.push(`Potentially dangerous characters detected in ${context}`);
@@ -58,19 +40,16 @@ export class SecurityValidator {
         break;
       }
     }
-
     if (input.length > 1000) {
       warnings.push(
         `${context} is unusually long (${input.length} characters)`
       );
       suggestions.push("Consider using shorter input values");
     }
-
     if (input.includes("\0")) {
       errors.push(`Null byte detected in ${context}`);
       suggestions.push("Remove null bytes from input");
     }
-
     return {
       isValid: errors.length === 0,
       errors,
@@ -78,7 +57,6 @@ export class SecurityValidator {
       suggestions,
     };
   }
-
   static validateFilePath(
     filePath: string,
     allowedBasePath?: string
@@ -86,31 +64,25 @@ export class SecurityValidator {
     const errors: string[] = [];
     const warnings: string[] = [];
     const suggestions: string[] = [];
-
     const normalizedPath = normalize(filePath);
-
     if (normalizedPath.includes("..")) {
       errors.push("Directory traversal detected in file path");
       suggestions.push("Use absolute paths or paths relative to project root");
     }
-
     if (allowedBasePath && isAbsolute(normalizedPath)) {
       const resolvedPath = resolve(normalizedPath);
       const resolvedBase = resolve(allowedBasePath);
-
       if (!resolvedPath.startsWith(resolvedBase)) {
         errors.push("File path is outside allowed directory");
         suggestions.push(`Ensure file path is within ${allowedBasePath}`);
       }
     }
-
     const suspiciousExtensions = [".exe", ".bat", ".cmd", ".sh", ".ps1"];
     const extension = normalizedPath.toLowerCase().split(".").pop();
     if (extension && suspiciousExtensions.includes(`.${extension}`)) {
       warnings.push("Potentially executable file detected");
       suggestions.push("Verify file type and purpose");
     }
-
     return {
       isValid: errors.length === 0,
       errors,
@@ -118,7 +90,6 @@ export class SecurityValidator {
       suggestions,
     };
   }
-
   static validateDatabaseUrl(
     databaseUrl: string
   ): SecurityValidationResult & { urlInfo?: DatabaseUrlInfo } {
@@ -126,10 +97,8 @@ export class SecurityValidator {
     const warnings: string[] = [];
     const suggestions: string[] = [];
     let urlInfo: DatabaseUrlInfo | undefined;
-
     try {
       const url = new URL(databaseUrl);
-
       urlInfo = {
         protocol: url.protocol,
         hostname: url.hostname,
@@ -138,19 +107,16 @@ export class SecurityValidator {
         isLocal: this.LOCAL_HOSTS.includes(url.hostname.toLowerCase()),
         isSecure: this.SECURE_PROTOCOLS.includes(url.protocol),
       };
-
       if (url.username || url.password) {
         warnings.push("Database credentials found in URL");
         suggestions.push(
           "Consider using environment variables for credentials"
         );
       }
-
       if (!urlInfo.isSecure && !urlInfo.isLocal) {
         warnings.push("Insecure database connection detected");
         suggestions.push("Use SSL/TLS for remote database connections");
       }
-
       const defaultPorts: Record<string, string> = {
         "5432": "PostgreSQL",
         "3306": "MySQL",
@@ -168,7 +134,6 @@ export class SecurityValidator {
         "Ensure URL follows format: protocol://user:pass@host:port/database"
       );
     }
-
     return {
       isValid: errors.length === 0,
       errors,
@@ -177,12 +142,10 @@ export class SecurityValidator {
       urlInfo,
     };
   }
-
   static validateEnvironmentVariables(): SecurityValidationResult {
     const errors: string[] = [];
     const warnings: string[] = [];
     const suggestions: string[] = [];
-
     const requiredVars = ["DATABASE_URL"];
     for (const varName of requiredVars) {
       if (!process.env[varName]) {
@@ -197,7 +160,6 @@ export class SecurityValidator {
         }
       }
     }
-
     const sensitivePatterns = [
       {
         pattern: /password/i,
@@ -213,7 +175,6 @@ export class SecurityValidator {
         message: "Token found in environment variable name",
       },
     ];
-
     for (const [key, value] of Object.entries(process.env)) {
       for (const { pattern, message } of sensitivePatterns) {
         if (pattern.test(key) && value) {
@@ -224,7 +185,6 @@ export class SecurityValidator {
         }
       }
     }
-
     return {
       isValid: errors.length === 0,
       errors,
@@ -232,7 +192,6 @@ export class SecurityValidator {
       suggestions,
     };
   }
-
   static sanitizeOutput(input: string): string {
     return input
       .replace(/[<>&"']/g, (char) => {
@@ -247,7 +206,6 @@ export class SecurityValidator {
       })
       .replace(/\x00/g, "");
   }
-
   static validateProductionSafety(
     operation: string,
     databaseUrl?: string
@@ -255,12 +213,10 @@ export class SecurityValidator {
     const errors: string[] = [];
     const warnings: string[] = [];
     const suggestions: string[] = [];
-
     const isProduction =
       process.env.NODE_ENV === "production" ||
       process.env.ENVIRONMENT === "production" ||
       process.env.ENV === "production";
-
     if (isProduction) {
       const dangerousOperations = ["drop", "delete", "truncate", "reset"];
       if (
@@ -274,7 +230,6 @@ export class SecurityValidator {
         );
       }
     }
-
     const prodIndicators = ["PROD", "PRODUCTION", "LIVE", "STAGING"];
     for (const [key, value] of Object.entries(process.env)) {
       if (
@@ -291,14 +246,12 @@ export class SecurityValidator {
         );
       }
     }
-
     if (databaseUrl) {
       const dbValidation = this.validateDatabaseUrl(databaseUrl);
       if (dbValidation.urlInfo?.isLocal && isProduction) {
         warnings.push("Local database detected in production environment");
         suggestions.push("Use a proper database server for production");
       }
-
       try {
         const parsed = new URL(databaseUrl);
         const hostname = parsed.hostname?.toLowerCase() || "";
@@ -312,7 +265,6 @@ export class SecurityValidator {
           "supabase.com",
           "neon.tech",
         ];
-
         if (cloudProviders.some((provider) => hostname.includes(provider))) {
           const dangerousOps = ["drop", "delete", "truncate", "reset"];
           if (dangerousOps.some((op) => operation.toLowerCase().includes(op))) {
@@ -325,10 +277,8 @@ export class SecurityValidator {
           }
         }
       } catch {
-        // URL parsing failed, but we'll let other validators handle it
       }
     }
-
     return {
       isValid: errors.length === 0,
       errors,
@@ -336,7 +286,6 @@ export class SecurityValidator {
       suggestions,
     };
   }
-
   static displaySecurityResults(
     result: SecurityValidationResult,
     context: string = "Security check"
@@ -347,49 +296,41 @@ export class SecurityValidator {
         console.error(chalk.red(`  • ${error}`));
       });
     }
-
     if (result.warnings.length > 0) {
       console.warn(chalk.yellow(`\n⚠️  ${context} - Security Warnings:`));
       result.warnings.forEach((warning) => {
         console.warn(chalk.yellow(`  • ${warning}`));
       });
     }
-
     if (result.suggestions.length > 0) {
       console.log(chalk.blue(`\n💡 ${context} - Security Suggestions:`));
       result.suggestions.forEach((suggestion) => {
         console.log(chalk.blue(`  • ${suggestion}`));
       });
     }
-
     if (result.isValid && result.warnings.length === 0) {
       console.log(chalk.green(`\n✅ ${context} passed security validation`));
     }
   }
-
   static displayValidationResults(
     result: SecurityValidationResult,
     title: string
   ): void {
     console.log(`\n🔍 ${title}:`);
-
     if (result.errors.length > 0) {
       console.log("❌ Errors:");
       result.errors.forEach((error) => console.log(`   • ${error}`));
     }
-
     if (result.warnings.length > 0) {
       console.log("⚠️  Warnings:");
       result.warnings.forEach((warning) => console.log(`   • ${warning}`));
     }
-
     if (result.suggestions.length > 0) {
       console.log("💡 Suggestions:");
       result.suggestions.forEach((suggestion) =>
         console.log(`   • ${suggestion}`)
       );
     }
-
     if (
       result.isValid &&
       result.errors.length === 0 &&
@@ -399,13 +340,11 @@ export class SecurityValidator {
     }
   }
 }
-
 export class SecurityAuditLogger {
   private static logFile = ".lorm/security.log";
-
   static async logSecurityEvent(
     event: string,
-    details: Record<string, any> = {},
+    details: Record<string, string | number | boolean | null | string[]> = {},
     level: "info" | "warn" | "error" = "info"
   ): Promise<void> {
     const timestamp = new Date().toISOString();
@@ -417,7 +356,6 @@ export class SecurityAuditLogger {
       pid: process.pid,
       user: process.env.USER || process.env.USERNAME || "unknown",
     };
-
     try {
       const { appendFile, ensureDir } = await import("./file-utils");
       await ensureDir(".lorm");
@@ -426,7 +364,6 @@ export class SecurityAuditLogger {
       console.warn(chalk.yellow("⚠️  Failed to write security log"));
     }
   }
-
   static async logCommandExecution(
     command: string,
     args: string[] = [],
@@ -443,7 +380,6 @@ export class SecurityAuditLogger {
       success ? "info" : "error"
     );
   }
-
   static async logDangerousOperation(
     operation: string,
     target: string,
@@ -460,7 +396,6 @@ export class SecurityAuditLogger {
       "warn"
     );
   }
-
   private static sanitizeLogData(data: string): string {
     return data
       .replace(/password=[^&\s]+/gi, "password=***")

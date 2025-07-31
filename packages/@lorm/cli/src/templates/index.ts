@@ -320,7 +320,7 @@ export type LormRouter = typeof router;
 
 
 type ExtractRouterMethods<T> = {
-  [K in keyof T]: T[K] extends (...args: any[]) => any ? T[K] : never;
+  [K in keyof T]: T[K] extends (...args: unknown[]) => unknown ? T[K] : never;
 };
 
 
@@ -346,7 +346,7 @@ import type { router } from "../lorm/router";
 export type LormRouter = typeof router;
 
 type ExtractRouterMethods<T> = {
-  [K in keyof T]: T[K] extends (...args: any[]) => any ? T[K] : never;
+  [K in keyof T]: T[K] extends (...args: unknown[]) => unknown ? T[K] : never;
 };
 
 export type TypedLormRouter = ExtractRouterMethods<typeof router>;
@@ -397,12 +397,6 @@ function getAdapterSpecificCredentials(adapter: string): string {
   }
 }
 
-export const basicTypes = `export type User = {
-  id: string;
-  name: string;
-};
+export const basicTypes = `import { LormRouter, ExtractRouterMethods, TypedLormRouter, User, CreateUserInput } from '../types.js';
 
-export type CreateUserInput = {
-  name: string;
-};
-`;
+export type { LormRouter, ExtractRouterMethods, TypedLormRouter, User, CreateUserInput };`;

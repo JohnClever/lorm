@@ -1,17 +1,23 @@
 import { defineConfig } from 'tsup';
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 export default defineConfig({
   entry: ['src/index.ts'],
   format: ['esm', 'cjs'],
   dts: true,
   clean: true,
-  splitting: true, // Enable code splitting to reduce bundle size
-  sourcemap: true,
-  minify: false, // Disable minification for debugging
+  splitting: true,
+  sourcemap: !isProduction,
+  minify: isProduction,
   target: 'es2020',
   outDir: 'dist',
-  shims: true, // Add shims for import.meta and other ESM features in CJS
-  treeshake: true, // Enable tree shaking
+  shims: true,
+  treeshake: true,
+  metafile: true, // Generate metafile for bundle analysis
+  bundle: true,
+  platform: 'node',
+  onSuccess: isProduction ? 'node scripts/analyze-bundle.js' : undefined,
   external: [
     '@inquirer/prompts',
     '@lorm/core',

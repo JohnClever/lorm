@@ -3,7 +3,13 @@ import { languageHandler, LanguageInfo } from "./language-handler";
 /**
  * Database adapter types
  */
-export type DatabaseAdapter = "neon" | "postgres" | "mysql" | "sqlite" | "planetscale" | "turso";
+export type DatabaseAdapter =
+  | "neon"
+  | "postgres"
+  | "mysql"
+  | "sqlite"
+  | "planetscale"
+  | "turso";
 
 /**
  * Template generation options
@@ -32,9 +38,11 @@ export class TemplateManager {
   /**
    * Generates router template based on detected language
    */
-  async generateRouterTemplate(options: { isMjs?: boolean } = {}): Promise<string> {
+  async generateRouterTemplate(
+    options: { isMjs?: boolean } = {}
+  ): Promise<string> {
     const languageInfo = await languageHandler.detectLanguage();
-    
+
     if (languageInfo.isTypeScript) {
       return this.getTypeScriptRouterTemplate();
     } else {
@@ -47,7 +55,7 @@ export class TemplateManager {
    */
   async generateSchemaTemplate(adapter: DatabaseAdapter): Promise<string> {
     const languageInfo = await languageHandler.detectLanguage();
-    
+
     if (languageInfo.isTypeScript) {
       return this.getTypeScriptSchemaTemplate(adapter);
     } else {
@@ -60,7 +68,7 @@ export class TemplateManager {
    */
   async generateConfigTemplate(options: TemplateOptions): Promise<string> {
     const languageInfo = await languageHandler.detectLanguage();
-    
+
     if (languageInfo.isTypeScript) {
       return this.getTypeScriptConfigTemplate(options.adapter, options.url);
     } else {
@@ -115,8 +123,8 @@ export const router = {
    * JavaScript router template
    */
   private getJavaScriptRouterTemplate(isMjs: boolean): string {
-    const schemaImport = isMjs ? '../schema/index.mjs' : '../schema';
-    
+    const schemaImport = isMjs ? "../schema/index.mjs" : "../schema";
+
     return `import { defineRouter } from "@lorm/core";
 import { z } from "zod";
 import { schema } from "${schemaImport}";
@@ -189,7 +197,10 @@ export const schema = { users };`;
   /**
    * TypeScript config template
    */
-  private getTypeScriptConfigTemplate(adapter: DatabaseAdapter, url?: string): string {
+  private getTypeScriptConfigTemplate(
+    adapter: DatabaseAdapter,
+    url?: string
+  ): string {
     const defaultUrl = this.getDefaultUrl(adapter);
     const adapterOptions = this.getAdapterSpecificOptions(adapter);
 
@@ -207,7 +218,10 @@ ${adapterOptions}
   /**
    * JavaScript config template
    */
-  private getJavaScriptConfigTemplate(adapter: DatabaseAdapter, url?: string): string {
+  private getJavaScriptConfigTemplate(
+    adapter: DatabaseAdapter,
+    url?: string
+  ): string {
     const defaultUrl = this.getDefaultUrl(adapter);
     const adapterOptions = this.getAdapterSpecificOptions(adapter);
 
@@ -300,7 +314,7 @@ ${adapterOptions}
       case "mysql":
         return "mysql://username:password@localhost:3306/database";
       case "planetscale":
-        return "mysql://username:password@aws.connect.psdb.cloud/database?ssl={\"rejectUnauthorized\":true}";
+        return 'mysql://username:password@aws.connect.psdb.cloud/database?ssl={"rejectUnauthorized":true}';
       case "sqlite":
         return "file:./dev.db";
       case "turso":

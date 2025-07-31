@@ -17,14 +17,18 @@
     "size": "turbo run size",
     "size:check": "turbo run size:check",
     "size:all": "pnpm --filter '@lorm/*' size",
-    "clean": "tsx scripts/clean.ts"
-
+    "clean": "tsx scripts/clean.ts",
+    "cleanup:code": "tsx scripts/cleanup-code.ts",
+    "cleanup:cli": "tsx scripts/cleanup-code.ts packages/@lorm/cli src",
+    "cleanup:core": "tsx scripts/cleanup-code.ts packages/@lorm/core src",
+    "cleanup:client": "tsx scripts/cleanup-code.ts packages/@lorm/client src",
+    "cleanup:schema": "tsx scripts/cleanup-code.ts packages/@lorm/schema src"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.5",
     "tsup": "^8.5.0",
     "tsx": "^4.20.3",
-    "turbo": "^2.5.4",
+    "turbo": "^2.5.5",
     "typescript": "^5.8.3"
   },
   "packageManager": "pnpm@9.13.2"

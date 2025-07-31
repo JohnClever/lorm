@@ -1,20 +1,31 @@
 import path from "path";
 import { exists } from "./file-utils";
 import { spawn } from "child_process";
-
 export function packageManager(): "pnpm" | "yarn" | "npm" | "bun" {
   const cwd = process.cwd();
-
   if (exists(path.join(cwd, "bun.lockb"))) return "bun";
   if (exists(path.join(cwd, "pnpm-lock.yaml"))) return "pnpm";
   if (exists(path.join(cwd, "yarn.lock"))) return "yarn";
   if (exists(path.join(cwd, "package-lock.json"))) return "npm";
-
   return "npm";
 }
-
 export const getPackageManager = packageManager;
 
+export function getCommandPrefix(): string {
+  const pm = packageManager();
+  switch (pm) {
+    case "npm":
+      return "npx";
+    case "yarn":
+      return "yarn";
+    case "bun":
+      return "bunx";
+    case "pnpm":
+      return "pnpm dlx";
+    default:
+      return "npx";
+  }
+}
 export async function installDependencies(
   dependencies: string[],
   options: {
@@ -24,14 +35,11 @@ export async function installDependencies(
   } = {}
 ): Promise<void> {
   if (dependencies.length === 0) return;
-
   const pm = options.packageManager || packageManager();
   const cwd = options.cwd || process.cwd();
   const isDev = options.dev || false;
-
   let command: string;
   let args: string[];
-
   switch (pm) {
     case "pnpm":
       command = "pnpm";
@@ -55,14 +63,12 @@ export async function installDependencies(
       ];
       break;
   }
-
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd,
       stdio: "inherit",
       shell: true,
     });
-
     child.on("close", (code) => {
       if (code === 0) {
         resolve();
@@ -74,7 +80,6 @@ export async function installDependencies(
         );
       }
     });
-
     child.on("error", (error) => {
       reject(error);
     });

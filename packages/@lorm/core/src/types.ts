@@ -35,24 +35,24 @@ export const configSchema = z.object({
         return false;
       }
     }, { message: "Must be a valid URL or environment variable expression" }),
-    adapter: z.enum(["neon", "postgres", "mysql", "sqlite", "planetscale", "turso"]).default("neon").optional(),
-    options: z.record(z.any()).optional(),
+    adapter: z.enum(["neon", "postgres", "mysql", "sqlite", "planetscale", "turso"]).optional().default("neon"),
+    options: z.record(z.string(), z.any()).optional(),
   }),
   server: z.object({
-    port: z.number().int().min(1).max(65535).default(3000).optional(),
-    host: z.string().default("localhost").optional(),
+    port: z.number().int().min(1).max(65535).optional().default(3000),
+    host: z.string().optional().default("localhost"),
     cors: z.object({
-      origin: z.union([z.string(), z.array(z.string())]).default("*").optional(),
-      credentials: z.boolean().default(false).optional(),
+      origin: z.union([z.string(), z.array(z.string())]).optional().default("*"),
+      credentials: z.boolean().optional().default(false),
     }).optional(),
     security: z.object({
-      maxRequestSize: z.number().int().min(1024).default(1024 * 1024).optional(), // 1MB default
-      requestTimeout: z.number().int().min(1000).default(30000).optional(), // 30s default
+      maxRequestSize: z.number().int().min(1024).optional().default(1024 * 1024), // 1MB default
+      requestTimeout: z.number().int().min(1000).optional().default(30000), // 30s default
     }).optional(),
   }).optional(),
   logging: z.object({
-    level: z.enum(["error", "warn", "info", "debug"]).default("info").optional(),
-    enableRequestLogging: z.boolean().default(false).optional(),
+    level: z.enum(["error", "warn", "info", "debug"]).optional().default("info"),
+    enableRequestLogging: z.boolean().optional().default(false),
   }).optional(),
 });
 

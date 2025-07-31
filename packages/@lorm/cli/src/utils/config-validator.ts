@@ -4,56 +4,39 @@ import chalk from "chalk";
 import { exists } from "./file-utils";
 import { SecurityValidator, SecurityAuditLogger } from "./security";
 import { loadConfig } from "@lorm/core";
+import { configValidationCache } from "./config-cache";
+import { ValidationResult, ConfigValidationOptions } from '../types.js';
 
-export interface ValidationResult {
-  isValid: boolean;
-  errors: string[];
-  warnings: string[];
-  suggestions?: string[];
-}
-
-export interface ConfigValidationOptions {
-  requireConfig?: boolean;
-  requireSchema?: boolean;
-  requireRouter?: boolean;
-  checkDatabase?: boolean;
-  checkDependencies?: boolean;
-  checkEnvironment?: boolean;
-  autoFix?: boolean;
-}
-
-/**
- * Validates the Lorm project configuration
- */
+export type { ValidationResult, ConfigValidationOptions };
 export async function validateConfig(
   options: ConfigValidationOptions = {}
 ): Promise<ValidationResult> {
+  const cachedResult = await configValidationCache.get(options);
+  if (cachedResult) {
+    return cachedResult;
+  }
   const {
-    requireConfig = true,
-    requireSchema = true,
+    requireConfig = false,
+    requireSchema = false,
     requireRouter = false,
     checkDatabase = false,
-    checkDependencies = true,
-    checkEnvironment = true,
+    checkDependencies = false,
+    checkEnvironment = false,
     autoFix = false,
   } = options;
-
   const errors: string[] = [];
   const warnings: string[] = [];
   const suggestions: string[] = [];
   const cwd = process.cwd();
-
   if (requireConfig) {
     const configTsPath = resolve(cwd, "lorm.config.ts");
     const configJsPath = resolve(cwd, "lorm.config.js");
     const configMjsPath = resolve(cwd, "lorm.config.mjs");
-    
     if (!exists(configTsPath) && !exists(configJsPath) && !exists(configMjsPath)) {
       errors.push(
         "lorm.config.js, lorm.config.mjs, or lorm.config.ts not found. Run `npx @lorm/cli init` to create it."
       );
     } else {
-      // Use loadConfig from @lorm/core which handles both .ts and .js files
       try {
         const config = await loadConfig();
         if (!config) {
@@ -74,13 +57,11 @@ export async function validateConfig(
       }
     }
   }
-
   if (requireSchema) {
     const newTsSchemaPath = resolve(cwd, "lorm/schema/index.ts");
     const newJsSchemaPath = resolve(cwd, "lorm/schema/index.js");
     const newMjsSchemaPath = resolve(cwd, "lorm/schema/index.mjs");
     const legacySchemaPath = resolve(cwd, "lorm.schema.js");
-    
     if (!exists(newTsSchemaPath) && !exists(newJsSchemaPath) && !exists(newMjsSchemaPath) && !exists(legacySchemaPath)) {
       errors.push(
         "Schema file not found. Expected lorm/schema/index.ts, lorm/schema/index.js, lorm/schema/index.mjs, or lorm.schema.js"
@@ -95,13 +76,11 @@ export async function validateConfig(
       );
     }
   }
-
   if (requireRouter) {
     const newTsRouterPath = resolve(cwd, "lorm/router/index.ts");
     const newJsRouterPath = resolve(cwd, "lorm/router/index.js");
     const newMjsRouterPath = resolve(cwd, "lorm/router/index.mjs");
     const legacyRouterPath = resolve(cwd, "lorm.router.js");
-    
     if (!exists(newTsRouterPath) && !exists(newJsRouterPath) && !exists(newMjsRouterPath) && !exists(legacyRouterPath)) {
       warnings.push(
         "Router file not found. Some features may not work correctly."
@@ -116,12 +95,10 @@ export async function validateConfig(
       );
     }
   }
-
   const lormDir = resolve(cwd, ".lorm");
   if (!exists(lormDir)) {
     warnings.push(".lorm directory not found. Type generation may not work.");
   }
-
   const packageJsonPath = resolve(cwd, "package.json");
   if (!exists(packageJsonPath)) {
     warnings.push(
@@ -136,7 +113,6 @@ export async function validateConfig(
           !packageJson.dependencies?.[dep] &&
           !packageJson.devDependencies?.[dep]
       );
-
       if (missingDeps.length > 0) {
         errors.push(`Missing required dependencies: ${missingDeps.join(", ")}`);
         suggestions.push(`Run: npm install ${missingDeps.join(" ")}`);
@@ -145,7 +121,6 @@ export async function validateConfig(
       warnings.push("Could not parse package.json");
     }
   }
-
   if (checkEnvironment) {
     const envFile = resolve(cwd, ".env");
     if (!exists(envFile)) {
@@ -162,7 +137,6 @@ export async function validateConfig(
           warnings.push("DATABASE_URL not found in .env file");
           suggestions.push("Add DATABASE_URL to your .env file");
         }
-
         const envSecurityResult =
           SecurityValidator.validateEnvironmentVariables();
         errors.push(...envSecurityResult.errors);
@@ -173,7 +147,6 @@ export async function validateConfig(
       }
     }
   }
-
   if (checkDatabase) {
     try {
       if (!process.env.DATABASE_URL) {
@@ -186,11 +159,10 @@ export async function validateConfig(
         errors.push(...dbSecurityResult.errors);
         warnings.push(...dbSecurityResult.warnings);
         suggestions.push(...dbSecurityResult.suggestions);
-
         await SecurityAuditLogger.logSecurityEvent("database_validation", {
           isValid: dbSecurityResult.isValid,
-          isLocal: dbSecurityResult.urlInfo?.isLocal,
-          protocol: dbSecurityResult.urlInfo?.protocol,
+          isLocal: dbSecurityResult.urlInfo?.isLocal ?? false,
+          protocol: dbSecurityResult.urlInfo?.protocol ?? "unknown",
         });
       }
     } catch (error) {
@@ -204,18 +176,15 @@ export async function validateConfig(
       );
     }
   }
-
-  return {
+  const result = {
     isValid: errors.length === 0,
     errors,
     warnings,
     suggestions,
   };
+  await configValidationCache.set(options, result);
+  return result;
 }
-
-/**
- * Displays validation results to the console
- */
 export function displayValidationResults(result: ValidationResult): void {
   if (result.errors.length > 0) {
     console.error(chalk.red("\n❌ Configuration Errors:"));
@@ -223,34 +192,26 @@ export function displayValidationResults(result: ValidationResult): void {
       console.error(chalk.red(`  • ${error}`));
     });
   }
-
   if (result.warnings.length > 0) {
     console.warn(chalk.yellow("\n⚠️  Configuration Warnings:"));
     result.warnings.forEach((warning) => {
       console.warn(chalk.yellow(`  • ${warning}`));
     });
   }
-
   if (result.suggestions && result.suggestions.length > 0) {
     console.log(chalk.blue("\n💡 Suggestions:"));
     result.suggestions.forEach((suggestion) => {
       console.log(chalk.blue(`  • ${suggestion}`));
     });
   }
-
   if (result.isValid && result.warnings.length === 0) {
     console.log(chalk.green("\n✅ Configuration is valid!"));
   }
 }
-
-/**
- * Validates configuration and exits if invalid
- */
 export async function validateConfigOrExit(
   options: ConfigValidationOptions = {}
 ): Promise<void> {
   const result = await validateConfig(options);
-
   if (!result.isValid) {
     displayValidationResults(result);
     console.error(
@@ -258,7 +219,6 @@ export async function validateConfigOrExit(
     );
     throw new Error(result.errors[0] || "Configuration validation failed");
   }
-
   if (result.warnings.length > 0) {
     displayValidationResults(result);
   }

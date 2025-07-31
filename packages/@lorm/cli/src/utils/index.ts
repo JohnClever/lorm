@@ -1,7 +1,20 @@
-export { packageManager, installDependencies } from "./package-manager";
-
+export { packageManager, installDependencies, getCommandPrefix } from "./package-manager";
 export { resolveDrizzleKitBin, executeDrizzleKit } from "./drizzle-kit";
-
+export {
+  LormConfigSchema,
+  DevelopmentEnvConfigSchema,
+  ProductionEnvConfigSchema,
+  ConfigMigrationSchema,
+  ConfigValidator,
+} from "./config-schema";
+export type {
+  LormConfig,
+  DatabaseConfig,
+  SecurityConfig,
+  PerformanceConfig,
+  DevelopmentConfig,
+  ConfigMigration,
+} from "./config-schema";
 export {
   validateConfig,
   validateConfigOrExit,
@@ -11,56 +24,37 @@ export type {
   ValidationResult,
   ConfigValidationOptions,
 } from "./config-validator";
-
-export { ErrorRecovery } from "./error-recovery";
-
-export {
-  COMMAND_HELP,
-  COMMAND_CATEGORIES,
-  displayCommandHelp,
-  displayGeneralHelp,
-  displayCategoryHelp,
-  displayQuickStart,
-} from "./help-system";
-export type {
-  CommandExample,
-  CommandHelp,
-  CommandCategory,
-} from "./help-system";
-
 export { CommandCache } from "./cache";
-
-export type { PerformanceMetric, PerformanceReport } from "./performance";
-export { PerformanceMonitor, PerformanceTracker } from "./performance";
-
 export type {
-  PluginContext,
-  PluginCommand,
-  PluginHook,
-  Plugin,
-  PluginConfig,
-} from "./plugin-system";
-export { PluginManager } from "./plugin-system";
-
+  PerformanceMetric,
+  PerformanceReport,
+} from "./performance-monitor";
+export {
+  PerformanceMonitor,
+  PerformanceTracker,
+  LegacyPerformanceMonitor,
+} from "./performance-monitor";
+// Plugin-related exports have been moved to src/plugins/index.ts
 export {
   initializeCommand,
   handleCommandError,
   validateSchemaFile,
   setupLormDirectory,
-} from "./setup";
-
-export {
+  createInitialProject,
+  detectTypeScript,
+  ensureLormDirectory,
+  createSchemaFile,
+  createDrizzleConfig,
   initializeAdvancedCommand,
   handleAdvancedCommandError,
-} from "./advanced-setup";
-
+  validateSchemaFileOptional,
+} from "./setup";
 export {
   lazyLoaders,
   preloadModules,
   warmCache,
   getCacheStats,
 } from "./lazy-loader";
-
 export { FileUtils, fileExists } from "./file-utils";
 export type {
   FileStats,
@@ -74,8 +68,5 @@ export {
   createDatabaseCommand,
   createDevelopmentCommand,
 } from "./command-registry";
-
 export { HealthChecker } from "./health-check";
-
 export { SecurityValidator, SecurityAuditLogger } from "./security";
-export { RateLimiter } from "./rate-limiter";

@@ -42,7 +42,9 @@ async function createConfigFiles(adapter: DatabaseAdapter): Promise<void> {
     const languageInfo = await languageHandler.detectLanguage();
 
     // Create config file
-    const configContent = await templateManager.generateConfigTemplate({ adapter });
+    const configContent = await templateManager.generateConfigTemplate({
+      adapter,
+    });
     await fs.writeFile(filePaths.config, configContent);
     console.log(chalk.green(`✅ Created ${filePaths.config}`));
 
@@ -53,8 +55,8 @@ async function createConfigFiles(adapter: DatabaseAdapter): Promise<void> {
     console.log(chalk.green(`✅ Created lorm/ directory structure`));
 
     // Create router file
-    const routerContent = await templateManager.generateRouterTemplate({ 
-      isMjs: filePaths.router.endsWith('.mjs') 
+    const routerContent = await templateManager.generateRouterTemplate({
+      isMjs: filePaths.router.endsWith(".mjs"),
     });
     await fs.writeFile(filePaths.router, routerContent);
     console.log(chalk.green(`✅ Created ${filePaths.router}`));
@@ -66,21 +68,23 @@ async function createConfigFiles(adapter: DatabaseAdapter): Promise<void> {
 
     // Log project type information
     if (languageInfo.isTypeScript) {
-      console.log(chalk.blue("🔷 Generated TypeScript files with full type safety"));
+      console.log(
+        chalk.blue("🔷 Generated TypeScript files with full type safety")
+      );
     } else {
-      console.log(chalk.blue("🟨 Generated JavaScript files (consider upgrading to TypeScript for better DX)"));
+      console.log(
+        chalk.blue(
+          "🟨 Generated JavaScript files (consider upgrading to TypeScript for better DX)"
+        )
+      );
     }
-
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : String(error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
     console.error(
       chalk.red(`❌ Failed to create configuration files:`),
       errorMessage
     );
-    throw new Error(
-      `Failed to create configuration files: ${errorMessage}`
-    );
+    throw new Error(`Failed to create configuration files: ${errorMessage}`);
   }
 }
 
@@ -152,9 +156,11 @@ async function displayCompletionMessage(
 ): Promise<void> {
   console.log(chalk.green("\n🎉 LORM project initialized successfully!"));
   console.log(chalk.blue("\n📖 Next steps:"));
-  
+
   const filePaths = await languageHandler.getFilePaths();
-  console.log(chalk.white(`1. Update your database URL in ${filePaths.config}`));
+  console.log(
+    chalk.white(`1. Update your database URL in ${filePaths.config}`)
+  );
   console.log(chalk.white(`2. Define your schema in ${filePaths.schema}`));
   console.log(chalk.white(`3. Create your API routes in ${filePaths.router}`));
   console.log(chalk.white("4. Start your development server"));
@@ -228,7 +234,10 @@ export async function initProject(options: InitOptions = {}): Promise<void> {
     );
 
     // Check for existing config files (both .js and .ts)
-    const configExists = (await fileExists("lorm.config.js")) || (await fileExists("lorm.config.ts")) || (await fileExists("lorm.config.mjs"));
+    const configExists =
+      (await fileExists("lorm.config.js")) ||
+      (await fileExists("lorm.config.ts")) ||
+      (await fileExists("lorm.config.mjs"));
     if (!force && configExists) {
       console.log(
         chalk.yellow(
