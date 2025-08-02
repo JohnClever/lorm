@@ -280,9 +280,7 @@ export class ErrorHandler {
     if (message.includes('database') || message.includes('sql')) {
       return ErrorType.DATABASE;
     }
-    if (message.includes('plugin')) {
-      return ErrorType.PLUGIN;
-    }
+    // Plugin error handling moved to @lorm/core
     if (message.includes('permission') || message.includes('unauthorized')) {
       return ErrorType.SECURITY;
     }
@@ -319,8 +317,7 @@ export class ErrorHandler {
         return `Configuration error: ${baseMessage}. Please check your Lorm configuration.`;
       case ErrorType.DATABASE:
         return `Database error: ${baseMessage}. Please check your database connection and schema.`;
-      case ErrorType.PLUGIN:
-        return `Plugin error: ${baseMessage}. Please check your plugin configuration.`;
+      // Plugin error handling moved to @lorm/core
       case ErrorType.SECURITY:
         return `Security error: ${baseMessage}. Please check your permissions and authentication.`;
       default:

@@ -3,9 +3,11 @@ import { readFileSync } from "fs";
 import chalk from "chalk";
 import { exists } from "./file-utils";
 import { SecurityValidator, SecurityAuditLogger } from "./security";
-import { loadConfig } from "@lorm/core";
-import { configValidationCache } from "./config-cache";
-import { ValidationResult, ConfigValidationOptions } from '../types.js';
+import { loadConfig, ConfigCache } from "@lorm/core";
+import { ValidationResult, ConfigValidationOptions } from '@lorm/core';
+
+// Get the singleton ConfigCache instance
+const configValidationCache = ConfigCache.getInstance();
 
 export type { ValidationResult, ConfigValidationOptions };
 export async function validateConfig(
@@ -188,19 +190,19 @@ export async function validateConfig(
 export function displayValidationResults(result: ValidationResult): void {
   if (result.errors.length > 0) {
     console.error(chalk.red("\n❌ Configuration Errors:"));
-    result.errors.forEach((error) => {
+    result.errors.forEach((error: string) => {
       console.error(chalk.red(`  • ${error}`));
     });
   }
   if (result.warnings.length > 0) {
     console.warn(chalk.yellow("\n⚠️  Configuration Warnings:"));
-    result.warnings.forEach((warning) => {
+    result.warnings.forEach((warning: string) => {
       console.warn(chalk.yellow(`  • ${warning}`));
     });
   }
   if (result.suggestions && result.suggestions.length > 0) {
     console.log(chalk.blue("\n💡 Suggestions:"));
-    result.suggestions.forEach((suggestion) => {
+    result.suggestions.forEach((suggestion: string) => {
       console.log(chalk.blue(`  • ${suggestion}`));
     });
   }

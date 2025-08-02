@@ -28,7 +28,7 @@ export class SecurityManager {
     }
     const defaultAllowedCommands = [
       'help', 'init', 'dev', 'build', 'check', 'migrate', 'generate',
-      'plugin', 'cache', 'audit', 'config', 'schema', 'db'
+      'cache', 'audit', 'config', 'schema', 'db' // 'plugin' moved to @lorm/core
     ];
     return defaultAllowedCommands.includes(command);
   }

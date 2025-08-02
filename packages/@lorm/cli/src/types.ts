@@ -104,8 +104,6 @@ export interface DevCommandOptions extends BaseCommandOptions {
   port?: number;
 }
 
-// Plugin Command Options
-// Plugin command options have been moved to src/plugins/types/index.ts
 
 // Utility Command Options
 export interface UtilityCommandOptions extends BaseCommandOptions {
@@ -158,7 +156,7 @@ export enum ErrorType {
   FILE_SYSTEM = 'file_system',
   DATABASE = 'database',
   CONFIGURATION = 'configuration',
-  PLUGIN = 'plugin',
+
   SECURITY = 'security',
   PERFORMANCE = 'performance',
   UNKNOWN = 'unknown'
@@ -235,22 +233,8 @@ export interface FileSystemError extends Error {
 // VALIDATION TYPES
 // =============================================================================
 
-export interface ValidationResult {
-  isValid: boolean;
-  errors: string[];
-  warnings: string[];
-  suggestions?: string[];
-}
-
-export interface ConfigValidationOptions {
-  requireConfig?: boolean;
-  requireSchema?: boolean;
-  requireRouter?: boolean;
-  checkDatabase?: boolean;
-  checkDependencies?: boolean;
-  checkEnvironment?: boolean;
-  autoFix?: boolean;
-}
+// ValidationResult and ConfigValidationOptions are now imported from @lorm/core
+// Remove duplicated validation types - use imports from @lorm/core instead
 
 // =============================================================================
 // SECURITY TYPES
@@ -272,34 +256,8 @@ export interface DatabaseUrlInfo {
   isSecure: boolean;
 }
 
-// =============================================================================
-// CACHE TYPES
-// =============================================================================
-
-export interface CacheOptions {
-  ttl?: number;
-  maxSize?: number;
-  enabled?: boolean;
-  compression?: boolean;
-  compressionThreshold?: number;
-  maxMemoryEntries?: number;
-}
-
-export interface CacheEntry<T = unknown> {
-  data: T;
-  timestamp: number;
-  hash: string;
-  size: number;
-  compressed?: boolean;
-  accessCount?: number;
-  lastAccessed?: number;
-}
-
-export interface ConfigCacheEntry {
-  config: Record<string, unknown>;
-  timestamp: number;
-  hash: string;
-}
+// Cache types are now imported from @lorm/core
+// Remove duplicated cache types - use imports from @lorm/core instead
 
 // =============================================================================
 // FILE SYSTEM TYPES
@@ -469,7 +427,6 @@ export interface DatabaseConfig {
   };
 }
 
-// PluginConfig has been moved to src/plugins/types/index.ts
 
 export interface SecurityConfig {
   encryption: {
@@ -532,7 +489,7 @@ export interface CommandGroup<T extends BaseCommandOptions> {
     | "database"
     | "development"
     | "utility"
-    | "plugin"
+
     | "security";
   defaultOptions?: Partial<CommandFactoryConfig<T>>;
   commands: Array<Omit<CommandFactoryConfig<T>, "category">>;
@@ -558,12 +515,85 @@ export interface CommandConfig<
     | "database"
     | "development"
     | "utility"
-    | "plugin"
+
     | "security";
 }
 export interface ValidationConfig {
   requireConfig?: boolean;
   requireSchema?: boolean;
+}
+
+// =============================================================================
+// PLUGIN TYPES
+// =============================================================================
+
+export interface PluginGroup<T extends BaseCommandOptions> {
+  prefix: string;
+  category:
+    | "core"
+    | "database"
+    | "development"
+    | "utility"
+    | "security";
+  defaultOptions?: Partial<CommandFactoryConfig<T>>;
+  plugins: Array<Omit<CommandFactoryConfig<T>, "category">>;
+}
+
+export interface PluginCommandConfig<T extends BaseCommandOptions> {
+  name: string;
+  description: string;
+  aliases?: string[];
+  options?: Array<{
+    flag: string;
+    description: string;
+    defaultValue?: string | number | boolean;
+  }>;
+  requiresConfig?: boolean;
+  requiresSchema?: boolean;
+  action: (options: T, ...args: string[]) => Promise<void>;
+  examples?: string[];
+  category?:
+    | "core"
+    | "database"
+    | "development"
+    | "utility"
+    | "security";
+}
+
+export interface PluginFactoryConfig<T extends BaseCommandOptions> {
+  name: string;
+  description: string;
+  category: string;
+  action: (options: T, ...args: string[]) => Promise<void>;
+  options?: Array<{ flag: string; description: string }>;
+  examples?: string[];
+  aliases?: string[];
+  requiresConfig?: boolean;
+  requiresSchema?: boolean;
+}
+
+export interface PluginValidationConfig {
+  requireConfig?: boolean;
+  requireSchema?: boolean;
+  allowedCategories?: string[];
+  maxPlugins?: number;
+}
+
+export interface PluginContext {
+  pluginName: string;
+  category: string;
+  options: Record<string, unknown>;
+  args: string[];
+  workingDirectory: string;
+  timestamp: number;
+}
+
+export interface PluginExecutionResult {
+  success: boolean;
+  duration: number;
+  output?: string;
+  error?: string;
+  metadata?: Record<string, unknown>;
 }
 
 // =============================================================================
@@ -606,9 +636,6 @@ export interface SystemInfo {
   };
 }
 
-// =============================================================================
-// PLUGIN TYPES
-// =============================================================================
 
 export interface CliCommand {
   option: (flags: string, description: string, options?: { default?: unknown }) => CliCommand;
@@ -623,61 +650,7 @@ export interface CliInstance {
   action: (callback: (...args: unknown[]) => void | Promise<void>) => CliInstance;
 }
 
-export interface PluginContext {
-  config: Record<string, unknown>;
-  logger: {
-    info: (message: string, ...args: unknown[]) => void;
-    warn: (message: string, ...args: unknown[]) => void;
-    error: (message: string, ...args: unknown[]) => void;
-    debug: (message: string, ...args: unknown[]) => void;
-  };
-  utils: PluginUtils;
-  cwd: string;
-  cli: {
-    command: (name: string, description: string) => CliCommand;
-    option: (flags: string, description: string, defaultValue?: unknown) => CliInstance;
-    action: (callback: (...args: unknown[]) => void | Promise<void>) => CliInstance;
-  };
-}
-
-export interface PluginUtils {
-  fs: {
-    readFile: (path: string) => Promise<string>;
-    writeFile: (path: string, content: string) => Promise<void>;
-    exists: (path: string) => Promise<boolean>;
-    mkdir: (path: string, options?: { recursive?: boolean }) => Promise<void>;
-  };
-  path: {
-    join: (...paths: string[]) => string;
-    resolve: (...paths: string[]) => string;
-    dirname: (path: string) => string;
-    basename: (path: string, ext?: string) => string;
-  };
-  crypto: {
-    createHash: (algorithm: string) => {
-      update: (data: string) => { digest: (encoding: string) => string };
-    };
-  };
-  http: {
-    get: (url: string) => Promise<{ data: unknown; status: number }>;
-    post: (url: string, data: unknown) => Promise<{ data: unknown; status: number }>;
-  };
-  chalk: {
-    red: (text: string) => string;
-    green: (text: string) => string;
-    yellow: (text: string) => string;
-    blue: (text: string) => string;
-    gray: (text: string) => string;
-  };
-  validateConfig: () => Promise<void>;
-  errorRecovery: (() => Promise<void>) | null;
-  cache: {
-    get: <T>(key: string) => Promise<T | null>;
-    set: <T>(key: string, value: T, ttl?: number) => Promise<void>;
-    delete: (key: string) => Promise<void>;
-    clear: () => Promise<void>;
-  };
-}
+// Plugin interfaces have been moved to @lorm/core package
 
 // All plugin-related interfaces have been moved to src/plugins/types/index.ts
 

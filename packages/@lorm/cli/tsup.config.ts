@@ -26,6 +26,19 @@ export default defineConfig({
     'chokidar',
     'drizzle-kit',
     'execa',
-    'which'
+    'which',
+    // Node.js built-in modules
+    'path',
+    'fs',
+    'util',
+    'os',
+    'crypto',
+    'http',
+    'https',
+    'url',
+    'events',
+    'stream',
+    'buffer',
+    'child_process'
   ],
 });

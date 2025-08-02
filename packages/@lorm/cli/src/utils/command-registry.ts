@@ -80,7 +80,7 @@ export class CommandRegistry {
       database: [],
       development: [],
       utility: [],
-      plugin: [],
+      // plugin category moved to @lorm/core
       security: [],
     };
     for (const config of this.commands.values()) {

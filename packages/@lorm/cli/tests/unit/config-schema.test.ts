@@ -37,6 +37,21 @@ describe('Config Schema', () => {
           }
         },
         security: {
+          encryption: {
+            algorithm: 'aes-256-gcm',
+            keyLength: 256
+          },
+          authentication: {
+            required: true,
+            methods: ['jwt', 'oauth']
+          },
+          authorization: {
+            roles: ['admin', 'user'],
+            permissions: {
+              admin: ['read', 'write', 'delete'],
+              user: ['read']
+            }
+          },
           enableAuditLog: true,
           auditLogPath: './.lorm/audit.log',
           commandSandbox: true,
@@ -45,13 +60,12 @@ describe('Config Schema', () => {
           sessionTimeout: 7200
         },
         performance: {
-          enableMetrics: true,
-          metricsPath: './.lorm/metrics.json',
-          cacheEnabled: true,
-          cacheSize: 200,
-          cacheTTL: 600,
-          lazyLoading: true,
-          bundleAnalysis: true
+          enabled: true,
+          logPath: './.lorm/performance.log',
+          maxLogSize: 10485760,
+          retentionDays: 30,
+          slowCommandThreshold: 1000,
+          memoryWarningThreshold: 0.8
         },
         plugins: [
           {
@@ -89,16 +103,30 @@ describe('Config Schema', () => {
     });
 
     it('should validate config with different database providers', () => {
-      const providers = ['postgresql', 'mysql', 'sqlite', 'turso'] as const;
+      const configs = [
+        {
+          provider: 'postgresql' as const,
+          url: 'postgresql://localhost:5432/test'
+        },
+        {
+          provider: 'mysql' as const,
+          url: 'mysql://localhost:3306/test'
+        },
+        {
+          provider: 'sqlite' as const,
+          url: 'file:./test.db'
+        },
+        {
+          provider: 'turso' as const,
+          url: 'libsql://localhost:8080/test'
+        }
+      ];
       
-      providers.forEach(provider => {
+      configs.forEach(dbConfig => {
         const config: LormConfig = {
           version: '1.0.0',
           environment: 'development',
-          database: {
-            provider,
-            url: `${provider}://localhost/test`
-          },
+          database: dbConfig,
           plugins: []
         };
 
@@ -145,7 +173,7 @@ describe('Config Schema', () => {
       expect(() => LormConfigSchema.parse(config)).toThrow(ZodError);
     });
 
-    it('should reject config with invalid plugin structure', () => {
+    it('should accept any plugin structure since validation moved to @lorm/core', () => {
       const config = {
         version: '1.0.0',
         environment: 'development',
@@ -154,13 +182,13 @@ describe('Config Schema', () => {
         },
         plugins: [
           {
-            // missing name
+            // any structure is allowed since plugins use z.unknown()
             enabled: true
           }
         ]
       };
 
-      expect(() => LormConfigSchema.parse(config)).toThrow(ZodError);
+      expect(() => LormConfigSchema.parse(config)).not.toThrow();
     });
 
     it('should reject config with invalid security settings', () => {
@@ -171,6 +199,21 @@ describe('Config Schema', () => {
           provider: 'postgresql'
         },
         security: {
+          encryption: {
+            algorithm: 'aes-256-gcm',
+            keyLength: 256
+          },
+          authentication: {
+            required: true,
+            methods: ['jwt', 'oauth']
+          },
+          authorization: {
+            roles: ['admin', 'user'],
+            permissions: {
+              admin: ['read', 'write', 'delete'],
+              user: ['read']
+            }
+          },
           enableAuditLog: 'invalid', // should be boolean
           sessionTimeout: -1 // should be positive
         },
@@ -188,8 +231,8 @@ describe('Config Schema', () => {
           provider: 'postgresql'
         },
         performance: {
-          enableMetrics: 'invalid', // should be boolean
-          cacheSize: -1 // should be positive
+          enabled: 'invalid', // should be boolean
+          maxLogSize: -1 // should be positive
         },
         plugins: []
       };
@@ -243,6 +286,21 @@ describe('Config Schema', () => {
           provider: 'postgresql' as const
         },
         security: {
+          encryption: {
+            algorithm: 'aes-256-gcm',
+            keyLength: 256
+          },
+          authentication: {
+            required: true,
+            methods: ['jwt', 'oauth']
+          },
+          authorization: {
+            roles: ['admin', 'user'],
+            permissions: {
+              admin: ['read', 'write', 'delete'],
+              user: ['read']
+            }
+          },
           enableAuditLog: true,
           auditLogPath: './.lorm/audit.log',
           commandSandbox: true,
@@ -264,13 +322,12 @@ describe('Config Schema', () => {
           provider: 'postgresql' as const
         },
         performance: {
-          enableMetrics: true,
-          metricsPath: './.lorm/metrics.json',
-          cacheEnabled: true,
-          cacheSize: 100,
-          cacheTTL: 300,
-          lazyLoading: true,
-          bundleAnalysis: false
+          enabled: true,
+          logPath: './.lorm/performance.log',
+          maxLogSize: 1024 * 1024,
+          retentionDays: 7,
+          slowCommandThreshold: 1000,
+          memoryWarningThreshold: 100 * 1024 * 1024
         },
         plugins: []
       };

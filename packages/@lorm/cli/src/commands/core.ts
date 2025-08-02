@@ -29,7 +29,7 @@ export const createHelpCommand = (commandRegistry: CommandRegistry) =>
           "development",
           "database",
           "security",
-          "plugin",
+          // "plugin", // moved to @lorm/core
           "utility",
         ];
         if (categories.includes(command.toLowerCase())) {

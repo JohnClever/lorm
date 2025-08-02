@@ -20,11 +20,8 @@ export {
   validateConfigOrExit,
   displayValidationResults,
 } from "./config-validator";
-export type {
-  ValidationResult,
-  ConfigValidationOptions,
-} from "./config-validator";
-export { CommandCache } from "./cache";
+// ValidationResult and ConfigValidationOptions are now imported from @lorm/core
+// CommandCache removed - now using cache system from @lorm/core
 export type {
   PerformanceMetric,
   PerformanceReport,

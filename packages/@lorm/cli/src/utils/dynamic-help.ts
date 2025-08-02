@@ -72,7 +72,7 @@ export class DynamicHelpGenerator {
     });
     console.log();
     const categories = this.getCommandsByCategory();
-    const categoryOrder = ['core', 'development', 'database', 'security', 'plugin', 'utility'];
+    const categoryOrder = ['core', 'development', 'database', 'plugin', 'cache', 'security', 'utility'];
     categoryOrder.forEach((categoryKey) => {
       const commands = categories[categoryKey];
       if (commands && commands.length > 0) {
@@ -179,10 +179,11 @@ export class DynamicHelpGenerator {
     const displayNames: Record<string, string> = {
       core: 'Project Setup',
       development: 'Development',
-      database: 'Database',
+      database: 'Database Operations',
       security: 'Security',
       plugin: 'Plugin Management',
-      utility: 'Utility Tools',
+      cache: 'Cache Management',
+      utility: 'System Utilities',
     };
     return displayNames[category] || category.charAt(0).toUpperCase() + category.slice(1);
   }
@@ -193,6 +194,7 @@ export class DynamicHelpGenerator {
       database: '🗄️',
       security: '🔒',
       plugin: '🔌',
+      cache: '💾',
       utility: '🛠️',
     };
     return icons[category] || '📁';

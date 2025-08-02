@@ -16,21 +16,7 @@ export function createDbCommand<T extends BaseCommandOptions>(
     ) || [`npx @lorm/cli db:${config.name}`],
   });
 }
-export function createPluginCommand<T extends BaseCommandOptions>(
-  config: CommandFactoryConfig<T>
-): CommandConfig<T> {
-  return createCommand({
-    ...config,
-    name: `plugin:${config.name}`,
-    category: "plugin",
-    requiresConfig: config.requiresConfig ?? false,
-    examples: config.examples?.map((example) =>
-      example.includes("npx @lorm/cli")
-        ? example
-        : `npx @lorm/cli plugin:${config.name} ${example}`.trim()
-    ) || [`npx @lorm/cli plugin:${config.name}`],
-  });
-}
+// Plugin commands have been moved to @lorm/core package
 export function createSecurityCommand<T extends BaseCommandOptions>(
   config: CommandFactoryConfig<T>
 ): CommandConfig<T> {

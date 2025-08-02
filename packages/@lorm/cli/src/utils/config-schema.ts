@@ -14,17 +14,7 @@ const DatabaseConfigSchema = z.object({
     schema: z.string().optional()
   }).optional()
 });
-const PluginConfigSchema = z.object({
-  name: z.string().min(1),
-  version: z.string().optional(),
-  enabled: z.boolean().prefault(true),
-  config: z.record(z.string(), z.unknown()).optional(),
-  marketplace: z.object({
-    enabled: z.boolean().prefault(true),
-    registryUrl: z.string().optional(),
-    apiKey: z.string().optional()
-  }).optional()
-});
+// Plugin configuration has been moved to @lorm/core package
 const SecurityConfigSchema = z.object({
   encryption: z.object({
     algorithm: z.string(),
@@ -65,7 +55,7 @@ export const LormConfigSchema = z.object({
   version: z.string().prefault('1.0.0'),
   environment: z.enum(['development', 'staging', 'production']).prefault('development'),
   database: DatabaseConfigSchema,
-  plugins: z.array(PluginConfigSchema).prefault([]),
+  plugins: z.array(z.unknown()).prefault([]), // Plugin management moved to @lorm/core
   security: SecurityConfigSchema.optional(),
   performance: PerformanceConfigSchema.optional(),
   development: DevConfigSchema.optional(),
@@ -147,7 +137,7 @@ export class ConfigValidator {
           table: '__drizzle_migrations'
         }
       },
-      plugins: [],
+      plugins: [], // Plugin management moved to @lorm/core
       security: {
         enableAuditLog: environment === 'production',
         commandSandbox: environment === 'production'

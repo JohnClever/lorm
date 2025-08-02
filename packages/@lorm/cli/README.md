@@ -261,28 +261,9 @@ npx @lorm/cli cache:stats
 
 ---
 
-### 🧩 Plugin Commands
+### 🔌 Plugin System
 
-#### `npx @lorm/cli plugin:list`
-List all available and installed plugins.
-
-#### `npx @lorm/cli plugin:install <name>`
-Install a new plugin from the registry.
-
-#### `npx @lorm/cli plugin:uninstall <name>`
-Uninstall an existing plugin.
-
-#### `npx @lorm/cli plugin:enable <name>`
-Enable a disabled plugin.
-
-#### `npx @lorm/cli plugin:disable <name>`
-Disable an active plugin.
-
-#### `npx @lorm/cli plugin:update [name]`
-Update plugins to their latest versions.
-
-#### `npx @lorm/cli plugin:search <query>`
-Search for plugins in the registry.
+Plugin management has been moved to the `@lorm/core` package. For plugin development and management, please refer to the `@lorm/core` documentation.
 
 ## 🗄️ Database Commands
 

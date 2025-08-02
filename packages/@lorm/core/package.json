@@ -27,7 +27,9 @@
     "prepublishOnly": "pnpm build",
     "size": "tsx ../../../scripts/bundle-size.ts",
     "size:check": "pnpm build && pnpm size",
-    "size:watch": "pnpm build && pnpm size && echo '\nWatching for changes...' && pnpm build --watch"
+    "size:watch": "pnpm build && pnpm size && echo '\nWatching for changes...' && pnpm build --watch",
+    "test": "vitest run",
+    "check": "npx tsc --noEmit --strict "
   },
   "dependencies": {
     "@libsql/client": "^0.15.9",
@@ -38,6 +40,7 @@
     "chalk": "^5.3.0",
     "dotenv": "^17.0.1",
     "drizzle-orm": "^0.44.2",
+    "glob": "^11.0.0",
     "mysql2": "^3.14.2",
     "postgres": "^3.4.7",
     "zod": "^4.0.0"
@@ -46,7 +49,8 @@
     "@types/better-sqlite3": "^7.6.13",
     "@types/pg": "^8.15.4",
     "terser": "^5.43.1",
-    "tsx": "^4.20.3"
+    "tsx": "^4.20.3",
+    "vitest": "^2.0.0"
   },
   "repository": {
     "type": "git",
