@@ -1,7 +1,7 @@
 {
   "name": "@lorm/core",
   "version": "0.1.34",
-  "description": "Core functionality for lorm - mobile-first framework",
+  "description": "Core functionality and shared infrastructure for lorm - mobile-first framework",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -20,6 +20,26 @@
       "types": "./dist/config.d.ts",
       "import": "./dist/config.js",
       "require": "./dist/config.cjs"
+    },
+    "./infrastructure": {
+      "types": "./dist/infrastructure/index.d.ts",
+      "import": "./dist/infrastructure/index.js",
+      "require": "./dist/infrastructure/index.cjs"
+    },
+    "./infrastructure/cache": {
+      "types": "./dist/infrastructure/cache/index.d.ts",
+      "import": "./dist/infrastructure/cache/index.js",
+      "require": "./dist/infrastructure/cache/index.cjs"
+    },
+    "./infrastructure/performance": {
+      "types": "./dist/infrastructure/performance/index.d.ts",
+      "import": "./dist/infrastructure/performance/index.js",
+      "require": "./dist/infrastructure/performance/index.cjs"
+    },
+    "./infrastructure/security": {
+      "types": "./dist/infrastructure/security/index.d.ts",
+      "import": "./dist/infrastructure/security/index.js",
+      "require": "./dist/infrastructure/security/index.cjs"
     }
   },
   "scripts": {
@@ -40,7 +60,11 @@
     "drizzle-orm": "^0.44.2",
     "mysql2": "^3.14.2",
     "postgres": "^3.4.7",
-    "zod": "^4.0.0"
+    "zod": "^4.0.0",
+    "fast-glob": "^3.3.2",
+    "fs-extra": "^11.2.0",
+    "semver": "^7.6.3",
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",

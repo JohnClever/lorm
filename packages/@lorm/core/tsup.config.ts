@@ -1,7 +1,17 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: ['src/index.ts', 'src/config.ts', 'src/router.ts', 'src/load.ts', 'src/server.ts'],
+  entry: [
+    'src/index.ts', 
+    'src/config.ts', 
+    'src/router.ts', 
+    'src/load.ts', 
+    'src/server.ts',
+    'src/infrastructure/index.ts',
+    'src/infrastructure/cache/index.ts',
+    'src/infrastructure/performance/index.ts',
+    'src/infrastructure/security/index.ts'
+  ],
   format: ['esm', 'cjs'],
   dts: true,
   clean: true,
@@ -20,6 +30,10 @@ export default defineConfig({
     'drizzle-orm',
     'mysql2',
     'postgres',
-    'zod'
+    'zod',
+    'fast-glob',
+    'fs-extra',
+    'semver',
+    'node-fetch'
   ],
 });

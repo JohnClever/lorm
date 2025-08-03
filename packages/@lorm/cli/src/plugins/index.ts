@@ -109,10 +109,8 @@ export {
 
 // Export all plugin-related types and utilities
 export * from './types';
-export * from './types/simple';
-export * from './core';
+export * from './types/simple'
 export * from './core/performance';
-export * from './utils';
 export * from './utils/testing';
 export * from './schemas';
 export * from './commands';
