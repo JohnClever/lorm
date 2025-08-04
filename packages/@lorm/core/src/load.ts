@@ -115,12 +115,37 @@ try {
       throw new Error('Failed to load TypeScript module - no success marker found');
     }
     
-    // For development mode, we'll return a minimal mock module
-    // The actual loading will be handled by the build process
-    return {
-      router: {},
-      default: {}
-    };
+    // Parse the module information from tsx output
+    const moduleInfoMatch = output.match(/__LORM_MODULE_SUCCESS__\s*([\s\S]*?)$/m);
+    if (!moduleInfoMatch) {
+      throw new Error('Failed to parse module information from tsx output');
+    }
+    
+    try {
+      const moduleInfo = JSON.parse(moduleInfoMatch[1].trim());
+      
+      // For TypeScript modules, we need to actually import them
+      // Use dynamic import with file:// protocol for proper module loading
+      const { pathToFileURL } = await import('url');
+      const moduleUrl = pathToFileURL(modulePath).href;
+      
+      // Import the compiled module
+      const module = await import(moduleUrl);
+      
+      // Return the module based on its structure
+      if (moduleInfo.hasDefault) {
+        return module.default || module;
+      } else if (moduleInfo.hasRouter) {
+        return module.router || module;
+      } else {
+        return module;
+      }
+    } catch (parseError) {
+      // Fallback: try direct import if JSON parsing fails
+      const { pathToFileURL } = await import('url');
+      const moduleUrl = pathToFileURL(modulePath).href;
+      return await import(moduleUrl);
+    }
     
   } catch (error) {
     throw new Error(`Failed to load TypeScript module: ${error instanceof Error ? error.message : String(error)}`);

@@ -1,6 +1,7 @@
 import chalk from 'chalk';
 import fs from 'fs';
 import path from 'path';
+import { getCommandPrefix } from './index.js';
 import type { Result, success, failure } from './result';
 import type { FileSystemError } from './file-system-errors';
 import {
@@ -329,6 +330,7 @@ export class ErrorHandler {
   }
   private generateRecoveryActions(error: Error, type: ErrorType): RecoveryAction[] {
     const actions: RecoveryAction[] = [];
+    const commandPrefix = getCommandPrefix();
     switch (type) {
       case ErrorType.FILE_SYSTEM:
         actions.push({
@@ -354,31 +356,31 @@ export class ErrorHandler {
       case ErrorType.CONFIGURATION:
         actions.push({
           description: 'Validate configuration file',
-          command: 'lorm config validate',
+          command: `${commandPrefix} @lorm/cli config validate`,
           priority: 1
         });
         actions.push({
           description: 'Reset to default configuration',
-          command: 'lorm config reset',
+          command: `${commandPrefix} @lorm/cli config reset`,
           priority: 3
         });
         break;
       case ErrorType.DATABASE:
         actions.push({
           description: 'Check database connection',
-          command: 'lorm db check',
+          command: `${commandPrefix} @lorm/cli db check`,
           priority: 1
         });
         actions.push({
           description: 'Run database migrations',
-          command: 'lorm migrate',
+          command: `${commandPrefix} @lorm/cli migrate`,
           priority: 2
         });
         break;
     }
     actions.push({
       description: 'Get help for this command',
-      command: 'lorm help',
+      command: `${commandPrefix} @lorm/cli help`,
       priority: 10
     });
     return actions;
@@ -596,12 +598,12 @@ export class ErrorUtils {
       [
         {
           description: 'Validate your configuration file',
-          command: 'lorm config validate',
+          command: `${getCommandPrefix()} @lorm/cli config validate`,
           priority: 1
         },
         {
           description: 'Generate a new configuration file',
-          command: 'lorm init --force',
+          command: `${getCommandPrefix()} @lorm/cli init --force`,
           priority: 2
         }
       ]

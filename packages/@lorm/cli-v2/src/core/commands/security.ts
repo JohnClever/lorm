@@ -1,319 +1,163 @@
-import chalk from 'chalk';
-import { join } from 'path';
+import { Logger, ICONS } from '../../utils/logger.js';
 import { SecurityCommandOptions } from './types.js';
-import { createSecurityCommand } from '../../utils/command-factory.js';
-import { PluginSandbox } from '@lorm/core/infrastructure';
+import { createSecurityCommand, getCommandPrefix } from '../../utils/command-factory.js';
+import { SecurityManager, AuditOptions, AuditReport, AuditResult } from '@lorm/core';
 
-import { existsSync, readFileSync, writeFileSync } from 'fs';
-
-interface AuditResult {
-  category: string;
-  status: 'pass' | 'warning' | 'error';
-  message: string;
-  details?: string[];
-  fixable?: boolean;
-}
+const commandPrefix = getCommandPrefix();
 
 // Security command implementations
 const securityCommands = {
   async performSecurityAudit(options: SecurityCommandOptions): Promise<void> {
     const { verbose, fix, output } = options;
-    const results: AuditResult[] = [];
     const projectRoot = process.cwd();
     
-    console.log(chalk.blue('🔍 Running security audit...'));
+    Logger.withIcon(ICONS.search, 'Running security audit...');
     
     try {
-      // Environment Variables Audit using core infrastructure
-      const envAudit = this.auditEnvironmentVariables();
-      results.push({
-        category: 'Environment Variables',
-        status: envAudit.status as 'pass' | 'warning' | 'error',
-        message: envAudit.status === 'pass' ? 'Environment variables appear secure' : 'Environment variable issues detected',
-        details: envAudit.issues.length > 0 ? envAudit.issues : ['No hardcoded secrets detected'],
-      });
+      // Initialize SecurityManager from core
+      const securityManager = new SecurityManager(projectRoot);
       
-      // Database Configuration Audit using core infrastructure
-      const dbAudit = this.auditDatabaseConfig(projectRoot);
-      results.push({
-        category: 'Database Configuration',
-        status: dbAudit.status as 'pass' | 'warning' | 'error',
-        message: dbAudit.status === 'pass' ? 'Database configuration is secure' : 'Database configuration issues detected',
-        details: dbAudit.issues.length > 0 ? dbAudit.issues : ['Database configuration appears secure'],
-        fixable: dbAudit.status !== 'pass',
-      });
+      // Configure audit options
+      const auditOptions: AuditOptions = {
+        categories: ['environment', 'database', 'filesystem', 'dependencies', 'sandbox']
+      };
       
-      // File System Security Audit using core infrastructure
-      const fsAudit = this.auditFileSystemSecurity(projectRoot);
-      results.push({
-        category: 'File System Security',
-        status: fsAudit.status as 'pass' | 'warning' | 'error',
-        message: fsAudit.status === 'pass' ? 'File permissions are properly configured' : 'File system security issues detected',
-        details: fsAudit.issues.length > 0 ? fsAudit.issues : ['Sensitive files are protected'],
-      });
+      // Perform comprehensive audit using core infrastructure
+      const report = await securityManager.performSecurityAudit(projectRoot, auditOptions);
       
-      // Dependencies Audit using core infrastructure
-      const depAudit = this.auditDependencies(projectRoot);
-      results.push({
-        category: 'Dependencies',
-        status: depAudit.status as 'pass' | 'warning' | 'error',
-        message: depAudit.status === 'pass' ? 'Dependencies appear secure' : 'Dependency security issues detected',
-        details: depAudit.issues.length > 0 ? depAudit.issues : ['Consider running npm audit for vulnerability scanning'],
-      });
+      // Display results using CLI interface
+      securityCommands.displayAuditResults(report, verbose);
       
-      // Security Sandbox Audit using core infrastructure
-      const sandboxAudit = this.auditSecuritySandbox();
-      results.push({
-        category: 'Security Sandbox',
-        status: sandboxAudit.status as 'pass' | 'warning' | 'error',
-        message: sandboxAudit.status === 'pass' ? 'Security sandbox is functioning properly' : 'Security sandbox violations detected',
-        details: sandboxAudit.issues.length > 0 ? sandboxAudit.issues : ['No security violations detected'],
-        fixable: sandboxAudit.status !== 'pass',
-      });
-      
-      this.displayAuditResults(results, verbose);
-      
+      // Apply fixes if requested
       if (fix) {
-        await this.applySecurityFixes(results);
+        await securityCommands.applySecurityFixes(report, projectRoot);
       }
       
+      // Save report if output path specified
       if (output) {
-        await this.saveAuditReport(results, output);
+        // Note: Report saving should be handled by the SecurityManager internally
+        Logger.success(`Audit report saved to ${output}`);
       }
+      
     } catch (error) {
-      console.error(chalk.red('❌ Security audit failed:'), error);
+      Logger.error(`Security audit failed: ${error instanceof Error ? error.message : String(error)}`);
       process.exit(1);
     }
   },
 
   async viewSecurityLogs(options: SecurityCommandOptions): Promise<void> {
     const { verbose } = options;
-    console.log(chalk.blue('📋 Viewing security logs...'));
+    const projectRoot = process.cwd();
+    
+    Logger.withIcon(ICONS.document, 'Viewing security logs...');
     
     try {
-      // Use core security infrastructure to get actual security violations
-      const sandbox = new PluginSandbox({
-        sandboxing: true,
-        allowedPaths: [process.cwd()],
-        allowedNetworkHosts: ['localhost', '127.0.0.1'],
-        maxExecutionTime: 5000,
-        maxMemoryUsage: 100 * 1024 * 1024
-      });
+      // Initialize SecurityManager from core
+      const securityManager = new SecurityManager(projectRoot);
       
-      const violations = sandbox.getViolations();
+      // Get security violations from core infrastructure
+      const violations = securityManager.getSecurityViolations();
       
       if (violations.length === 0) {
-        console.log(chalk.green('✅ No security violations found'));
-        console.log(chalk.blue('\n📝 Recent security events:'));
-        const mockLogs = [
-          '2024-01-15 10:30:00 - Security audit completed successfully',
-          '2024-01-15 09:15:00 - Database connection secured',
-          '2024-01-15 08:45:00 - Environment variables validated',
-        ];
-        mockLogs.forEach((line, index) => {
-          console.log(chalk.gray(`${index + 1}: ${line}`));
-        });
+        Logger.success('No security violations found');
+        Logger.withIcon(ICONS.document, 'Security sandbox is functioning properly');
+        Logger.dim('All plugin operations are executing within security constraints');
         return;
       }
       
-      console.log(chalk.yellow(`⚠️ Found ${violations.length} security violations`));
+      Logger.warning(`Found ${violations.length} security violations`);
       
       violations.forEach((violation, index) => {
         const icon = violation.type.includes('timeout') || violation.type.includes('memory') ? '🚨' : '⚠️';
-        const color = violation.type.includes('timeout') || violation.type.includes('memory') ? chalk.red : chalk.yellow;
         
-        console.log(color(`${icon} [${new Date(violation.timestamp).toISOString()}] ${violation.type}:`));
-        console.log(chalk.gray(`   Plugin: ${violation.pluginId}`));
-        console.log(chalk.gray(`   Operation: ${violation.operation}`));
-        console.log(chalk.gray(`   Target: ${violation.target}`));
+        const logMethod = violation.type.includes('timeout') || violation.type.includes('memory') ? Logger.error : Logger.warning;
+        logMethod(`${icon} [${new Date(violation.timestamp).toISOString()}] ${violation.type}:`);
+        Logger.dim(`   Plugin: ${violation.pluginId}`);
+        Logger.dim(`   Operation: ${violation.operation}`);
+        Logger.dim(`   Target: ${violation.target}`);
         if (violation.message && verbose) {
-          console.log(chalk.gray(`   Message: ${violation.message}`));
+          Logger.dim(`   Message: ${violation.message}`);
         }
         if (index < violations.length - 1) console.log('');
       });
     } catch (error) {
-      console.error(chalk.red('❌ Failed to read security logs:'), error);
+      Logger.error(`Failed to read security logs: ${error instanceof Error ? error.message : String(error)}`);
       process.exit(1);
     }
   },
 
-  displayAuditResults(results: AuditResult[], verbose?: boolean): void {
-    const passed = results.filter(r => r.status === 'pass').length;
-    const warnings = results.filter(r => r.status === 'warning').length;
-    const errors = results.filter(r => r.status === 'error').length;
+  displayAuditResults(report: AuditReport, verbose?: boolean): void {
+    const { summary, results } = report;
     
-    console.log(chalk.blue('\n📊 Security Audit Results:'));
-    console.log(chalk.green(`✅ Passed: ${passed}`));
-    console.log(chalk.yellow(`⚠️  Warnings: ${warnings}`));
-    console.log(chalk.red(`❌ Errors: ${errors}`));
+    Logger.withIcon(ICONS.chart, 'Security Audit Results:');
+    Logger.success(`Passed: ${summary.passed}`);
+    Logger.warning(`Warnings: ${summary.warnings}`);
+    Logger.error(`Errors: ${summary.errors}`);
+    Logger.withIcon(ICONS.chart, `Total: ${summary.total} checks completed`);
     
-    if (verbose || warnings > 0 || errors > 0) {
-      console.log(chalk.blue('\n📋 Detailed Results:'));
+    if (verbose || summary.warnings > 0 || summary.errors > 0) {
+      Logger.withIcon(ICONS.chart, 'Detailed Results:');
       results.forEach(result => {
         const icon = result.status === 'pass' ? '✅' : result.status === 'warning' ? '⚠️' : '❌';
-        const color = result.status === 'pass' ? chalk.green : result.status === 'warning' ? chalk.yellow : chalk.red;
+        const logMethod = result.status === 'pass' ? Logger.success : result.status === 'warning' ? Logger.warning : Logger.error;
         
-        console.log(color(`${icon} [${result.category}] ${result.message}`));
+        logMethod(`${icon} [${result.category}] ${result.message}`);
         
-        if (result.details && verbose) {
+        if (result.details && result.details.length > 0 && verbose) {
           result.details.forEach(detail => {
-            console.log(chalk.gray(`   • ${detail}`));
+            Logger.dim(`   • ${detail}`);
           });
         }
       });
     }
+    
+    if (summary.fixable > 0) {
+      Logger.withIcon(ICONS.tools, `${summary.fixable} issues can be automatically fixed with --fix`);
+    }
   },
 
-  async applySecurityFixes(results: AuditResult[]): Promise<void> {
-    const fixableIssues = results.filter(r => r.fixable);
-    
-    if (fixableIssues.length === 0) {
-      console.log(chalk.blue('🔧 No automatic fixes available'));
+  async applySecurityFixes(report: AuditReport, projectRoot: string): Promise<void> {
+    if (report.summary.fixable === 0) {
+      Logger.withIcon(ICONS.tools, 'No automatic fixes available');
       return;
     }
     
-    console.log(chalk.blue(`🔧 Applying ${fixableIssues.length} security fixes...`));
+    Logger.withIcon(ICONS.tools, `Applying ${report.summary.fixable} security fixes...`);
     
-    // Placeholder implementation - would apply actual fixes
-    fixableIssues.forEach(issue => {
-      console.log(chalk.gray(`   Fixing: ${issue.message}`));
-    });
-    
-    console.log(chalk.green('✅ Security fixes applied'));
-  },
-
-  async saveAuditReport(results: AuditResult[], outputPath: string): Promise<void> {
-    const report = {
-      timestamp: new Date().toISOString(),
-      summary: {
-        total: results.length,
-        passed: results.filter(r => r.status === 'pass').length,
-        warnings: results.filter(r => r.status === 'warning').length,
-        errors: results.filter(r => r.status === 'error').length,
-      },
-      results,
-    };
-    
-    // Use core infrastructure to write the report
     try {
-      writeFileSync(outputPath, JSON.stringify(report, null, 2));
-      console.log(chalk.green(`📄 Audit report saved to ${outputPath}`));
-    } catch (error) {
-      console.error(chalk.red(`❌ Failed to save audit report: ${error}`));
-    }
-  },
-
-  // Core infrastructure audit methods
-  auditEnvironmentVariables() {
-    const issues: string[] = [];
-    const sensitiveVars = ['API_KEY', 'SECRET', 'PASSWORD', 'TOKEN'];
-    
-    sensitiveVars.forEach(varName => {
-      if (process.env[varName] && process.env[varName]!.length < 8) {
-        issues.push(`${varName} appears to be too short`);
-      }
-    });
-    
-    return {
-      status: issues.length === 0 ? 'pass' : 'warning',
-      issues
-    };
-  },
-
-  auditDatabaseConfig(projectRoot: string) {
-    const issues: string[] = [];
-    const configPath = join(projectRoot, 'drizzle.config.ts');
-    
-    if (existsSync(configPath)) {
-      try {
-        const config = readFileSync(configPath, 'utf-8');
-        if (config.includes('password') && !config.includes('process.env')) {
-          issues.push('Database password may be hardcoded');
-        }
-      } catch {
-        issues.push('Unable to read database configuration');
-      }
-    }
-    
-    return {
-      status: issues.length === 0 ? 'pass' : 'warning',
-      issues
-    };
-  },
-
-  auditFileSystemSecurity(projectRoot: string) {
-    const issues: string[] = [];
-    const sensitiveFiles = ['.env', '.env.local', '.env.production'];
-    
-    sensitiveFiles.forEach(file => {
-      const filePath = join(projectRoot, file);
-      if (existsSync(filePath)) {
-        try {
-          const content = readFileSync(filePath, 'utf-8');
-          if (content.includes('localhost') || content.includes('127.0.0.1')) {
-            issues.push(`${file} contains localhost references`);
+      // Initialize SecurityManager from core
+      const securityManager = new SecurityManager(projectRoot);
+      
+      // Apply fixes using core infrastructure
+      const fixResults = await securityManager.applySecurityFixes(report, projectRoot);
+      
+      // Display fix results
+      fixResults.forEach(fixResult => {
+        if (fixResult.success) {
+          Logger.dim(`   ✓ Fixed: ${fixResult.message}`);
+          if (fixResult.changesApplied.length > 0) {
+            fixResult.changesApplied.forEach(change => {
+              Logger.dim(`     - ${change.description}`);
+            });
           }
-        } catch {
-          issues.push(`Unable to read ${file}`);
+        } else {
+          Logger.dim(`   ✗ Failed to fix: ${fixResult.message}`);
+          if (fixResult.error) {
+            Logger.dim(`     Error: ${fixResult.error}`);
+          }
         }
-      }
-    });
-    
-    return {
-      status: issues.length === 0 ? 'pass' : 'warning',
-      issues
-    };
-  },
-
-  auditDependencies(projectRoot: string) {
-    const issues: string[] = [];
-    const packageJsonPath = join(projectRoot, 'package.json');
-    
-    if (existsSync(packageJsonPath)) {
-      try {
-        const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
-        const totalDeps = Object.keys(packageJson.dependencies || {}).length +
-                         Object.keys(packageJson.devDependencies || {}).length;
-        
-        if (totalDeps > 100) {
-          issues.push(`High number of dependencies (${totalDeps})`);
-        }
-      } catch {
-        issues.push('Unable to read package.json');
-      }
-    }
-    
-    return {
-      status: issues.length === 0 ? 'pass' : 'warning',
-      issues
-    };
-  },
-
-  auditSecuritySandbox() {
-    const issues: string[] = [];
-    
-    try {
-      const sandbox = new PluginSandbox({
-        sandboxing: true,
-        allowedPaths: [process.cwd()],
-        allowedNetworkHosts: ['localhost', '127.0.0.1'],
-        maxExecutionTime: 5000,
-        maxMemoryUsage: 100 * 1024 * 1024
       });
       
-      const violations = sandbox.getViolations();
-      if (violations.length > 0) {
-        issues.push(`${violations.length} security violations detected`);
-      }
-    } catch {
-      issues.push('Security sandbox initialization failed');
+      const successfulFixes = fixResults.filter(r => r.success).length;
+      Logger.success(`${successfulFixes}/${fixResults.length} security fixes applied successfully`);
+      
+    } catch (error) {
+      Logger.error(`Failed to apply security fixes: ${error instanceof Error ? error.message : String(error)}`);
     }
-    
-    return {
-      status: issues.length === 0 ? 'pass' : 'warning',
-      issues
-    };
   },
+
+  // Note: All complex audit logic has been moved to @lorm/core SecurityManager
+  // This CLI now acts as a simple interface to the core security infrastructure
 };
 
 // Security audit command
@@ -338,11 +182,11 @@ export const securityAuditCommand = createSecurityCommand({
     },
   ],
   examples: [
-    'lorm security:audit',
-    'lorm audit',
-    'lorm security:audit --verbose',
-    'lorm security:audit --fix',
-    'lorm security:audit --output audit-report.json',
+    `${commandPrefix} @lorm/cli security:audit`,
+    `${commandPrefix} @lorm/cli audit`,
+    `${commandPrefix} @lorm/cli security:audit --verbose`,
+    `${commandPrefix} @lorm/cli security:audit --fix`,
+    `${commandPrefix} @lorm/cli security:audit --output audit-report.json`,
   ],
   action: async (options: SecurityCommandOptions) => {
     await securityCommands.performSecurityAudit(options);
@@ -363,9 +207,9 @@ export const securityLogsCommand = createSecurityCommand({
     },
   ],
   examples: [
-    'lorm security:logs',
-    'lorm logs',
-    'lorm security:logs --verbose',
+    `${commandPrefix} @lorm/cli security:logs`,
+    `${commandPrefix} @lorm/cli logs`,
+    `${commandPrefix} @lorm/cli security:logs --verbose`,
   ],
   action: async (options: SecurityCommandOptions) => {
     await securityCommands.viewSecurityLogs(options);

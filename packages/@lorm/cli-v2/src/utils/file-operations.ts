@@ -1,6 +1,5 @@
 import { readFile, access, constants } from 'fs/promises';
 import { join } from 'path';
-import { parse as parseYaml } from 'yaml';
 
 /**
  * Utility functions for common file operations
@@ -39,18 +38,6 @@ export async function readJsonFile<T = any>(filePath: string): Promise<T | null>
   try {
     const content = await readFile(filePath, 'utf-8');
     return JSON.parse(content) as T;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Read and parse a YAML file
- */
-export async function readYamlFile<T = any>(filePath: string): Promise<T | null> {
-  try {
-    const content = await readFile(filePath, 'utf-8');
-    return parseYaml(content) as T;
   } catch {
     return null;
   }

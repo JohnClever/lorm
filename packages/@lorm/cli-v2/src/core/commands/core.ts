@@ -1,9 +1,7 @@
-import {
-  createCommand,
-  createDevelopmentCommand,
-  CommandRegistry,
-} from './registry';
+import { CommandRegistry } from './registry';
+import { createCommand } from '../../utils/command-factory.js';
 import { getCommandPrefix } from '../../utils/command-factory';
+import { createDynamicHelp } from '../../utils/help-system';
 import type {
   HelpCommandOptions,
   InitCommandOptions,
@@ -19,32 +17,37 @@ export const createHelpCommand = (commandRegistry: CommandRegistry) =>
     description: "Show detailed help information with examples",
     category: "utility",
     action: async (_options: HelpCommandOptions, command?: string) => {
-      const { createDynamicHelp } = await import("../../utils/help-system");
-      const helpGenerator = createDynamicHelp(commandRegistry.getCommandsMap());
-      if (command) {
-        const categories = [
-          "core",
-          "development",
-          "database",
-          "security",
-          "plugin",
-          "utility",
-        ];
-        if (categories.includes(command.toLowerCase())) {
-          helpGenerator.displayCategoryHelp(command);
+      try {
+        const commandsMap = commandRegistry.getCommandsMap();
+        const helpGenerator = createDynamicHelp(commandsMap);
+        if (command) {
+          const categories = [
+            "core",
+            "development",
+            "database",
+            "security",
+            "plugin",
+            "utility",
+          ];
+          if (categories.includes(command.toLowerCase())) {
+            helpGenerator.displayCategoryHelp(command);
+          } else {
+            helpGenerator.displayCommandHelp(command);
+          }
         } else {
-          helpGenerator.displayCommandHelp(command);
+          helpGenerator.displayGeneralHelp();
         }
-      } else {
-        helpGenerator.displayGeneralHelp();
+      } catch (error) {
+        console.error('Help command error:', error);
       }
     },
   });
 
-export const devCommand = createDevelopmentCommand({
+export const devCommand = createCommand({
   name: "dev",
   description:
     "Start development server with file watching and type generation",
+  category: "development",
   requiresConfig: true,
   requiresSchema: true,
   options: [
@@ -53,13 +56,30 @@ export const devCommand = createDevelopmentCommand({
       description: "Port to run the server on",
       defaultValue: 3000,
     },
+    {
+      flag: "--no-types",
+      description: "Disable automatic type generation",
+    },
   ],
   examples: [
     `${commandPrefix} @lorm/cli dev`,
     `${commandPrefix} @lorm/cli dev --port 3001`,
+    `${commandPrefix} @lorm/cli dev --no-types`,
   ],
   action: async (options: DevCommandOptions) => {
     try {
+      // Start type generation watcher unless disabled
+      if (!options['no-types']) {
+        const { watchRouter, generateTypeFile } = await import('../../utils/type-generation.js');
+        console.log('🔧 Starting type generation watcher...');
+        
+        // Generate initial types
+        await generateTypeFile();
+        
+        // Start watching for changes
+        watchRouter();
+      }
+      
       const { startServer } = await import("@lorm/core");
       await startServer(options.port, {
         host: "localhost",

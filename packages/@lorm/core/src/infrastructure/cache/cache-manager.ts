@@ -5,17 +5,19 @@ import { HybridCache } from './hybrid-cache.js';
 import type { ICache, CacheConfig, CacheStats } from './types.js';
 
 /**
- * Project-scoped cache manager for LORM CLI v2
- * Manages cache lifecycle and provides unified interface
+ * Enhanced Project-scoped cache manager with improved resource management
  */
 export class ProjectScopedCache implements ICache {
   private cache: ICache;
   private config: CacheConfig;
   private projectRoot: string;
+  private isDestroyed = false;
+  private createdAt: number;
 
   constructor(projectRoot: string, config: CacheConfig) {
     this.projectRoot = projectRoot;
-    this.config = config;
+    this.config = { ...config }; // Deep copy to prevent external mutations
+    this.createdAt = Date.now();
     this.cache = this.createCache();
   }
 
@@ -32,14 +34,14 @@ export class ProjectScopedCache implements ICache {
     switch (this.config.strategy) {
       case 'memory':
         return new MemoryCache({
-          maxEntries: 1000,
-          checkPeriod: 60000 // 1 minute
+          maxEntries: this.config.maxSize ? Math.floor(this.config.maxSize / 1024) : 1000,
+          checkPeriod: 60000
         });
 
       case 'disk':
         return new DiskCache({
           cacheDir,
-          compression: false,
+          compression: this.config.compression ?? false,
           fileExtension: '.cache'
         });
 
@@ -51,10 +53,10 @@ export class ProjectScopedCache implements ICache {
           },
           diskOptions: {
             cacheDir,
-            compression: false,
+            compression: this.config.compression ?? false,
             fileExtension: '.cache'
           },
-          memoryThreshold: 10 * 1024 // 10KB threshold
+          memoryThreshold: 10 * 1024
         });
 
       default:
@@ -62,43 +64,93 @@ export class ProjectScopedCache implements ICache {
     }
   }
 
+  private ensureNotDestroyed(): void {
+    if (this.isDestroyed) {
+      throw new Error('Cache has been destroyed and cannot be used');
+    }
+  }
+
   async get<T>(key: string): Promise<T | null> {
-    return this.cache.get<T>(key);
+    this.ensureNotDestroyed();
+    try {
+      return await this.cache.get<T>(key);
+    } catch (error) {
+      console.warn(`Cache get operation failed for key '${key}':`, error instanceof Error ? error.message : String(error));
+      return null;
+    }
   }
 
   async set<T>(key: string, value: T, ttl?: number): Promise<void> {
-    const effectiveTtl = ttl ?? this.config.ttl;
-    return this.cache.set(key, value, effectiveTtl);
+    this.ensureNotDestroyed();
+    try {
+      const effectiveTtl = ttl ?? this.config.ttl;
+      await this.cache.set(key, value, effectiveTtl);
+    } catch (error) {
+      console.warn(`Cache set operation failed for key '${key}':`, error instanceof Error ? error.message : String(error));
+      // Don't throw - cache failures shouldn't break the application
+    }
   }
 
   async has(key: string): Promise<boolean> {
-    return this.cache.has(key);
+    this.ensureNotDestroyed();
+    try {
+      return await this.cache.has(key);
+    } catch (error) {
+      console.warn(`Cache has operation failed for key '${key}':`, error instanceof Error ? error.message : String(error));
+      return false;
+    }
   }
 
   async delete(key: string): Promise<boolean> {
-    return this.cache.delete(key);
+    this.ensureNotDestroyed();
+    try {
+      return await this.cache.delete(key);
+    } catch (error) {
+      console.warn(`Cache delete operation failed for key '${key}':`, error instanceof Error ? error.message : String(error));
+      return false;
+    }
   }
 
   async clear(): Promise<void> {
-    return this.cache.clear();
+    this.ensureNotDestroyed();
+    try {
+      await this.cache.clear();
+    } catch (error) {
+      console.warn('Cache clear operation failed:', error instanceof Error ? error.message : String(error));
+      throw error; // Clear failures should be reported
+    }
   }
 
   async getStats(): Promise<CacheStats> {
-    return this.cache.getStats();
+    this.ensureNotDestroyed();
+    try {
+      const stats = await this.cache.getStats();
+      return stats;
+    } catch (error) {
+      console.warn('Cache stats operation failed:', error instanceof Error ? error.message : String(error));
+      return this.getEmptyStats();
+    }
   }
 
   async cleanup(): Promise<void> {
-    return this.cache.cleanup();
+    this.ensureNotDestroyed();
+    try {
+      await this.cache.cleanup();
+    } catch (error) {
+      console.warn('Cache cleanup operation failed:', error instanceof Error ? error.message : String(error));
+    }
   }
 
   /**
-   * Cache a function result with automatic key generation
+   * Enhanced cached method with better error handling
    */
   async cached<T>(
     key: string,
     fn: () => Promise<T>,
     ttl?: number
   ): Promise<T> {
+    this.ensureNotDestroyed();
+    
     // Try to get from cache first
     const cached = await this.get<T>(key);
     if (cached !== null) {
@@ -106,9 +158,14 @@ export class ProjectScopedCache implements ICache {
     }
 
     // Execute function and cache result
-    const result = await fn();
-    await this.set(key, result, ttl);
-    return result;
+    try {
+      const result = await fn();
+      await this.set(key, result, ttl);
+      return result;
+    } catch (error) {
+      // Don't cache errors, just propagate them
+      throw error;
+    }
   }
 
   /**
@@ -153,32 +210,74 @@ export class ProjectScopedCache implements ICache {
   }
 
   /**
-   * Get cache configuration
+   * Get cache configuration (read-only)
    */
-  getConfig(): CacheConfig {
-    return { ...this.config };
+  getConfig(): Readonly<CacheConfig> {
+    return Object.freeze({ ...this.config });
   }
 
   /**
-   * Get project root
+   * Get project root (read-only)
    */
   getProjectRoot(): string {
     return this.projectRoot;
   }
 
   /**
-   * Destroy cache and cleanup resources
+   * Check if cache is healthy
+   */
+  async isHealthy(): Promise<boolean> {
+    if (this.isDestroyed) return false;
+    
+    try {
+      // Perform a simple health check
+      const testKey = '__health_check__';
+      await this.set(testKey, 'ok', 1); // 1 second TTL
+      const result = await this.get(testKey);
+      await this.delete(testKey);
+      return result === 'ok';
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Enhanced destroy method with proper cleanup
    */
   async destroy(): Promise<void> {
-    await this.cleanup();
+    if (this.isDestroyed) return;
     
-    // Cleanup specific cache implementations
-    this.cache.destroy?.();
+    try {
+      // Cleanup cache data
+      await this.cleanup();
+      
+      // Destroy underlying cache implementation
+      if (this.cache.destroy) {
+        this.cache.destroy();
+      }
+      
+      this.isDestroyed = true;
+    } catch (error) {
+      console.warn(`Cache destruction warning: ${error instanceof Error ? error.message : String(error)}`);
+      this.isDestroyed = true; // Mark as destroyed even if cleanup failed
+    }
+  }
+
+  private getEmptyStats(): CacheStats {
+    return {
+      hits: 0,
+      misses: 0,
+      size: 0,
+      entryCount: 0,
+      hitRate: 0,
+      memoryUsage: 0,
+      diskUsage: 0
+    };
   }
 }
 
 /**
- * No-op cache implementation for when caching is disabled
+ * Enhanced No-op cache implementation
  */
 class NoOpCache implements ICache {
   async get<T>(): Promise<T | null> {
@@ -214,6 +313,10 @@ class NoOpCache implements ICache {
   }
 
   async cleanup(): Promise<void> {
+    // No-op
+  }
+
+  destroy(): void {
     // No-op
   }
 }

@@ -40,11 +40,22 @@
       "types": "./dist/infrastructure/security/index.d.ts",
       "import": "./dist/infrastructure/security/index.js",
       "require": "./dist/infrastructure/security/index.cjs"
+    },
+    "./infrastructure/plugin-system": {
+      "types": "./dist/infrastructure/plugin-system/index.d.ts",
+      "import": "./dist/infrastructure/plugin-system/index.js",
+      "require": "./dist/infrastructure/plugin-system/index.cjs"
+    },
+    "./infrastructure/plugin-system/*": {
+      "types": "./dist/infrastructure/plugin-system/*.d.ts",
+      "import": "./dist/infrastructure/plugin-system/*.js",
+      "require": "./dist/infrastructure/plugin-system/*.cjs"
     }
   },
   "scripts": {
     "build": "tsup",
     "prepublishOnly": "pnpm build",
+    "check": "npx tsc --noEmit --strict ",
     "size": "tsx ../../../scripts/bundle-size.ts",
     "size:check": "pnpm build && pnpm size",
     "size:watch": "pnpm build && pnpm size && echo '\nWatching for changes...' && pnpm build --watch"

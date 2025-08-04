@@ -4,7 +4,9 @@ export * from './database';
 export * from './utility';
 export * from './security';
 export * from './cache';
+export * from './plugin';
 export * from './types';
+export * from './type-generation';
 export * from './registry';
 
 // Export command collections
@@ -13,6 +15,8 @@ import { getDatabaseCommands } from './database';
 import { getUtilityCommands } from './utility';
 import { getSecurityCommands } from './security';
 import { getCacheCommands } from './cache';
+import { getTypeCommands } from './type-generation';
+import { getPluginCommands } from './plugin';
 
 // Collect all commands
 export const getAllCommands = (commandRegistry: any) => [
@@ -21,4 +25,6 @@ export const getAllCommands = (commandRegistry: any) => [
   ...getUtilityCommands(),
   ...getSecurityCommands(),
   ...getCacheCommands(),
+  ...getTypeCommands(),
+  ...getPluginCommands(),
 ];

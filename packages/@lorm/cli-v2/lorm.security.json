@@ -1,0 +1,89 @@
+{
+  "sandboxing": true,
+  "allowedPaths": [
+    "/Users/johnclever/Jay/projects/lorm/packages/@lorm/cli-v2"
+  ],
+  "allowedNetworkHosts": [
+    "localhost",
+    "127.0.0.1"
+  ],
+  "maxExecutionTime": 30000,
+  "maxMemoryUsage": 268435456,
+  "auditRules": {
+    "environment": {
+      "enabled": true,
+      "sensitivePatterns": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ],
+      "excludePatterns": [
+        {},
+        {},
+        {},
+        {},
+        {}
+      ],
+      "checkHardcodedSecrets": true,
+      "strictMode": false
+    },
+    "database": {
+      "enabled": true,
+      "checkCredentials": true,
+      "allowedHosts": [
+        "localhost",
+        "127.0.0.1"
+      ],
+      "requireSSL": false,
+      "checkConnectionStrings": true
+    },
+    "filesystem": {
+      "enabled": true,
+      "sensitiveFiles": [
+        ".env",
+        ".env.local",
+        ".env.production",
+        ".env.staging",
+        "config/secrets.yml",
+        "config/database.yml",
+        "private.key",
+        "*.pem",
+        "*.p12"
+      ],
+      "excludePaths": [
+        "node_modules",
+        ".git",
+        "dist",
+        "build",
+        "coverage"
+      ],
+      "checkPermissions": true,
+      "scanForSecrets": true
+    },
+    "dependencies": {
+      "enabled": true,
+      "vulnerabilityThreshold": "medium",
+      "excludePackages": [],
+      "checkLicenses": false,
+      "allowedLicenses": [
+        "MIT",
+        "Apache-2.0",
+        "BSD-3-Clause",
+        "ISC"
+      ]
+    }
+  },
+  "autoFix": {
+    "enabled": false,
+    "categories": [
+      "filesystem",
+      "configuration"
+    ],
+    "backupBeforeFix": true
+  }
+}

@@ -498,7 +498,7 @@ export async function down() {
       
       // Run migrations
       const mockSpawn = vi.mocked(spawn);
-      const migrateProcess = spawn('lorm', ['migrate', 'up'], { cwd: projectPath });
+      const migrateProcess = spawn('npx', ['@lorm/cli', 'migrate', 'up'], { cwd: projectPath });
       
       // Simulate migration progress
       const stdoutCallback = mockProcess.stdout.on.mock.calls.find(
@@ -512,16 +512,16 @@ export async function down() {
         stdoutCallback(Buffer.from('All migrations completed successfully'));
       }
       
-      expect(mockSpawn).toHaveBeenCalledWith('lorm', ['migrate', 'up'], { cwd: projectPath });
+      expect(mockSpawn).toHaveBeenCalledWith('npx', ['@lorm/cli', 'migrate', 'up'], { cwd: projectPath });
       
       // Test rollback
-      const rollbackProcess = spawn('lorm', ['migrate', 'down', '--steps', '1'], {
+      const rollbackProcess = spawn('npx', ['@lorm/cli', 'migrate', 'down', '--steps', '1'], {
         cwd: projectPath
       });
       
       expect(mockSpawn).toHaveBeenCalledWith(
-        'lorm',
-        ['migrate', 'down', '--steps', '1'],
+        'npx',
+        ['@lorm/cli', 'migrate', 'down', '--steps', '1'],
         { cwd: projectPath }
       );
     });
@@ -554,7 +554,7 @@ export async function down() {
       
       // Start dev server with metrics
       const mockSpawn = vi.mocked(spawn);
-      const devProcess = spawn('lorm', ['dev', '--metrics'], { cwd: projectPath });
+      const devProcess = spawn('npx', ['@lorm/cli', 'dev', '--metrics'], { cwd: projectPath });
       
       // Simulate metrics collection
       const metricsData = {
@@ -615,14 +615,14 @@ export async function down() {
       const auditEntries = [
         {
           timestamp: new Date().toISOString(),
-          command: 'lorm dev',
+          command: 'npx @lorm/cli dev',
           user: 'developer',
           success: true,
           duration: 1500
         },
         {
           timestamp: new Date().toISOString(),
-          command: 'lorm migrate up',
+          command: 'npx @lorm/cli migrate up',
           user: 'developer',
           success: true,
           duration: 3200
@@ -638,7 +638,7 @@ export async function down() {
       
       expect(mockWriteFile).toHaveBeenCalledWith(
         path.join(projectPath, '.lorm/audit.log'),
-        expect.stringContaining('lorm dev')
+        expect.stringContaining('npx @lorm/cli dev')
       );
     });
   });
@@ -649,7 +649,7 @@ export async function down() {
       
       // Start dev server
       const mockSpawn = vi.mocked(spawn);
-      const devProcess = spawn('lorm', ['dev'], { cwd: projectPath });
+      const devProcess = spawn('npx', ['@lorm/cli', 'dev'], { cwd: projectPath });
       
       // Simulate SIGINT (Ctrl+C)
       const exitCallback = mockProcess.on.mock.calls.find(

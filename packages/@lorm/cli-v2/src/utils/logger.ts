@@ -37,7 +37,12 @@ export const LOG_LEVELS = {
   error: (message: string) => console.error(picocolors.red(message)),
   info: (message: string) => console.log(picocolors.cyan(message)),
   dim: (message: string) => console.log(picocolors.dim(message)),
-  bold: (message: string) => console.log(picocolors.bold(message))
+  bold: (message: string) => console.log(picocolors.bold(message)),
+  debug: (message: string) => {
+    if (process.env.DEBUG || process.env.NODE_ENV === 'development') {
+      console.log(picocolors.gray(`[DEBUG] ${message}`));
+    }
+  }
 } as const;
 
 /**
@@ -133,6 +138,13 @@ export class Logger {
    */
   static performance(label: string, value: string | number): void {
     LOG_LEVELS.dim(`${label}: ${value}`);
+  }
+
+  /**
+   * Log a debug message (only in development or when DEBUG env var is set)
+   */
+  static debug(message: string): void {
+    LOG_LEVELS.debug(message);
   }
 
   /**

@@ -319,3 +319,161 @@ export interface PluginDependency {
   type: 'npm' | 'plugin';
   optional: boolean;
 }
+
+/**
+ * Enhanced plugin installation options
+ */
+export interface PluginInstallOptions {
+  name: string;
+  source: 'marketplace' | 'npm' | 'local' | 'git';
+  version?: string;
+  force?: boolean;
+  skipDependencies?: boolean;
+  registry?: string;
+  auth?: {
+    token?: string;
+    username?: string;
+    password?: string;
+  };
+}
+
+/**
+ * Plugin installation result
+ */
+export interface PluginInstallResult {
+  success: boolean;
+  plugin?: IPlugin;
+  error?: Error;
+  installTime: number;
+  dependencies?: string[];
+}
+
+/**
+ * Plugin uninstall options
+ */
+export interface PluginUninstallOptions {
+  force?: boolean;
+  removeConfig?: boolean;
+  removeDependencies?: boolean;
+}
+
+/**
+ * Plugin search result
+ */
+export interface PluginSearchResult {
+  name: string;
+  version: string;
+  description: string;
+  author: string;
+  keywords: string[];
+  downloads?: number;
+  rating?: number;
+  verified: boolean;
+  source: 'marketplace' | 'npm';
+}
+
+/**
+ * Plugin search options
+ */
+export interface PluginSearchOptions {
+  source?: 'marketplace' | 'npm' | 'all';
+  category?: string;
+  verified?: boolean;
+  limit?: number;
+  offset?: number;
+}
+
+/**
+ * Plugin information
+ */
+export interface PluginInfo {
+  metadata: PluginMetadata;
+  status: 'installed' | 'available' | 'outdated';
+  installedVersion?: string;
+  latestVersion: string;
+  dependencies: PluginDependency[];
+  permissions: PluginPermissions;
+}
+
+/**
+ * Plugin configuration
+ */
+export interface PluginConfig {
+  enabled: boolean;
+  autoUpdate: boolean;
+  permissions: Partial<PluginPermissions>;
+  settings: Record<string, unknown>;
+}
+
+/**
+ * Plugin list options
+ */
+export interface PluginListOptions {
+  verbose?: boolean;
+  enabled?: boolean;
+  disabled?: boolean;
+  type?: PluginType;
+}
+
+/**
+ * Plugin source information
+ */
+export interface PluginSource {
+  type: 'npm' | 'local' | 'git' | 'marketplace';
+  location: string;
+  version?: string;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Plugin error context
+ */
+export interface PluginErrorContext {
+  pluginId: string;
+  operation: string;
+  performanceMonitor?: TypedPerformanceMonitorInstance;
+  securityManager?: any; // Will be typed when security manager is available
+}
+
+/**
+ * Plugin error class
+ */
+export class PluginError extends Error {
+  public readonly pluginId: string;
+  public readonly operation: string;
+  public readonly originalError?: Error;
+
+  constructor(message: string, context: {
+    pluginId: string;
+    operation: string;
+    originalError?: Error;
+  }) {
+    super(message);
+    this.name = 'PluginError';
+    this.pluginId = context.pluginId;
+    this.operation = context.operation;
+    this.originalError = context.originalError;
+  }
+}
+
+/**
+ * Plugin performance report
+ */
+export interface PluginPerformanceReport {
+  pluginMetrics: Record<string, PerformanceMetrics>;
+  recommendations: string[];
+}
+
+/**
+ * Plugin context for individual plugin operations
+ */
+export interface PluginOperationContext {
+  pluginId: string;
+  pluginName: string;
+  version: string;
+  permissions: PluginPermissions;
+  workingDirectory: string;
+  tempDirectory: string;
+  configDirectory: string;
+  cacheDirectory: string;
+}

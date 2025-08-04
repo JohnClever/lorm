@@ -1,6 +1,6 @@
 import { CAC } from "cac";
-import chalk from "chalk";
 import { BaseCommandOptions, CommandConfig, ValidationConfig } from "./types";
+import { Logger } from "../../utils/logger.js";
 
 export type { CommandConfig, ValidationConfig };
 
@@ -66,7 +66,7 @@ export class CommandRegistry {
 
       await config.action(options, ...otherArgs);
     } catch (error) {
-      console.error(chalk.red(`Error executing ${config.name}:`), error instanceof Error ? error.message : error);
+      Logger.error(`Error executing ${config.name}: ${error instanceof Error ? error.message : error}`);
       process.exit(1);
     }
   }
@@ -102,34 +102,6 @@ export class CommandRegistry {
   getCommandsMap(): Map<string, CommandConfig<BaseCommandOptions>> {
     return new Map(this.commands);
   }
-}
-
-export function createCommand<T extends BaseCommandOptions>(
-  config: CommandConfig<T>
-): CommandConfig<T> {
-  return {
-    category: "utility",
-    ...config,
-  };
-}
-
-export function createDatabaseCommand<T extends BaseCommandOptions>(
-  config: Omit<CommandConfig<T>, "category" | "requiresConfig">
-): CommandConfig<T> {
-  return {
-    ...config,
-    category: "database",
-    requiresConfig: true,
-  } as CommandConfig<T>;
-}
-
-export function createDevelopmentCommand<T extends BaseCommandOptions>(
-  config: Omit<CommandConfig<T>, "category">
-): CommandConfig<T> {
-  return {
-    ...config,
-    category: "development",
-  };
 }
 
 // Alias for backward compatibility

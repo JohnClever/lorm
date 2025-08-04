@@ -1,4 +1,3 @@
-import { parse as parseYaml } from 'yaml';
 import type { ProjectContext } from '../utils/project-detection.js';
 import { loadConfigFromSources, type ConfigParser } from '../utils/file-operations.js';
 
@@ -38,7 +37,7 @@ export interface LormConfig {
  */
 const DEFAULT_CONFIG: LormConfig = {
   plugins: {
-    builtin: ['db', 'scaffold', 'dev'],
+    builtin: [], // No built-in plugins until they are properly implemented
     npm: {},
     local: [],
     marketplace: {}
@@ -62,12 +61,10 @@ const DEFAULT_CONFIG: LormConfig = {
 
 /**
  * Load configuration from various sources
- * Priority: .lormrc.yml > .lormrc.json > package.json > defaults
+ * Priority: .lormrc.json > .lormrc > package.json > defaults
  */
 export async function loadConfig(projectContext: ProjectContext): Promise<LormConfig> {
   const configSources: ConfigParser<any>[] = [
-    { file: '.lormrc.yml', parser: (content: string) => parseYaml(content) },
-    { file: '.lormrc.yaml', parser: (content: string) => parseYaml(content) },
     { file: '.lormrc.json', parser: JSON.parse },
     { file: '.lormrc', parser: JSON.parse },
     { file: 'package.json', parser: JSON.parse, key: 'lorm' }

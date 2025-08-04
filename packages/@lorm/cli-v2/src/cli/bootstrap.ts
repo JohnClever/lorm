@@ -2,123 +2,141 @@ import { cac } from "cac";
 import { detectProject } from "../utils/project-detection.js";
 import { loadConfig } from "./config.js";
 import {
-  CLIPerformanceMonitor,
-  type PerformanceOperation,
   ProjectScopedCache,
-  PluginSandbox,
-  CLIPluginLoader,
-} from "@lorm/core/infrastructure";
+} from "@lorm/core";
+import { cliSecurityService } from "../services/security.js";
 import { UnifiedCommandSystem } from "../core/commands/registry.js";
 import { Logger, ICONS } from "../utils/logger.js";
+import { cliPerformanceService } from "../services/performance.js";
+import { CLIPluginService } from "../services/plugin-service";
 
 /**
  * Bootstrap the LORM CLI v2
  * Handles initialization, plugin loading, and command execution
  */
 export async function bootstrap(): Promise<void> {
-  const startTime = Date.now();
-
-  // Initialize performance monitoring
-  const performanceMonitor = new CLIPerformanceMonitor();
-  performanceMonitor.start("cli_bootstrap");
+  // Start performance monitoring session
+  cliPerformanceService.startSession('cli_bootstrap', {
+    command: process.argv.slice(2).join(' ') || 'default',
+    args: process.argv.slice(2)
+  });
 
   // Set up process exit handlers
   process.on("SIGINT", () => {
+    cliPerformanceService.endSession();
     Logger.goodbye();
     process.exit(0);
   });
 
   process.on("SIGTERM", () => {
+    cliPerformanceService.endSession();
     process.exit(0);
   });
 
   try {
     // 1. Project Detection
-    performanceMonitor.start("project_detection");
-    const projectContext = await detectProject();
-    performanceMonitor.end("project_detection");
-
-    // 2. Configuration Loading
-    performanceMonitor.start("config_loading");
-    const config = await loadConfig(projectContext);
-    performanceMonitor.end("config_loading");
-
-    // 3. Initialize Core Systems
-    performanceMonitor.start("core_systems_init");
-    const cache = new ProjectScopedCache(projectContext.root, config.cache);
-    const sandbox = new PluginSandbox(config.security);
-    const commandSystem = new UnifiedCommandSystem();
-    performanceMonitor.end("core_systems_init");
-
-    // 4. Plugin Loading
-    performanceMonitor.start("plugin_loading");
-    const pluginLoader = new CLIPluginLoader({
-      projectContext,
-      config,
-      cache,
-      sandbox,
-      commandSystem,
-      performanceMonitor,
+    const projectContext = await cliPerformanceService.trackOperation('project_detection', async () => {
+      return await detectProject();
     });
 
-    await pluginLoader.loadAllPlugins();
-    performanceMonitor.end("plugin_loading");
+    // 2. Configuration Loading
+    const config = await cliPerformanceService.trackOperation('config_loading', async () => {
+      return await loadConfig(projectContext);
+    });
 
-    // 5. CLI Setup
-    performanceMonitor.start("cli_setup");
-    const cli = cac("lorm");
+    // 3. Initialize Core Systems
+    const { cache, sandbox, commandSystem } = await cliPerformanceService.trackOperation('core_systems_init', async () => {
+      const cache = new ProjectScopedCache(projectContext.root, config.cache);
+      
+      // Update security configuration with project-specific settings
+      cliSecurityService.updateConfig({
+        sandboxing: config.security.sandboxing,
+        allowedPaths: config.security.allowedPaths.length > 0 ? config.security.allowedPaths : [projectContext.root],
+        allowedNetworkHosts: config.security.allowedNetworkHosts
+      });
+      
+      // Get the configured sandbox from security service
+      const sandbox = cliSecurityService.getSandbox();
+      
+      const commandSystem = new UnifiedCommandSystem();
+      
+      return { cache, sandbox, commandSystem };
+    });
 
-    // Set CLI metadata
-    cli.version("0.1.0");
-    cli.help();
+    // 4. Load Built-in Commands
+    await cliPerformanceService.trackOperation('builtin_commands_loading', async () => {
+      const { getAllCommands } = await import("../core/commands/index.js");
+      const allCommands = getAllCommands(commandSystem);
+      allCommands.forEach(command => commandSystem.register(command));
+    });
 
-    // Register all commands from plugins
-    commandSystem.applyToCAC(cli);
-    performanceMonitor.end("cli_setup");
+    // 5. Plugin System Initialization
+    await cliPerformanceService.trackOperation('plugin_system_init', async () => {
+      const pluginService = new CLIPluginService();
+      await pluginService.initialize(projectContext.root);
+      
+      // Load and register plugin commands
+      const enabledPlugins = await pluginService.listPlugins({ enabled: true });
+      
+      // Register plugin commands with the command system
+      for (const plugin of enabledPlugins.plugins) {
+        try {
+          // Plugin commands will be automatically registered through the plugin manager
+          Logger.dim(`✓ Loaded plugin: ${plugin.name}`);
+        } catch (error) {
+          Logger.warning(`Failed to load plugin ${plugin.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+      }
+    });
 
-    // 6. Parse and Execute
-    performanceMonitor.start("command_execution");
+    // 6. CLI Setup
+    const cli = await cliPerformanceService.trackOperation('cli_setup', async () => {
+      const cli = cac("lorm");
 
-    // Check if any command was provided
-    const args = process.argv.slice(2);
+      // Set CLI metadata
+      cli.version("0.1.0");
+      // Note: Don't call cli.help() as it overrides our custom help command
 
-    if (args.length === 0) {
-      // No command specified, show help and exit
-      cli.outputHelp();
-      performanceMonitor.end("command_execution");
-      return;
-    }
+      // Register all commands from plugins
+      commandSystem.applyToCAC(cli);
+      
+      return cli;
+    });
 
-    // Parse and execute command
-    cli.parse();
-    performanceMonitor.end("command_execution");
+    // 7. Parse and Execute
+
+    await cliPerformanceService.trackOperation('command_execution', async () => {
+      // Check if any command was provided
+      const args = process.argv.slice(2);
+
+      // Intercept --help flag to use custom help system
+      if (args.includes('--help') || args.includes('-h')) {
+        // Use custom help system instead of CAC's default
+        const { createDynamicHelp } = await import('../utils/help-system.js');
+        const helpGenerator = createDynamicHelp(commandSystem.getCommandsMap());
+        
+        // Show general help for --help flag
+        helpGenerator.displayGeneralHelp();
+        return;
+      }
+
+      if (args.length === 0) {
+        // No command specified, show custom help and exit
+        const { createDynamicHelp } = await import('../utils/help-system.js');
+        const helpGenerator = createDynamicHelp(commandSystem.getCommandsMap());
+        helpGenerator.displayGeneralHelp();
+        return;
+      }
+
+      // Parse and execute command
+      cli.parse();
+    });
   } catch (error) {
-    performanceMonitor.recordError(
-      error instanceof Error ? error : new Error(String(error))
-    );
+    // Record error in performance monitoring
+    cliPerformanceService.recordError(error instanceof Error ? error : new Error(String(error)));
     throw error;
   } finally {
-    // 7. Performance Summary
-    performanceMonitor.end("cli_bootstrap");
-
-    if (process.env["LORM_PERFORMANCE"] === "true") {
-      const summary = performanceMonitor.generateSummary();
-      Logger.withIcon(ICONS.chart, "Performance Summary:", "dim");
-      Logger.performance("Total execution time", `${Date.now() - startTime}ms`);
-      Logger.performance(
-        "Memory usage",
-        `${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)}MB`
-      );
-
-      if (summary.operations.length > 0) {
-        Logger.dim("Operations:");
-        summary.operations.forEach((op: PerformanceOperation) => {
-          Logger.performance(`  ${op.name}`, `${op.duration}ms`);
-        });
-      }
-    }
-
-    // Ensure process exits after bootstrap completion
-    process.exit(0);
+    // End performance session
+    cliPerformanceService.endSession();
   }
 }

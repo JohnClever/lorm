@@ -1,5 +1,6 @@
 import type { CommandDefinition, CommandContext, CommandOptions } from './types.js';
 import { Logger } from '../../utils/logger.js';
+import { getCommandPrefix } from '../../utils/command-factory.js';
 
 /**
  * Base command class with common functionality
@@ -47,7 +48,8 @@ export abstract class BaseCommand {
   protected validateContext(context: CommandContext): void {
     // Check if LORM config is required
     if (this.definition.requiresLormConfig && !context.hasLormConfig) {
-      throw new Error('No LORM configuration found. Run `lorm init` first.');
+      const commandPrefix = getCommandPrefix();
+      throw new Error(`No LORM configuration found. Run \`${commandPrefix} @lorm/cli init\` first.`);
     }
 
     // Check if mobile project is required

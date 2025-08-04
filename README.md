@@ -50,8 +50,7 @@
 ```
 my-mobile-app/
 ├── lorm.config.js         # Project settings
-├── lorm.schema.js         # Drizzle ORM schema
-├── lorm.router.js         # Your API routes
+├──         
 ├── .lorm/                 # Auto-generated backend code
 └── app/                   # Your React Native app
 ```

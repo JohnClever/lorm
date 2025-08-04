@@ -67,6 +67,7 @@ export interface InitCommandOptions extends BaseCommandOptions {
 
 export interface DevCommandOptions extends BaseCommandOptions {
   port?: number;
+  'no-types'?: boolean;
 }
 
 export interface CheckCommandOptions extends BaseCommandOptions {

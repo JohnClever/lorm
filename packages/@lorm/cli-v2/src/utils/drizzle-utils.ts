@@ -1,7 +1,11 @@
-import { spawn } from 'child_process';
 import { join } from 'path';
+import { execSync, spawn } from 'child_process';
 import { existsSync } from 'fs';
-import chalk from 'chalk';
+import { Logger } from './logger.js';
+import { findConfigFile, isLormProject, hasSchemaFile } from './file-utils.js';
+import { getCommandPrefix } from './command-factory.js';
+
+const commandPrefix = getCommandPrefix();
 
 /**
  * Execute Drizzle Kit commands
@@ -25,16 +29,16 @@ export async function executeDrizzleKit(
       cwd: process.cwd()
     });
 
-    drizzleProcess.on('close', (code) => {
+    drizzleProcess.on('close', (code: number) => {
       if (code === 0) {
-        console.log(chalk.green(`✅ [lorm] ${successMessage}`));
+        Logger.success(`[lorm] ${successMessage}`);
         resolve();
       } else {
         reject(new Error(`Drizzle Kit command failed with exit code ${code}`));
       }
     });
 
-    drizzleProcess.on('error', (error) => {
+    drizzleProcess.on('error', (error: Error) => {
       reject(new Error(`Failed to start Drizzle Kit: ${error.message}`));
     });
   });
@@ -45,12 +49,12 @@ export async function executeDrizzleKit(
  * Migrated from v1 implementation
  */
 export async function initializeCommand(operation: string): Promise<{ lormDir: string }> {
-  console.log(chalk.blue(`🚀 [lorm] Starting ${operation}...`));
+  Logger.info(`🚀 [lorm] Starting ${operation}...`);
   
   const lormDir = join(process.cwd(), '.lorm');
   
-  if (!existsSync(lormDir)) {
-    throw new Error('LORM project not initialized. Run "lorm init" first.');
+  if (!isLormProject(process.cwd())) {
+    throw new Error(`LORM project not initialized. Run "${commandPrefix} @lorm/cli init" first.`);
   }
   
   return { lormDir };
@@ -63,13 +67,12 @@ export async function initializeCommand(operation: string): Promise<{ lormDir: s
 export async function initializeAdvancedCommand(): Promise<{ lormDir: string }> {
   const lormDir = join(process.cwd(), '.lorm');
   
-  if (!existsSync(lormDir)) {
-    throw new Error('LORM project not initialized. Run "lorm init" first.');
+  if (!isLormProject(process.cwd())) {
+    throw new Error(`LORM project not initialized. Run "${commandPrefix} @lorm/cli init" first.`);
   }
   
-  const schemaPath = join(lormDir, 'schema.ts');
-  if (!existsSync(schemaPath)) {
-    console.log(chalk.yellow('⚠️  No schema file found. Some operations may not work correctly.'));
+  if (!hasSchemaFile(process.cwd())) {
+    Logger.warning('No schema file found. Some operations may not work correctly.');
   }
   
   return { lormDir };
@@ -81,8 +84,7 @@ export async function initializeAdvancedCommand(): Promise<{ lormDir: string }> 
  */
 export function handleCommandError(error: string | Error, operation: string): void {
   const errorMessage = error instanceof Error ? error.message : error;
-  console.error(chalk.red(`❌ [lorm] ${operation} failed:`));
-  console.error(chalk.red(errorMessage));
+  Logger.error(`[lorm] ${operation} failed: ${errorMessage}`);
   process.exit(1);
 }
 
@@ -96,7 +98,6 @@ export function handleAdvancedCommandError(
   duration: number
 ): void {
   const errorMessage = error instanceof Error ? error.message : error;
-  console.error(chalk.red(`❌ [lorm] ${operation} failed after ${duration}ms:`));
-  console.error(chalk.red(errorMessage));
+  Logger.error(`[lorm] ${operation} failed after ${duration}ms: ${errorMessage}`);
   process.exit(1);
 }

@@ -33,14 +33,30 @@ export interface FetchResponse {
 }
 
 /**
- * Security configuration for plugin sandboxing
+ * Security configuration for plugin sandboxing and auditing
  */
 export interface SecurityConfig {
+  // Sandbox settings
   sandboxing: boolean;
   allowedPaths: string[];
   allowedNetworkHosts: string[];
   maxExecutionTime?: number; // in milliseconds
   maxMemoryUsage?: number; // in bytes
+  
+  // Audit rule configuration
+  auditRules: {
+    environment: EnvironmentAuditConfig;
+    database: DatabaseAuditConfig;
+    filesystem: FileSystemAuditConfig;
+    dependencies: DependencyAuditConfig;
+  };
+  
+  // Auto-fix settings
+  autoFix: {
+    enabled: boolean;
+    categories: AuditCategory[];
+    backupBeforeFix: boolean;
+  };
 }
 
 /**
@@ -196,4 +212,133 @@ export interface RestrictedCLIContext {
     set: <T>(key: string, value: T, ttl?: number) => Promise<void>;
     delete: (key: string) => Promise<boolean>;
   };
+}
+
+/**
+ * Audit category types
+ */
+export type AuditCategory = 
+  | 'environment'
+  | 'database'
+  | 'filesystem'
+  | 'dependencies'
+  | 'sandbox'
+  | 'configuration';
+
+/**
+ * Audit options for security scanning
+ */
+export interface AuditOptions {
+  verbose?: boolean;
+  fix?: boolean;
+  output?: string;
+  categories?: AuditCategory[];
+  format?: 'json' | 'table' | 'summary';
+}
+
+/**
+ * Individual audit result
+ */
+export interface AuditResult {
+  category: AuditCategory;
+  status: 'pass' | 'warning' | 'error';
+  message: string;
+  details: string[];
+  fixable: boolean;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  timestamp: string;
+  metadata?: Record<string, any>;
+}
+
+/**
+ * Audit summary statistics
+ */
+export interface AuditSummary {
+  total: number;
+  passed: number;
+  warnings: number;
+  errors: number;
+  fixable: number;
+  duration: number; // milliseconds
+}
+
+/**
+ * Comprehensive audit report
+ */
+export interface AuditReport {
+  timestamp: string;
+  projectPath: string;
+  configUsed: SecurityConfig;
+  summary: AuditSummary;
+  results: AuditResult[];
+  violations: SecurityViolation[];
+  recommendations: string[];
+}
+
+/**
+ * Security fix result
+ */
+export interface FixResult {
+  category: AuditCategory;
+  success: boolean;
+  message: string;
+  error?: string;
+  appliedAt: string;
+  backupCreated?: string;
+  changesApplied: FixChange[];
+}
+
+/**
+ * Individual fix change
+ */
+export interface FixChange {
+  type: 'file_modify' | 'file_create' | 'file_delete' | 'config_update' | 'env_update';
+  target: string;
+  description: string;
+  oldValue?: string;
+  newValue?: string;
+}
+
+/**
+ * Environment audit configuration
+ */
+export interface EnvironmentAuditConfig {
+  enabled: boolean;
+  sensitivePatterns: RegExp[];
+  excludePatterns: RegExp[];
+  checkHardcodedSecrets: boolean;
+  strictMode: boolean; // When true, flags development values as potential issues in production
+}
+
+/**
+ * Database audit configuration
+ */
+export interface DatabaseAuditConfig {
+  enabled: boolean;
+  checkCredentials: boolean;
+  allowedHosts: string[];
+  requireSSL: boolean;
+  checkConnectionStrings: boolean;
+}
+
+/**
+ * File system audit configuration
+ */
+export interface FileSystemAuditConfig {
+  enabled: boolean;
+  sensitiveFiles: string[];
+  excludePaths: string[];
+  checkPermissions: boolean;
+  scanForSecrets: boolean;
+}
+
+/**
+ * Dependency audit configuration
+ */
+export interface DependencyAuditConfig {
+  enabled: boolean;
+  vulnerabilityThreshold: 'low' | 'medium' | 'high' | 'critical';
+  excludePackages: string[];
+  checkLicenses: boolean;
+  allowedLicenses: string[];
 }

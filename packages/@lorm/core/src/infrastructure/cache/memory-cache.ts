@@ -201,13 +201,30 @@ export class MemoryCache implements ICache {
   }
 
   /**
-   * Cleanup resources
+   * Enhanced cleanup resources with better error handling
    */
   destroy(): void {
-    if (this.cleanupTimer) {
-      clearInterval(this.cleanupTimer);
-      delete this.cleanupTimer;
+    try {
+      // Clear the cleanup timer
+      if (this.cleanupTimer) {
+        clearInterval(this.cleanupTimer);
+        this.cleanupTimer = undefined;
+      }
+      
+      // Clear all cache data
+      this.clear();
+      
+      // Reset stats
+      this.stats = {
+        hits: 0,
+        misses: 0,
+        size: 0
+      };
+      
+      this.accessCounter = 0;
+    } catch (error) {
+      // Log warning but don't throw - destruction should be safe
+      console.warn(`MemoryCache destruction warning: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-    this.clear();
   }
 }

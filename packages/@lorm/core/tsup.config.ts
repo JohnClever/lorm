@@ -10,7 +10,8 @@ export default defineConfig({
     'src/infrastructure/index.ts',
     'src/infrastructure/cache/index.ts',
     'src/infrastructure/performance/index.ts',
-    'src/infrastructure/security/index.ts'
+    'src/infrastructure/security/index.ts',
+    'src/infrastructure/plugin-system/index.ts'
   ],
   format: ['esm', 'cjs'],
   dts: true,

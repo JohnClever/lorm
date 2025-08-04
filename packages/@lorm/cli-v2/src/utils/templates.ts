@@ -1,15 +1,22 @@
 import type { lormConfig } from "@lorm/core";
 
-// JavaScript router template
-export const routerTemplate = `import { defineRouter } from "@lorm/core";
+/**
+ * Generate router template with language-specific typing
+ */
+export function getRouterTemplate(isTypeScript: boolean = false): string {
+  const typeImports = isTypeScript ? '\nimport type { Database } from "@lorm/core";' : '';
+  const createUsersParams = isTypeScript ? ': { input: { name: string }; db: Database }' : '';
+  const getAllUsersParams = isTypeScript ? ': { db: Database }' : '';
+  
+  return `import { defineRouter } from "@lorm/core";
 import { z } from "zod";
-import { schema } from "../schema";
+import { schema } from "../schema";${typeImports}
 
 export const createUsers = defineRouter({
   input: z.object({
     name: z.string()
   }),
-  resolve: async ({input, db}) => {
+  resolve: async ({ input, db }${createUsersParams}) => {
     try {
       const [users] = await db.insert(schema.users).values({
         name: input.name
@@ -23,7 +30,7 @@ export const createUsers = defineRouter({
 
 export const getAllUsers = defineRouter({
   input: z.void(),
-  resolve: async ({ db }) => {
+  resolve: async ({ db }${getAllUsersParams}) => {
     try {
       const users = await db.select().from(schema.users);
       return users;
@@ -37,84 +44,26 @@ export const router = {
   getAllUsers,
   createUsers
 };`;
+}
 
-// New TypeScript router template
-export const routerTsTemplate = `import { defineRouter } from "@lorm/core";
-import { z } from "zod";
-import { schema } from "../schema";
-import type { Database } from "@lorm/core";
 
-export const createUsers = defineRouter({
-  input: z.object({
-    name: z.string()
-  }),
-  resolve: async ({ input, db }: { input: { name: string }; db: Database }) => {
-    try {
-      const [users] = await db.insert(schema.users).values({
-        name: input.name
-      }).returning();
-      return users;
-    } catch (error) {
-      throw new Error("Failed to create user: " + (error instanceof Error ? error.message : "Unknown error"));
-    }
-  }
-});
 
-export const getAllUsers = defineRouter({
-  input: z.void(),
-  resolve: async ({ db }: { db: Database }) => {
-    try {
-      const users = await db.select().from(schema.users);
-      return users;
-    } catch (error) {
-      throw new Error("Failed to fetch users: " + (error instanceof Error ? error.message : "Unknown error"));
-    }
-  },
-});
-
-export const router = {
-  getAllUsers,
-  createUsers
-};`;
-
-// JavaScript schema template
-export const getSchemaTemplate = (adapter: string) => {
+/**
+ * Generate schema template with language-specific features
+ */
+export function getSchemaTemplate(adapter: string, isTypeScript: boolean = false): string {
   const imports = getSchemaImports(adapter);
-  const tableDefinition = getTableDefinition(adapter);
+  const tableDefinition = getTableDefinition(adapter, isTypeScript);
+  const typeExports = isTypeScript ? '\n\nexport type User = typeof users.$inferSelect;\nexport type NewUser = typeof users.$inferInsert;' : '';
 
   return `${imports}
 
 export const users = ${tableDefinition};
 
-export const schema = { users };`;
-};
+export const schema = { users };${typeExports}`;
+}
 
-// JavaScript schema template (same as above, kept for clarity)
-export const getSchemaJsTemplate = (adapter: string) => {
-  const imports = getSchemaImports(adapter);
-  const tableDefinition = getTableDefinition(adapter);
 
-  return `${imports}
-
-export const users = ${tableDefinition};
-
-export const schema = { users };`;
-};
-
-// New TypeScript schema template
-export const getSchemaTsTemplate = (adapter: string) => {
-  const imports = getSchemaTsImports(adapter);
-  const tableDefinition = getTsTableDefinition(adapter);
-
-  return `${imports}
-
-export const users = ${tableDefinition};
-
-export const schema = { users };
-
-export type User = typeof users.$inferSelect;
-export type NewUser = typeof users.$inferInsert;`;
-};
 
 function getSchemaImports(adapter: string): string {
   switch (adapter) {
@@ -129,72 +78,48 @@ function getSchemaImports(adapter: string): string {
   }
 }
 
-function getTableDefinition(adapter: string): string {
+function getTableDefinition(adapter: string, isTypeScript: boolean = false): string {
+  const notNull = isTypeScript ? '.notNull()' : '';
+  
   switch (adapter) {
     case "mysql":
     case "planetscale":
       return `mysqlTable("users", {
   id: int("id").primaryKey().autoincrement(),
-  name: varchar("name", { length: 255 })
+  name: varchar("name", { length: 255 })${notNull}
 })`;
     case "sqlite":
     case "turso":
       return `sqliteTable("users", {
   id: integer("id").primaryKey({ autoIncrement: true }),
-  name: text("name")
+  name: text("name")${notNull}
 })`;
     default:
       return `pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
-  name: varchar("name", { length: 255 })
+  name: varchar("name", { length: 255 })${notNull}
 })`;
   }
 }
 
-// TypeScript-specific functions
-function getSchemaTsImports(adapter: string): string {
-  switch (adapter) {
-    case "mysql":
-    case "planetscale":
-      return `import { mysqlTable, varchar, int } from "@lorm/schema/mysql";`;
-    case "sqlite":
-    case "turso":
-      return `import { sqliteTable, text, integer } from "@lorm/schema/sqlite";`;
-    default:
-      return `import { pgTable, uuid, varchar } from "@lorm/schema/pg";`;
-  }
-}
-
-function getTsTableDefinition(adapter: string): string {
-  switch (adapter) {
-    case "mysql":
-    case "planetscale":
-      return `mysqlTable("users", {
-  id: int("id").primaryKey().autoincrement(),
-  name: varchar("name", { length: 255 }).notNull()
-})`;
-    case "sqlite":
-    case "turso":
-      return `sqliteTable("users", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  name: text("name").notNull()
-})`;
-    default:
-      return `pgTable("users", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  name: varchar("name", { length: 255 }).notNull()
-})`;
-  }
-}
-
-// TypeScript config template
-export const getConfigTemplate = (adapter: string, url?: string) => {
+/**
+ * Generate config template with language-specific import/export syntax
+ */
+export function getConfigTemplate(adapter: string, url?: string, isTypeScript: boolean = true): string {
   const defaultUrl = getDefaultUrl(adapter);
   const adapterOptions = getAdapterSpecificOptions(adapter);
+  
+  const importStatement = isTypeScript 
+    ? 'import { defineConfig } from "@lorm/core";'
+    : 'const { defineConfig } = require("@lorm/core");';
+    
+  const exportStatement = isTypeScript 
+    ? 'export default defineConfig({'
+    : 'module.exports = defineConfig({';
 
-  return `import { defineConfig } from "@lorm/core";
+  return `${importStatement}
 
-export default defineConfig({
+${exportStatement}
   db: {
     url: "${url || defaultUrl}",
     adapter: "${adapter}",
@@ -218,40 +143,9 @@ export default defineConfig({
     enableRequestLogging: false // Enable for debugging
   }
 });`;
-};
+}
 
-// JavaScript config template (same structure, different file extension)
-export const getConfigJsTemplate = (adapter: string, url?: string) => {
-  const defaultUrl = getDefaultUrl(adapter);
-  const adapterOptions = getAdapterSpecificOptions(adapter);
 
-  return `const { defineConfig } = require("@lorm/core");
-
-module.exports = defineConfig({
-  db: {
-    url: "${url || defaultUrl}",
-    adapter: "${adapter}",
-    options: {${adapterOptions}
-    }
-  },
-  server: {
-    port: 3000,
-    host: "localhost",
-    cors: {
-      origin: "*", // Configure for production
-      credentials: false
-    },
-    security: {
-      maxRequestSize: 1024 * 1024, // 1MB
-      requestTimeout: 30000 // 30 seconds
-    }
-  },
-  logging: {
-    level: "info",
-    enableRequestLogging: false // Enable for debugging
-  }
-});`;
-};
 
 function getDefaultUrl(adapter: string): string {
   switch (adapter) {
@@ -293,38 +187,13 @@ function getAdapterSpecificOptions(adapter: string): string {
   }
 }
 
-export const typeTemplate = `// Auto-generated types for Lorm
+/**
+ * Generate type template with configurable router path
+ */
+export function getTypeTemplate(routerPath: string = "../lorm.router"): string {
+  return `// Auto-generated types for Lorm
 
-
-import type { router } from "../lorm.router";
-
-
-export type LormRouter = typeof router;
-
-
-type ExtractRouterMethods<T> = {
-  [K in keyof T]: T[K] extends (...args: unknown[]) => unknown ? T[K] : never;
-};
-
-
-export type TypedLormRouter = ExtractRouterMethods<typeof router>;
-
-
-declare module '@lorm/client' {
-  interface LormRouterRegistry extends TypedLormRouter {}
-  
-  
-  type LormRouter = TypedLormRouter;
-}
-
-
-export { router as default };
-export type { router as RouterType };`;
-
-// New TypeScript type template
-export const typeTsTemplate = `// Auto-generated types for Lorm
-
-import type { router } from "../lorm/router";
+import type { router } from "${routerPath}";
 
 export type LormRouter = typeof router;
 
@@ -341,6 +210,9 @@ declare module '@lorm/client' {
 
 export { router as default };
 export type { router as RouterType };`;
+}
+
+
 
 export const drizzleConfigTemplate = (config: lormConfig) => {
   const adapter = config.db.adapter || "neon";

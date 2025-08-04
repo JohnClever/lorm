@@ -123,9 +123,9 @@ describe('CLI Commands Integration', () => {
         description: 'A LORM project',
         main: 'index.js',
         scripts: {
-          dev: 'lorm dev',
-          build: 'lorm build',
-          migrate: 'lorm migrate'
+          dev: 'npx @lorm/cli dev',
+          build: 'npx @lorm/cli build',
+          migrate: 'npx @lorm/cli migrate'
         },
         dependencies: {
           '@lorm/core': '^1.0.0',
@@ -230,7 +230,7 @@ describe('CLI Commands Integration', () => {
       expect(config).toBe(configContent);
       
       // Simulate dev server start
-      const result = execSync('lorm dev --port 3000');
+      const result = execSync('npx @lorm/cli dev --port 3000');
       expect(result.toString()).toContain('Development server started');
     });
 
@@ -293,7 +293,7 @@ describe('CLI Commands Integration', () => {
       // Mock build process
       mockExecSync.mockReturnValue(Buffer.from('Build completed successfully'));
       
-      const result = execSync('lorm build --output dist');
+      const result = execSync('npx @lorm/cli build --output dist');
       expect(result.toString()).toContain('Build completed successfully');
       
       // Mock build artifacts creation
@@ -307,7 +307,7 @@ describe('CLI Commands Integration', () => {
       // Mock optimized build
       mockExecSync.mockReturnValue(Buffer.from('Optimized build completed'));
       
-      const result = execSync('lorm build --optimize --minify');
+      const result = execSync('npx @lorm/cli build --optimize --minify');
       expect(result.toString()).toContain('Optimized build completed');
     });
 
@@ -359,7 +359,7 @@ describe('CLI Commands Integration', () => {
       // Mock successful migration
       mockExecSync.mockReturnValue(Buffer.from('Migrations completed successfully'));
       
-      const result = execSync('lorm migrate up');
+      const result = execSync('npx @lorm/cli migrate up');
       expect(result.toString()).toContain('Migrations completed successfully');
     });
 
@@ -368,7 +368,7 @@ describe('CLI Commands Integration', () => {
       
       mockExecSync.mockReturnValue(Buffer.from('Rollback completed'));
       
-      const result = execSync('lorm migrate down --steps 1');
+      const result = execSync('npx @lorm/cli migrate down --steps 1');
       expect(result.toString()).toContain('Rollback completed');
     });
 
@@ -447,7 +447,7 @@ export async function down() {
       
       mockExecSync.mockReturnValue(Buffer.from(pluginList));
       
-      const result = execSync('lorm plugin list');
+      const result = execSync('npx @lorm/cli plugin list');
       const plugins = JSON.parse(result.toString());
       
       expect(plugins).toHaveLength(2);
@@ -498,7 +498,7 @@ export async function down() {
         throw error;
       });
       
-      expect(() => execSync('lorm invalid-command')).toThrow('Command failed');
+      expect(() => execSync('npx @lorm/cli invalid-command')).toThrow('Command failed');
     });
 
     it('should handle file system errors gracefully', async () => {
@@ -520,7 +520,7 @@ export async function down() {
         throw error;
       });
       
-      expect(() => execSync('lorm init')).toThrow('Invalid arguments'); // missing project name
+      expect(() => execSync('npx @lorm/cli init')).toThrow('Invalid arguments'); // missing project name
     });
   });
 });

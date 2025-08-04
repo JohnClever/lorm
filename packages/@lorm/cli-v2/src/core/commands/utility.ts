@@ -1,48 +1,30 @@
-import chalk from 'chalk';
 import { PerfCommandOptions, HealthCommandOptions } from './types.js';
-import { createUtilityCommand } from '../../utils/command-factory.js';
+import { createUtilityCommand, getCommandPrefix } from '../../utils/command-factory.js';
+
+const commandPrefix = getCommandPrefix();
 import { writeFileSync } from 'fs';
-import { LegacyPerformanceMonitor, HealthChecker } from '../../utils/legacy-utils.js';
+import { cliPerformanceService } from '../../services/performance.js';
+import { ModernHealthChecker } from '../../utils/modern-health-checker.js';
+import { Logger, ICONS } from '../../utils/logger.js';
+// Removed chalk import - using Logger utility instead
 
 // Utility command implementations - migrated from v1
 const utilityCommands = {
   async showPerformanceMetrics(options: PerfCommandOptions): Promise<void> {
-    const { clear, export: exportFile } = options;
-    console.log(chalk.blue('📊 Performance Metrics'));
-    
     try {
-      const performanceMonitor = new LegacyPerformanceMonitor();
-      
-      if (clear) {
-        performanceMonitor.clearMetrics();
-        return;
-      }
-      
-      if (exportFile) {
-        const report = performanceMonitor.generateReport();
-        const exportData = {
-          ...report,
-          timestamp: new Date().toISOString()
-        };
-        const filePath = typeof exportFile === 'string' ? exportFile : 'performance-metrics.json';
-        writeFileSync(filePath, JSON.stringify(exportData, null, 2));
-        console.log(chalk.green(`✅ Metrics exported to ${filePath}`));
-        return;
-      }
-      
-      performanceMonitor.displayReport();
+      await cliPerformanceService.displayMetrics(options);
     } catch (error) {
-      console.error(chalk.red('❌ Failed to get performance metrics:'), error);
+      Logger.error(`Failed to get performance metrics: ${error}`);
       process.exit(1);
     }
   },
 
   async runHealthCheck(options: HealthCommandOptions): Promise<void> {
     const { system, json } = options;
-    console.log(chalk.blue('🏥 Running Health Checks'));
+    Logger.withIcon('🏥', 'Running Health Checks');
     
     try {
-      const healthChecker = new HealthChecker();
+      const healthChecker = new ModernHealthChecker();
       
       if (system) {
         const systemInfo = await healthChecker.getSystemInfo();
@@ -51,6 +33,15 @@ const utilityCommands = {
       
       const results = await healthChecker.runAllChecks();
       
+      // Add performance health check
+      const performanceHealthy = cliPerformanceService.isHealthy();
+      results.push({
+        name: 'Performance System',
+        status: performanceHealthy ? 'pass' : 'warn',
+        message: performanceHealthy ? 'Performance monitoring healthy' : 'Performance issues detected',
+        details: { healthy: performanceHealthy }
+      });
+      
       if (json) {
         console.log(JSON.stringify(results, null, 2));
         return;
@@ -58,12 +49,15 @@ const utilityCommands = {
       
       healthChecker.displayResults(results);
       
+      // Display performance health separately
+      await cliPerformanceService.displayHealth();
+      
       const hasFailures = results.some(r => r.status === 'fail');
       if (hasFailures) {
         process.exit(1);
       }
     } catch (error) {
-      console.error(chalk.red('❌ Health check failed:'), error);
+      Logger.error(`Health check failed: ${error}`);
       process.exit(1);
     }
   },
@@ -85,10 +79,10 @@ export const perfCommand = createUtilityCommand({
     { flag: '--verbose', description: 'Show detailed metrics' },
   ],
   examples: [
-    'lorm perf',
-    'lorm perf --clear',
-    'lorm perf --export metrics.json',
-    'lorm perf --verbose',
+    `${commandPrefix} @lorm/cli perf`,
+    `${commandPrefix} @lorm/cli perf --clear`,
+    `${commandPrefix} @lorm/cli perf --export metrics.json`,
+    `${commandPrefix} @lorm/cli perf --verbose`,
   ],
   action: async (options: PerfCommandOptions) => {
     await utilityCommands.showPerformanceMetrics(options);
@@ -108,11 +102,11 @@ export const healthCommand = createUtilityCommand({
     { flag: '--verbose', description: 'Show detailed check information' },
   ],
   examples: [
-    'lorm health',
-    'lorm doctor',
-    'lorm health --system',
-    'lorm health --json',
-    'lorm health --verbose',
+    `${commandPrefix} @lorm/cli health`,
+    `${commandPrefix} @lorm/cli doctor`,
+    `${commandPrefix} @lorm/cli health --system`,
+    `${commandPrefix} @lorm/cli health --json`,
+    `${commandPrefix} @lorm/cli health --verbose`,
   ],
   action: async (options: HealthCommandOptions) => {
     await utilityCommands.runHealthCheck(options);

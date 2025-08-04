@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import { Logger, ICONS } from './logger.js';
 import { CommandConfig } from '../core/commands/registry';
 import { BaseCommandOptions } from '../core/commands/types';
 
@@ -12,74 +12,74 @@ export class DynamicHelpGenerator {
   displayCommandHelp(commandName: string): void {
     const command = this.commands.get(commandName);
     if (!command) {
-      console.error(chalk.red(`Unknown command: ${commandName}`));
-      console.log(chalk.gray('Available commands:'));
+      Logger.error(`Unknown command: ${commandName}`);
+      Logger.info('Available commands:');
       this.listAvailableCommands();
       return;
     }
 
-    console.log(chalk.bold.blue(`\n${command.name}`));
-    console.log(chalk.gray(command.description));
+    Logger.withIcon(ICONS.document, `Help: ${command.name}`);
+    Logger.dim(command.description);
 
-    console.log(chalk.bold('\nUsage:'));
+    Logger.bold('\nUsage:');
     const usage = this.generateUsage(command);
-    console.log(`  ${chalk.cyan(usage)}`);
+    Logger.info(`  ${usage}`);
 
     if (command.options && command.options.length > 0) {
-      console.log(chalk.bold('\nOptions:'));
+      Logger.bold('\nOptions:');
       command.options.forEach((option) => {
         const defaultText = option.defaultValue
-          ? chalk.gray(` (default: ${option.defaultValue})`)
+          ? ` (default: ${option.defaultValue})`
           : '';
-        console.log(
-          `  ${chalk.yellow((option.flag || option.name || '').padEnd(20))} ${option.description}${defaultText}`
+        Logger.dim(
+          `  ${(option.flag || option.name || '').padEnd(20)} ${option.description}${defaultText}`
         );
       });
     }
 
     if (command.examples && command.examples.length > 0) {
-      console.log(chalk.bold('\nExamples:'));
+      Logger.bold('\nExamples:');
       command.examples.forEach((example) => {
-        console.log(`  ${chalk.cyan(example)}`);
+        Logger.info(`  ${example}`);
       });
     }
 
     if (command.aliases && command.aliases.length > 0) {
-      console.log(chalk.bold('\nAliases:'));
+      Logger.bold('\nAliases:');
       command.aliases.forEach((alias) => {
-        console.log(`  ${chalk.cyan(alias)}`);
+        Logger.info(`  ${alias}`);
       });
     }
 
     const relatedCommands = this.getRelatedCommands(command);
     if (relatedCommands.length > 0) {
-      console.log(chalk.bold('\nRelated Commands:'));
+      Logger.bold('\nRelated Commands:');
       relatedCommands.forEach((cmd) => {
-        console.log(
-          `  ${chalk.cyan(cmd.name.padEnd(15))} ${chalk.gray(cmd.description)}`
+        Logger.dim(
+          `  ${cmd.name.padEnd(15)} ${cmd.description}`
         );
       });
     }
 
     console.log();
-    console.log(chalk.gray(`💡 Run 'npx @lorm/cli help' to see all commands`));
+    Logger.info(`💡 Run 'npx @lorm/cli help' to see all commands`);
     console.log();
   }
 
   displayGeneralHelp(): void {
-    console.log(chalk.bold.blue('\n🚀 Lorm CLI - Mobile-first framework'));
-    console.log(chalk.gray('Build full-stack, type-safe mobile apps fast\n'));
+    Logger.withIcon(ICONS.document, 'LORM CLI v2 - Help System');
+    Logger.dim('Build full-stack, type-safe mobile apps fast\n');
 
-    console.log(chalk.bold('Usage:'));
+    Logger.bold('Usage:');
     console.log('  npx @lorm/cli <command> [options]\n');
 
-    console.log(chalk.bold('🚀 Quick Start:'));
+    Logger.bold('🚀 Quick Start:');
     const quickStartCommands = ['init', 'dev', 'db:push'];
     quickStartCommands.forEach((cmdName) => {
       const cmd = this.commands.get(cmdName);
       if (cmd) {
-        console.log(
-          `  ${chalk.cyan(`npx @lorm/cli ${cmdName}`.padEnd(25))} ${chalk.gray(cmd.description)}`
+        Logger.dim(
+          `  ${`npx @lorm/cli ${cmdName}`.padEnd(25)} ${cmd.description}`
         );
       }
     });
@@ -93,17 +93,17 @@ export class DynamicHelpGenerator {
       if (commands && commands.length > 0) {
         const categoryName = this.getCategoryDisplayName(categoryKey);
         const categoryIcon = this.getCategoryIcon(categoryKey);
-        console.log(chalk.bold(`${categoryIcon} ${categoryName}:`));
+        Logger.bold(`${categoryIcon} ${categoryName}:`);
         commands.forEach((cmd) => {
-          console.log(
-            `   ${chalk.cyan(cmd.name.padEnd(15))} ${chalk.gray(cmd.description)}`
+          Logger.dim(
+            `   ${cmd.name.padEnd(15)} ${cmd.description}`
           );
         });
         console.log();
       }
     });
 
-    console.log(chalk.bold('🔧 Global Options:'));
+    Logger.bold('🔧 Global Options:');
     const globalOptions = [
       { flag: '--help, -h', description: 'Show help for command' },
       { flag: '--version, -v', description: 'Show version number' },
@@ -111,21 +111,19 @@ export class DynamicHelpGenerator {
       { flag: '--quiet, -q', description: 'Suppress non-error output' },
     ];
     globalOptions.forEach((option) => {
-      console.log(
-        `  ${chalk.yellow(option.flag.padEnd(20))} ${chalk.gray(option.description)}`
+      Logger.dim(
+        `  ${option.flag.padEnd(20)} ${option.description}`
       );
     });
     console.log();
 
-    console.log(chalk.bold('📚 Resources:'));
-    console.log(`  ${chalk.blue('Documentation:')} https://lorm.dev/docs`);
-    console.log(`  ${chalk.blue('GitHub:')} https://github.com/lorm-dev/lorm`);
-    console.log(`  ${chalk.blue('Discord:')} https://discord.gg/lorm`);
+    Logger.bold('📚 Resources:');
+    console.log(`  Documentation: https://lorm.dev/docs`);
+    console.log(`  GitHub: https://github.com/lorm-dev/lorm`);
+    console.log(`  Discord: https://discord.gg/lorm`);
     console.log();
 
-    console.log(
-      chalk.gray("💡 Run 'npx @lorm/cli help <command>' for detailed command help")
-    );
+    Logger.info("💡 Run 'npx @lorm/cli help <command>' for detailed command help");
     console.log();
   }
 
@@ -135,30 +133,28 @@ export class DynamicHelpGenerator {
     const commands = categories[normalizedCategory];
 
     if (!commands || commands.length === 0) {
-      console.error(chalk.red(`Unknown category: ${categoryName}`));
-      console.log(chalk.gray('Available categories:'));
+      Logger.error(`Unknown category: ${categoryName}`);
+      Logger.info('Available categories:');
       Object.keys(categories).forEach((cat) => {
         const displayName = this.getCategoryDisplayName(cat);
-        console.log(`  ${chalk.cyan(displayName)}`);
+        Logger.info(`  ${displayName}`);
       });
       return;
     }
 
     const displayName = this.getCategoryDisplayName(normalizedCategory);
     const icon = this.getCategoryIcon(normalizedCategory);
-    console.log(chalk.bold.blue(`\n${icon} ${displayName}`));
+    Logger.withIcon(ICONS.document, `${icon} ${displayName}`);
     console.log();
 
     commands.forEach((cmd) => {
-      console.log(chalk.bold(cmd.name));
-      console.log(`  ${chalk.gray(cmd.description)}`);
-      console.log(`  ${chalk.cyan(this.generateUsage(cmd))}`);
+      Logger.bold(cmd.name);
+      Logger.dim(`  ${cmd.description}`);
+      Logger.info(`  ${this.generateUsage(cmd)}`);
       console.log();
     });
 
-    console.log(
-      chalk.gray(`💡 Run 'npx @lorm/cli help <command>' for detailed command help`)
-    );
+    Logger.info(`💡 Run 'npx @lorm/cli help <command>' for detailed command help`);
     console.log();
   }
 
@@ -203,7 +199,7 @@ export class DynamicHelpGenerator {
   private listAvailableCommands(): void {
     const commandNames = Array.from(this.commands.keys()).sort();
     commandNames.forEach((name) => {
-      console.log(`  ${chalk.cyan(name)}`);
+      Logger.dim(`  ${name}`);
     });
   }
 

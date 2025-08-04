@@ -97,7 +97,7 @@ export async function detectLanguage(projectRoot: string, packageJson?: PackageJ
  * Check if LORM configuration exists
  */
 export async function hasLormConfig(projectRoot: string): Promise<boolean> {
-  const configFiles = ['.lormrc', '.lormrc.json', '.lormrc.yml', '.lormrc.yaml'];
+  const configFiles = ['.lormrc', '.lormrc.json'];
   const existingConfigFile = await findExistingFile(projectRoot, configFiles);
   
   if (existingConfigFile) {

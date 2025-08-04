@@ -1,5 +1,7 @@
 import { DbCommandOptions } from './types';
-import { createDbCommand } from '../../utils/command-factory';
+import { createDbCommand, getCommandPrefix } from '../../utils/command-factory';
+
+const commandPrefix = getCommandPrefix();
 import { 
   executeDrizzleKit,
   initializeCommand,
@@ -103,7 +105,7 @@ const dbCommands = {
 
 // Database command definitions
 export const dbPushCommand = createDbCommand({
-  name: 'push',
+  name: 'db:push',
   description: 'Push schema changes directly to the database (destructive)',
   aliases: ['push'],
   requiresSchema: true,
@@ -111,9 +113,9 @@ export const dbPushCommand = createDbCommand({
     { flag: '--force', description: 'Force push without confirmation' },
   ],
   examples: [
-    'lorm db:push',
-    'lorm push',
-    'lorm db:push --force',
+    `${commandPrefix} @lorm/cli db:push`,
+    `${commandPrefix} @lorm/cli push`,
+    `${commandPrefix} @lorm/cli db:push --force`,
   ],
   action: async (options: DbCommandOptions) => {
     await dbCommands.push(options);
@@ -121,7 +123,7 @@ export const dbPushCommand = createDbCommand({
 });
 
 export const dbPullCommand = createDbCommand({
-  name: 'pull',
+  name: 'db:pull',
   description: 'Pull database schema and generate types',
   aliases: ['pull'],
   requiresSchema: true,
@@ -132,9 +134,9 @@ export const dbPullCommand = createDbCommand({
     },
   ],
   examples: [
-    'lorm db:pull',
-    'lorm pull',
-    'lorm db:pull --introspect',
+    `${commandPrefix} @lorm/cli db:pull`,
+    `${commandPrefix} @lorm/cli pull`,
+    `${commandPrefix} @lorm/cli db:pull --introspect`,
   ],
   action: async (options: DbCommandOptions) => {
     await dbCommands.pull(options);
@@ -142,15 +144,15 @@ export const dbPullCommand = createDbCommand({
 });
 
 export const dbGenerateCommand = createDbCommand({
-  name: 'generate',
+  name: 'db:generate',
   description: 'Generate migration files from schema changes',
   aliases: ['generate'],
   requiresSchema: true,
   options: [{ flag: '--name <name>', description: 'Custom migration name' }],
   examples: [
-    'lorm db:generate',
-    'lorm generate',
-    'lorm db:generate --name add_users_table',
+    `${commandPrefix} @lorm/cli db:generate`,
+    `${commandPrefix} @lorm/cli generate`,
+    `${commandPrefix} @lorm/cli db:generate --name add_users_table`,
   ],
   action: async (options: DbCommandOptions) => {
     await dbCommands.generate(options);
@@ -158,7 +160,7 @@ export const dbGenerateCommand = createDbCommand({
 });
 
 export const dbMigrateCommand = createDbCommand({
-  name: 'migrate',
+  name: 'db:migrate',
   description: 'Apply pending database migrations',
   aliases: ['migrate'],
   requiresSchema: true,
@@ -166,9 +168,9 @@ export const dbMigrateCommand = createDbCommand({
     { flag: '--to <target>', description: 'Migrate to specific migration' },
   ],
   examples: [
-    'lorm db:migrate',
-    'lorm migrate',
-    'lorm db:migrate --to 20231201_001',
+    `${commandPrefix} @lorm/cli db:migrate`,
+    `${commandPrefix} @lorm/cli migrate`,
+    `${commandPrefix} @lorm/cli db:migrate --to 20231201_001`,
   ],
   action: async (options: DbCommandOptions) => {
     await dbCommands.migrate(options);
@@ -176,7 +178,7 @@ export const dbMigrateCommand = createDbCommand({
 });
 
 export const dbStudioCommand = createDbCommand({
-  name: 'studio',
+  name: 'db:studio',
   description: 'Open database studio for visual management',
   aliases: ['studio'],
   requiresSchema: true,
@@ -193,9 +195,9 @@ export const dbStudioCommand = createDbCommand({
     },
   ],
   examples: [
-    'lorm db:studio',
-    'lorm studio',
-    'lorm db:studio --port 5000',
+    `${commandPrefix} @lorm/cli db:studio`,
+    `${commandPrefix} @lorm/cli studio`,
+    `${commandPrefix} @lorm/cli db:studio --port 5000`,
   ],
   action: async (options: DbCommandOptions) => {
     await dbCommands.studio(options);
@@ -203,7 +205,7 @@ export const dbStudioCommand = createDbCommand({
 });
 
 export const dbUpCommand = createDbCommand({
-  name: 'up',
+  name: 'db:up',
   description: 'Upgrade schema to latest version',
   aliases: ['up'],
   requiresSchema: true,
@@ -214,9 +216,9 @@ export const dbUpCommand = createDbCommand({
     },
   ],
   examples: [
-    'lorm db:up',
-    'lorm up',
-    'lorm db:up --dry-run',
+    `${commandPrefix} @lorm/cli db:up`,
+    `${commandPrefix} @lorm/cli up`,
+    `${commandPrefix} @lorm/cli db:up --dry-run`,
   ],
   action: async (options: DbCommandOptions) => {
     await dbCommands.up(options);
@@ -224,7 +226,7 @@ export const dbUpCommand = createDbCommand({
 });
 
 export const dbDropCommand = createDbCommand({
-  name: 'drop',
+  name: 'db:drop',
   description: '⚠️  Drop all tables and data (DANGER ZONE)',
   aliases: ['drop'],
   requiresSchema: false,
@@ -239,9 +241,9 @@ export const dbDropCommand = createDbCommand({
     },
   ],
   examples: [
-    'lorm db:drop',
-    'lorm drop',
-    'lorm db:drop --force',
+    `${commandPrefix} @lorm/cli db:drop`,
+    `${commandPrefix} @lorm/cli drop`,
+    `${commandPrefix} @lorm/cli db:drop --force`,
   ],
   action: async (options: DbCommandOptions) => {
     await dbCommands.drop(options);
