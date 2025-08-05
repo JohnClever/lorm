@@ -1,5 +1,13 @@
 # @lorm/cli
 
+## 0.1.70
+
+### Patch Changes
+
+- f026595: vr
+- Updated dependencies [f026595]
+  - @lorm/core@0.1.35
+
 ## 0.1.66
 
 ### Patch Changes
