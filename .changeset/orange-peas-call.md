@@ -1,0 +1,5 @@
+---
+"@lorm/cli": patch
+---
+
+y

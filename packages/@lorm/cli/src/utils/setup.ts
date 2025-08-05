@@ -250,8 +250,8 @@ export async function initializeCommand(
   
   const rootDir = process.cwd();
   const lormDir = path.join(rootDir, ".lorm");
-  const drizzleConfigPath = path.join(lormDir, "drizzle.config.js");
-  const schemaTargetPath = path.join(lormDir, "schema.js");
+  const drizzleConfigPath = path.join(lormDir, "drizzle.config.ts");
+  const schemaTargetPath = path.join(lormDir, "schema.ts");
   
   console.log("📖 [lorm] Loading configuration...");
   const config = await loadConfig();

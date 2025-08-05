@@ -1,164 +1,26 @@
-import chalk from "chalk";
-import { spawn } from "child_process";
-import { promises as fs } from "fs";
-import { resolve } from "path";
-import { fileExists } from "@/utils/file-utils";
-import { languageHandler } from "@/utils/language-handler";
-import { loadConfig } from "@lorm/core";
-import { drizzleConfigTemplate } from "@/templates";
-import { getCommandPrefix } from "@/utils/package-manager";
+import {
+  handleAdvancedCommandError,
+  initializeAdvancedCommand,
+} from "@/utils/setup";
+import { executeDrizzleKit } from "../../utils/index";
 
-const commandPrefix = getCommandPrefix();
-
-export interface DbStudioOptions {
-  port?: number;
-  host?: string;
-  verbose?: boolean;
-}
-
-export async function dbStudioCommand(options: DbStudioOptions = {}) {
-  const { port = 4983, host = "localhost", verbose = false } = options;
-
-  console.log(chalk.blue("🎨 Starting database studio..."));
+export async function studio(): Promise<void> {
+  const startTime = Date.now();
 
   try {
-    // Check if project is initialized
-    const configExists = await checkProjectSetup();
-    if (!configExists) {
-      console.error(
-        chalk.red(
-          `❌ LORM project not found. Run '${commandPrefix} @lorm/cli init' first.`
-        )
-      );
-      process.exit(1);
-    }
+    const { lormDir } = await initializeAdvancedCommand("studio");
 
-    // Create drizzle config if it doesn't exist
-    await ensureDrizzleConfig();
+    console.log("🎨 [lorm] Starting Drizzle Studio...");
+    await executeDrizzleKit("studio", lormDir, "Studio successfully launched");
 
-    // Start drizzle studio
-    await startDrizzleStudio(port, host, verbose);
+    const duration = Date.now() - startTime;
+    console.log(`✅ [lorm] Studio started successfully! (${duration}ms)`);
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(
-      chalk.red("❌ Failed to start database studio:"),
-      errorMessage
+    const duration = Date.now() - startTime;
+    handleAdvancedCommandError(
+      error instanceof Error ? error : String(error),
+      "Studio",
+      duration
     );
-    process.exit(1);
   }
-}
-
-async function checkProjectSetup(): Promise<boolean> {
-  const filePaths = await languageHandler.getFilePaths();
-
-  const configExists = await fileExists(filePaths.config);
-  const schemaExists = await fileExists(filePaths.schema);
-
-  if (!configExists) {
-    console.error(
-      chalk.red("❌ Configuration file not found:"),
-      filePaths.config
-    );
-    return false;
-  }
-
-  if (!schemaExists) {
-    console.error(chalk.red("❌ Schema file not found:"), filePaths.schema);
-    return false;
-  }
-
-  return true;
-}
-
-// checkDrizzleKit function removed - drizzle-kit is bundled with the CLI
-
-async function ensureDrizzleConfig(): Promise<void> {
-  const lormDir = resolve(".lorm");
-  const drizzleConfigPath = resolve(".lorm/drizzle.config.ts");
-  const schemaPath = resolve(".lorm/schema.ts");
-
-  // Create .lorm directory if it doesn't exist
-  try {
-    await fs.mkdir(lormDir, { recursive: true });
-  } catch (error) {
-    // Directory might already exist, ignore error
-  }
-
-  if (await fileExists(drizzleConfigPath)) {
-    console.log(chalk.gray("📄 Using existing .lorm/drizzle.config.ts"));
-    return;
-  }
-
-  console.log(
-    chalk.blue("📝 Creating .lorm/drizzle.config.ts and schema.ts...")
-  );
-
-  // Load the LORM config and generate drizzle config using template
-  const config = await loadConfig();
-  const filePaths = await languageHandler.getFilePaths();
-
-  // Create schema.ts that re-exports the main schema
-  const schemaContent = `// Auto-generated schema re-export for Drizzle
-export * from "../${filePaths.schema.replace(/\.(ts|js|mjs)$/, "")}";`;
-  await fs.writeFile(schemaPath, schemaContent);
-
-  // Generate drizzle config that points to the .lorm schema
-  const drizzleConfig = drizzleConfigTemplate(config).replace(
-    "schema: './schema.js'",
-    "schema: './schema.ts'"
-  );
-
-  await fs.writeFile(drizzleConfigPath, drizzleConfig);
-  console.log(chalk.green("✅ Created .lorm/drizzle.config.ts and schema.ts"));
-}
-
-async function startDrizzleStudio(
-  port: number,
-  host: string,
-  verbose: boolean
-): Promise<void> {
-  const args = ["drizzle-kit", "studio", "--config=.lorm/drizzle.config.ts"];
-
-  args.push("--port", port.toString());
-  args.push("--host", host);
-
-  if (verbose) {
-    args.push("--verbose");
-  }
-
-  console.log(
-    chalk.blue(`🌐 Starting Drizzle Studio on http://${host}:${port}`)
-  );
-  console.log(chalk.gray("   Press Ctrl+C to stop the studio"));
-
-  const studioProcess = spawn("npx", args, {
-    stdio: "inherit",
-    env: { ...process.env },
-  });
-
-  // Handle process cleanup
-  process.on("SIGINT", () => {
-    console.log(chalk.yellow("\n🛑 Shutting down database studio..."));
-    studioProcess.kill("SIGTERM");
-    process.exit(0);
-  });
-
-  process.on("SIGTERM", () => {
-    studioProcess.kill("SIGTERM");
-    process.exit(0);
-  });
-
-  studioProcess.on("error", (error) => {
-    console.error(chalk.red("❌ Studio process error:"), error.message);
-    process.exit(1);
-  });
-
-  studioProcess.on("exit", (code) => {
-    if (code !== 0 && code !== null) {
-      console.error(chalk.red(`❌ Studio exited with code ${code}`));
-      process.exit(code);
-    }
-  });
-
-  console.log(chalk.green("✅ Database studio started successfully"));
 }

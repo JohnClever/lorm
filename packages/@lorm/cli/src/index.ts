@@ -4,8 +4,8 @@ import { dirname, resolve } from "path";
 import { readFileSync } from "fs";
 import { init } from "./commands/init.js";
 import { devCommand } from "./commands/dev.js";
-import { dbPushCommand } from "./commands/db/push.js";
-import { dbStudioCommand } from "./commands/db/studio.js";
+import { push } from "./commands/db/push.js";
+import { studio } from "./commands/db/studio.js";
 import { getCommandPrefix } from "@/utils/package-manager";
 
 const commandPrefix = getCommandPrefix();
@@ -52,31 +52,22 @@ cli
   });
 
 // Register db:push command
-cli
-  .command("db:push", "Push schema changes to database")
-  .option("--force", "Force push without confirmation")
-  .option("--verbose", "Enable verbose output")
-  .action(async (options) => {
-    try {
-      await dbPushCommand(options);
-      process.exit(0);
-    } catch (error) {
-      console.error("DB push command failed:", error);
-      process.exit(1);
-    }
-  });
+cli.command("db:push", "Push schema changes to database").action(async () => {
+  try {
+    await push();
+    process.exit(0);
+  } catch (error) {
+    console.error("DB push command failed:", error);
+    process.exit(1);
+  }
+});
 
 // Register db:studio command
 cli
   .command("db:studio", "Open database management UI")
-  .option("--port <port>", "Port for the studio server", { default: 4983 })
-  .option("--host <host>", "Host for the studio server", {
-    default: "localhost",
-  })
-  .option("--verbose", "Enable verbose output")
-  .action(async (options) => {
+  .action(async () => {
     try {
-      await dbStudioCommand(options);
+      await studio();
     } catch (error) {
       console.error("DB studio command failed:", error);
       process.exit(1);

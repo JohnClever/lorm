@@ -19,3 +19,5 @@ export {
 } from "./setup";
 export { languageHandler } from "./language-handler";
 export { templateManager } from "./template-manager";
+
+export * from './drizzle-kit'

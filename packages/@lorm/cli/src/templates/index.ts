@@ -374,14 +374,20 @@ export const drizzleConfigTemplate = (config: lormConfig) => {
   const dialect =
     dialectMap[adapter as keyof typeof dialectMap] || "postgresql";
 
+  // Handle environment variable resolution for database URL
+  const dbUrl = config.db.url;
+  const urlExpression = dbUrl.includes('process.env') 
+    ? dbUrl // Keep the expression as-is for runtime evaluation
+    : `"${dbUrl}"`; // Wrap in quotes if it's a literal string
+
   return `import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
   out: './drizzle',
-  schema: './schema.js',
+  schema: './schema.ts',
   dialect: '${dialect}',
   dbCredentials: {
-    url: "${config.db.url}",${getAdapterSpecificCredentials(adapter)}
+    url: ${urlExpression},${getAdapterSpecificCredentials(adapter)}
   },${getAdapterSpecificOptions(adapter)}
 });`;
 };
