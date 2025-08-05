@@ -2,5 +2,5 @@
 packages:
   - "packages/*"
   - "packages/@lorm/*"
-  - "www-v2"
+  - "www"
   - "test"

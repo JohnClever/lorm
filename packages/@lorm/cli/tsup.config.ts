@@ -17,7 +17,6 @@ export default defineConfig({
   metafile: true, // Generate metafile for bundle analysis
   bundle: true,
   platform: 'node',
-  onSuccess: isProduction ? 'node scripts/analyze-bundle.js' : undefined,
   external: [
     '@inquirer/prompts',
     '@lorm/core',
