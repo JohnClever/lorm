@@ -104,7 +104,7 @@ export * from "../${filePaths.schema.replace(/\.(ts|js|mjs)$/, "")}";`;
 }
 
 async function runDrizzlePush(force: boolean, verbose: boolean): Promise<void> {
-  const args = ["drizzle-kit", "push:pg", "--config=.lorm/drizzle.config.ts"];
+  const args = ["drizzle-kit", "push", "--config=.lorm/drizzle.config.ts"];
   
   if (force) {
     args.push("--force");
@@ -117,7 +117,7 @@ async function runDrizzlePush(force: boolean, verbose: boolean): Promise<void> {
   console.log(chalk.blue("🔄 Running drizzle-kit push..."));
   
   return new Promise((resolve, reject) => {
-    const child = spawn(commandPrefix, args, {
+    const child = spawn("npx", args, {
       stdio: "inherit",
       env: { ...process.env }
     });
