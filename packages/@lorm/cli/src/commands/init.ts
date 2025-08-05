@@ -319,3 +319,6 @@ export async function initProject(options: InitOptions = {}): Promise<void> {
     throw error;
   }
 }
+
+// Export alias for compatibility
+export const init = initProject;

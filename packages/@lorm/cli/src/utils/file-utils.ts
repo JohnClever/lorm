@@ -12,19 +12,13 @@ import { resolve, dirname, join, normalize } from "path";
 import { gzip, gunzip } from "zlib";
 import { promisify } from "util";
 import { createHash } from "crypto";
-import { SecurityValidator, SecurityAuditLogger } from './security';
-import { Result, success, failure } from './result';
-import { 
-  FileSystemError, 
-  normalizeFileSystemError
-} from './file-system-errors';
+// Removed security, result, and file-system-errors imports
 import { FileStats, ReadOptions, WriteOptions, DirectoryOptions, FileSystemErrorCode } from '../types.js';
 
 const gzipAsync = promisify(gzip);
 const gunzipAsync = promisify(gunzip);
 
 export type { FileStats, ReadOptions, WriteOptions, DirectoryOptions };
-export { FileSystemErrorCode };
 export function exists(path: string): boolean {
   return existsSync(path);
 }
@@ -87,49 +81,16 @@ export function readJsonSync<T = unknown>(path: string): T {
   return JSON.parse(content);
 }
 
-// Result-based versions for better error handling
-export async function readJsonSafe<T = unknown>(path: string): Promise<Result<T, FileSystemError>> {
-  try {
-    const content = await fs.readFile(path, 'utf-8');
-    const data = JSON.parse(content) as T;
-    return success(data);
-  } catch (error) {
-    const fsError = normalizeFileSystemError(error, 'read JSON file');
-    return failure(fsError);
-  }
-}
-
-export function readJsonSyncSafe<T = unknown>(path: string): Result<T, FileSystemError> {
-  try {
-    const content = fsReadFileSync(path, 'utf-8');
-    const data = JSON.parse(content) as T;
-    return success(data);
-  } catch (error) {
-    const fsError = normalizeFileSystemError(error, 'read JSON file');
-    return failure(fsError);
-  }
-}
+// Removed Result-based versions that depended on deleted modules
 export async function writeFile(
   path: string,
   content: string,
   options: WriteOptions = {}
 ): Promise<void> {
   const { createDir = true, encoding = "utf8" } = options;
-  const pathValidation = SecurityValidator.validateFilePath(path, process.cwd());
-  if (!pathValidation.isValid) {
-    await SecurityAuditLogger.logSecurityEvent('file_write_blocked', {
-      path: SecurityValidator.sanitizeOutput(path),
-      errors: pathValidation.errors
-    }, 'error');
-    throw new Error(`File write blocked: ${pathValidation.errors.join(', ')}`);
-  }
   if (createDir) {
     await ensureDir(dirname(path));
   }
-  await SecurityAuditLogger.logSecurityEvent('file_write', {
-    path: SecurityValidator.sanitizeOutput(path),
-    size: content.length
-  });
   return fs.writeFile(path, content, { encoding, ...options });
 }
 export function writeFileSync(
@@ -138,21 +99,9 @@ export function writeFileSync(
   options: WriteOptions = {}
 ): void {
   const { createDir = true, encoding = "utf8" } = options;
-  const pathValidation = SecurityValidator.validateFilePath(path, process.cwd());
-  if (!pathValidation.isValid) {
-    SecurityAuditLogger.logSecurityEvent('file_write_blocked', {
-      path: SecurityValidator.sanitizeOutput(path),
-      errors: pathValidation.errors
-    }, 'error').catch(() => {});
-    throw new Error(`File write blocked: ${pathValidation.errors.join(', ')}`);
-  }
   if (createDir) {
     ensureDirSync(dirname(path));
   }
-  SecurityAuditLogger.logSecurityEvent('file_write', {
-    path: SecurityValidator.sanitizeOutput(path),
-    size: content.length
-  }).catch(() => {});
   fsWriteFileSync(path, content, { encoding, ...options });
 }
 export async function writeJson(
@@ -183,23 +132,12 @@ export async function appendFile(
   return fs.appendFile(path, content, { encoding, ...options });
 }
 export async function deleteFile(path: string): Promise<void> {
-  const pathValidation = SecurityValidator.validateFilePath(path, process.cwd());
-  if (!pathValidation.isValid) {
-    await SecurityAuditLogger.logSecurityEvent('file_delete_blocked', {
-      path: SecurityValidator.sanitizeOutput(path),
-      errors: pathValidation.errors
-    }, 'error');
-    throw new Error(`File delete blocked: ${pathValidation.errors.join(', ')}`);
-  }
-  await SecurityAuditLogger.logSecurityEvent('file_delete', {
-    path: SecurityValidator.sanitizeOutput(path)
-  }, 'warn');
   try {
     await fs.unlink(path);
   } catch (error: unknown) {
-    const fsError = normalizeFileSystemError(error, 'delete file');
-    if (fsError.code !== FileSystemErrorCode.FILE_NOT_FOUND) {
-      throw fsError;
+    // Ignore file not found errors
+    if ((error as any).code !== 'ENOENT') {
+      throw error;
     }
   }
 }
@@ -207,9 +145,9 @@ export function deleteFileSync(path: string): void {
   try {
     unlinkSync(path);
   } catch (error: unknown) {
-    const fsError = normalizeFileSystemError(error, 'delete file sync');
-    if (fsError.code !== FileSystemErrorCode.FILE_NOT_FOUND) {
-      throw fsError;
+    // Ignore file not found errors
+    if ((error as any).code !== 'ENOENT') {
+      throw error;
     }
   }
 }
@@ -221,12 +159,11 @@ export async function ensureDir(
   try {
     await fs.mkdir(path, { recursive, ...options });
   } catch (error: unknown) {
-    const fsError = normalizeFileSystemError(error, 'ensure directory');
-    if (fsError.code === FileSystemErrorCode.FILE_EXISTS) {
-      // Directory already exists, which is fine
+    // Directory already exists, which is fine
+    if ((error as any).code === 'EEXIST') {
       return;
     }
-    throw fsError;
+    throw error;
   }
 }
 export function ensureDirSync(path: string, options: DirectoryOptions = {}): void {
@@ -234,12 +171,11 @@ export function ensureDirSync(path: string, options: DirectoryOptions = {}): voi
   try {
     mkdirSync(path, { recursive, ...options });
   } catch (error: unknown) {
-    const fsError = normalizeFileSystemError(error, 'ensure directory sync');
-    if (fsError.code === FileSystemErrorCode.FILE_EXISTS) {
-      // Directory already exists, which is fine
+    // Directory already exists, which is fine
+    if ((error as any).code === 'EEXIST') {
       return;
     }
-    throw fsError;
+    throw error;
   }
 }
 export async function readDir(path: string): Promise<string[]> {
@@ -252,12 +188,11 @@ export async function removeDir(path: string): Promise<void> {
   try {
     await fs.rm(path, { recursive: true, force: true });
   } catch (error: unknown) {
-    const fsError = normalizeFileSystemError(error, 'remove directory');
-    if (fsError.code === FileSystemErrorCode.FILE_NOT_FOUND) {
-      // Directory doesn't exist, which is fine
+    // Directory doesn't exist, which is fine
+    if ((error as any).code === 'ENOENT') {
       return;
     }
-    throw fsError;
+    throw error;
   }
 }
 export async function copyFile(

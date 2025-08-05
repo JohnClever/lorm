@@ -1,37 +1,11 @@
-export { packageManager, installDependencies, getCommandPrefix } from "./package-manager";
-export { resolveDrizzleKitBin, executeDrizzleKit } from "./drizzle-kit";
-export {
-  LormConfigSchema,
-  DevelopmentEnvConfigSchema,
-  ProductionEnvConfigSchema,
-  ConfigMigrationSchema,
-  ConfigValidator,
-} from "./config-schema";
+export { packageManager, installDependencies } from "./package-manager";
+export { FileUtils, fileExists } from "./file-utils";
 export type {
-  LormConfig,
-  DatabaseConfig,
-  SecurityConfig,
-  PerformanceConfig,
-  DevelopmentConfig,
-  ConfigMigration,
-} from "./config-schema";
-export {
-  validateConfig,
-  validateConfigOrExit,
-  displayValidationResults,
-} from "./config-validator";
-// ValidationResult and ConfigValidationOptions are now imported from @lorm/core
-// CommandCache removed - now using cache system from @lorm/core
-export type {
-  PerformanceMetric,
-  PerformanceReport,
-} from "./performance-monitor";
-export {
-  PerformanceMonitor,
-  PerformanceTracker,
-  LegacyPerformanceMonitor,
-} from "./performance-monitor";
-// Plugin-related exports have been moved to src/plugins/index.ts
+  FileStats,
+  ReadOptions,
+  WriteOptions,
+  DirectoryOptions,
+} from "./file-utils";
 export {
   initializeCommand,
   handleCommandError,
@@ -42,28 +16,6 @@ export {
   ensureLormDirectory,
   createSchemaFile,
   createDrizzleConfig,
-  initializeAdvancedCommand,
-  handleAdvancedCommandError,
-  validateSchemaFileOptional,
 } from "./setup";
-export {
-  lazyLoaders,
-  preloadModules,
-  warmCache,
-  getCacheStats,
-} from "./lazy-loader";
-export { FileUtils, fileExists } from "./file-utils";
-export type {
-  FileStats,
-  ReadOptions,
-  WriteOptions,
-  DirectoryOptions,
-} from "./file-utils";
-export {
-  CommandRegistry,
-  createCommand,
-  createDatabaseCommand,
-  createDevelopmentCommand,
-} from "./command-registry";
-export { HealthChecker } from "./health-check";
-export { SecurityValidator, SecurityAuditLogger } from "./security";
+export { languageHandler } from "./language-handler";
+export { templateManager } from "./template-manager";

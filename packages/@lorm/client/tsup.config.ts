@@ -12,7 +12,6 @@ export default defineConfig({
   outDir: 'dist',
   external: [
     'typed-rpc',
-    'zod',
     'fs',
     'path',
     'url',

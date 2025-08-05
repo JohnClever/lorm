@@ -183,24 +183,8 @@ export async function createInitialProject(options: SetupOptions = {}): Promise<
     return;
   }
   
-  // Prompt for database adapter selection
-  const { lazyLoaders } = await import("./lazy-loader.js");
-  const inquirer = await lazyLoaders.inquirer() as {
-    select: (options: { message: string; choices: Array<{ name: string; value: string }>; default?: string }) => Promise<string>;
-  };
-  
-  const selectedAdapter = await inquirer.select({
-    message: 'Which database would you like to use?',
-    choices: [
-      { name: 'PostgreSQL (Neon, Supabase, etc.)', value: 'neon' },
-      { name: 'PostgreSQL (Standard)', value: 'postgres' },
-      { name: 'MySQL', value: 'mysql' },
-      { name: 'PlanetScale (MySQL)', value: 'planetscale' },
-      { name: 'SQLite (Local development)', value: 'sqlite' },
-      { name: 'Turso (SQLite)', value: 'turso' }
-    ],
-    default: 'neon'
-  });
+  // Use default adapter for MVP
+  const selectedAdapter = 'neon';
   
   // Detect TypeScript
   const isTypeScript = await detectTypeScript();
