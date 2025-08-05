@@ -1,5 +1,11 @@
 # @lorm-enterprise/core
 
+## 0.1.35
+
+### Patch Changes
+
+- f026595: vr
+
 ## 0.1.8
 
 ### Patch Changes
