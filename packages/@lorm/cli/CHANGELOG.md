@@ -1,5 +1,13 @@
 # @lorm/cli
 
+## 0.1.72
+
+### Patch Changes
+
+- d9429c0: vr
+- Updated dependencies [d9429c0]
+  - @lorm/core@0.1.37
+
 ## 0.1.71
 
 ### Patch Changes
