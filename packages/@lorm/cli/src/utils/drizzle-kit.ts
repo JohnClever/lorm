@@ -1,25 +1,40 @@
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 import which from "which";
 import { execa } from "execa";
+import { createRequire } from "module";
 
 export function resolveDrizzleKitBin(): string {
+  // First, try to resolve drizzle-kit from the CLI's own context
   try {
-    const localBin = path.join(process.cwd(), "node_modules/.bin/drizzle-kit");
-    if (fs.existsSync(localBin)) {
-      return localBin;
+    // Create a require function relative to this module
+    const currentModuleUrl = import.meta.url;
+    const currentModulePath = fileURLToPath(currentModuleUrl);
+    const requireFromCli = createRequire(currentModulePath);
+    
+    const drizzleKitMainPath = requireFromCli.resolve('drizzle-kit');
+    const drizzleKitDir = path.dirname(drizzleKitMainPath);
+    const drizzleKitBin = path.join(drizzleKitDir, 'bin.cjs');
+    
+    if (fs.existsSync(drizzleKitBin)) {
+      return drizzleKitBin;
     }
-  } catch {}
+  } catch (error) {
+    // Continue to fallback options
+  }
 
+  // Check if drizzle-kit is available in the user's project
+  const localDrizzleKitBin = path.join(process.cwd(), 'node_modules', '.bin', 'drizzle-kit');
+  if (fs.existsSync(localDrizzleKitBin)) {
+    return localDrizzleKitBin;
+  }
+
+  // Finally, try to find drizzle-kit globally
   try {
-    return which.sync("drizzle-kit");
-  } catch {
-    throw new Error(
-      "drizzle-kit not found. Please install it locally or globally:\n" +
-        "  npm install drizzle-kit\n" +
-        "  # or\n" +
-        "  npm install -g drizzle-kit"
-    );
+    return which.sync('drizzle-kit');
+  } catch (error) {
+    throw new Error('drizzle-kit not found. This is likely a bundling issue with the lorm CLI.');
   }
 }
 
@@ -33,6 +48,21 @@ export async function executeDrizzleKit(
   try {
     console.log(`🚀 [lorm] Running ${command}...`);
 
+    // For studio command, use inherit stdio to show live output including URL
+    if (command === "studio") {
+      const result = await execa(drizzleKitBin, [command], {
+        cwd: lormDir,
+        stdio: "inherit",
+        reject: false,
+      });
+
+      if (result.exitCode !== 0) {
+        throw new Error(`[lorm] ${command} failed with exit code ${result.exitCode}`);
+      }
+      return; // Don't show success message for studio as it's a long-running process
+    }
+
+    // For other commands, use pipe to capture and process output
     const result = await execa(drizzleKitBin, [command], {
       cwd: lormDir,
       stdio: "pipe",
