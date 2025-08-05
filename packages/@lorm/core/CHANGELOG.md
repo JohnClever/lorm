@@ -1,5 +1,11 @@
 # @lorm-enterprise/core
 
+## 0.1.36
+
+### Patch Changes
+
+- 30390cf: y
+
 ## 0.1.35
 
 ### Patch Changes
