@@ -3,7 +3,9 @@ import { loadConfig, type lormConfig } from "@lorm/core";
 import { drizzleConfigTemplate } from "@/templates";
 import { FileUtils, fileExists } from "./file-utils";
 import { languageHandler } from "./language-handler";
+import { getCommandPrefix } from "@/utils/package-manager";
 
+const commandPrefix = getCommandPrefix();
 export interface SetupOptions {
   force?: boolean;
   skipInstall?: boolean;
@@ -230,7 +232,7 @@ export async function createInitialProject(options: SetupOptions = {}): Promise<
   console.log("\nNext steps:");
   console.log("1. Update your database URL in lorm.config" + configExtension);
   console.log("2. Modify your schema in lorm/schema/index" + configExtension);
-  console.log("3. Run 'npx @lorm/cli dev' to start development");
+  console.log(`3. Run '${commandPrefix} @lorm/cli dev' to start development`);
 }
 
 // Unified command initialization

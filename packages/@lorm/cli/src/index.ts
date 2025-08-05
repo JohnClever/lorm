@@ -4,8 +4,11 @@ import { dirname, resolve } from "path";
 import { readFileSync } from "fs";
 import { init } from "./commands/init.js";
 import { devCommand } from "./commands/dev.js";
-import { dbPushCommand } from "./commands/db-push.js";
-import { dbStudioCommand } from "./commands/db-studio.js";
+import { dbPushCommand } from "./commands/db/push.js";
+import { dbStudioCommand } from "./commands/db/studio.js";
+import { getCommandPrefix } from "@/utils/package-manager";
+
+const commandPrefix = getCommandPrefix();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -35,7 +38,9 @@ cli
 cli
   .command("dev", "Start development server with type generation")
   .option("--port <port>", "Port for the development server", { default: 3000 })
-  .option("--host <host>", "Host for the development server", { default: "localhost" })
+  .option("--host <host>", "Host for the development server", {
+    default: "localhost",
+  })
   .option("--watch", "Enable file watching", { default: true })
   .action(async (options) => {
     try {
@@ -65,7 +70,9 @@ cli
 cli
   .command("db:studio", "Open database management UI")
   .option("--port <port>", "Port for the studio server", { default: 4983 })
-  .option("--host <host>", "Host for the studio server", { default: "localhost" })
+  .option("--host <host>", "Host for the studio server", {
+    default: "localhost",
+  })
   .option("--verbose", "Enable verbose output")
   .action(async (options) => {
     try {
@@ -83,7 +90,9 @@ cli.version(packageJson.version);
 // Handle unknown commands
 cli.on("command:*", () => {
   console.error(`Unknown command: ${cli.args[0]}`);
-  console.log("\nRun 'npx @lorm/cli --help' to see available commands");
+  console.log(
+    `\nRun '${commandPrefix} @lorm/cli --help' to see available commands`
+  );
   process.exit(1);
 });
 

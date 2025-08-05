@@ -1,5 +1,10 @@
 import path from "path";
 import { FileUtils } from "./file-utils";
+import { getCommandPrefix } from "@/utils/package-manager";
+
+const commandPrefix = getCommandPrefix();
+
+
 export const FILE_EXTENSIONS = {
   typescript: '.ts',
   javascript: '.js',
@@ -89,7 +94,7 @@ export class LanguageHandler {
     }
     throw new Error(
       "[lorm] Schema file not found. Expected lorm/schema/index.ts, lorm/schema/index.js, lorm/schema/index.mjs, lorm.schema.js, or lorm.schema.ts.\n" +
-      "Please create a schema file or run 'npx @lorm/cli init' first."
+        `Please create a schema file or run '${commandPrefix} @lorm/cli init' first.`
     );
   }
   async findRouterFile(): Promise<string> {
