@@ -1,5 +1,11 @@
 # @lorm-enterprise/core
 
+## 0.1.37
+
+### Patch Changes
+
+- d9429c0: vr
+
 ## 0.1.36
 
 ### Patch Changes
