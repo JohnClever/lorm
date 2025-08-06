@@ -23,7 +23,6 @@ export default defineConfig({
     'cac',
     'chalk',
     'chokidar',
-    'drizzle-kit',
     'execa',
     'which',
     // Node.js built-in modules

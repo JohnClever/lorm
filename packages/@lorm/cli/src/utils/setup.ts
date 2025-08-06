@@ -29,17 +29,19 @@ export async function validateSchemaFile(mode: 'strict' | 'optional' = 'strict')
   const rootDir = process.cwd();
   const newSchemaPath = path.join(rootDir, "lorm/schema/index.ts");
   const newSchemaPathJs = path.join(rootDir, "lorm/schema/index.js");
+  const newSchemaPathMjs = path.join(rootDir, "lorm/schema/index.mjs");
   const legacySchemaPath = path.join(rootDir, "lorm.schema.js");
   const legacySchemaPathTs = path.join(rootDir, "lorm.schema.ts");
 
   try {
     const newTsExists = await fileExists(newSchemaPath);
     const newJsExists = await fileExists(newSchemaPathJs);
+    const newMjsExists = await fileExists(newSchemaPathMjs);
     const legacyJsExists = await fileExists(legacySchemaPath);
     const legacyTsExists = await fileExists(legacySchemaPathTs);
 
-    if (!newTsExists && !newJsExists && !legacyJsExists && !legacyTsExists) {
-      const message = "Schema file not found. Expected lorm/schema/index.ts, lorm/schema/index.js, lorm.schema.js, or lorm.schema.ts.";
+    if (!newTsExists && !newJsExists && !newMjsExists && !legacyJsExists && !legacyTsExists) {
+      const message = "Schema file not found. Expected lorm/schema/index.ts, lorm/schema/index.js, lorm/schema/index.mjs, lorm.schema.js, or lorm.schema.ts.";
       if (mode === 'strict') {
         throw new Error(message);
       } else {
