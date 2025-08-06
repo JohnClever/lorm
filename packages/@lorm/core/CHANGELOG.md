@@ -1,5 +1,11 @@
 # @lorm-enterprise/core
 
+## 0.1.39
+
+### Patch Changes
+
+- aa93607: y
+
 ## 0.1.38
 
 ### Patch Changes
