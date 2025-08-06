@@ -1,5 +1,11 @@
 # @lorm/client
 
+## 0.1.19
+
+### Patch Changes
+
+- 7e10ca6: y
+
 ## 0.1.18
 
 ### Patch Changes
