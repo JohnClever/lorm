@@ -380,14 +380,16 @@ export const drizzleConfigTemplate = (config: lormConfig) => {
     ? dbUrl // Keep the expression as-is for runtime evaluation
     : `"${dbUrl}"`; // Wrap in quotes if it's a literal string
 
-  return `export default {
+  return `import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
   out: './drizzle',
   schema: './schema.ts',
   dialect: '${dialect}',
   dbCredentials: {
     url: ${urlExpression},${getAdapterSpecificCredentials(adapter)}
   },${getAdapterSpecificOptions(adapter)}
-};`;
+});`;
 };
 
 function getAdapterSpecificCredentials(adapter: string): string {

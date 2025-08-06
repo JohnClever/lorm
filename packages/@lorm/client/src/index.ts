@@ -1,14 +1,17 @@
-import { rpcClient } from "typed-rpc";
-import type { LormRouter } from "./types";
+import type { RouterClient } from "@orpc/server";
+import { createORPCClient } from "@orpc/client";
+import { RPCLink } from "@orpc/client/fetch";
+// @ts-ignore
+import type { LormRouter } from ".lorm/types";
 
-export function createClient<T extends object = LormRouter>(baseUrl = "http://127.0.0.1:3000") {
-  return rpcClient<T>(baseUrl);
+export function createClient(baseUrl = "http://127.0.0.1:3000") {
+  const link = new RPCLink({
+    url: baseUrl,
+    headers: {
+      "Content-Type": "application/json",
+      "X-Lorm-Client": "true",
+    },
+  });
+
+  return createORPCClient(link) as RouterClient<LormRouter>;
 }
-
-export type {
-  LormRouter,
-  LormRouterRegistry,
-  GlobalLormRouter,
-  DynamicLormRouter,
-  LoadedLormTypes,
-} from "./types.js";
