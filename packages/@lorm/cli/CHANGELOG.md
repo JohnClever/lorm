@@ -1,5 +1,13 @@
 # @lorm/cli
 
+## 0.1.77
+
+### Patch Changes
+
+- e43216f: load
+- Updated dependencies [e43216f]
+  - @lorm/core@0.1.40
+
 ## 0.1.76
 
 ### Patch Changes
