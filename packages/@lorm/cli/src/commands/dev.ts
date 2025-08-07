@@ -43,12 +43,7 @@ export async function devCommand(options: DevOptions = {}) {
 
     // Start the server directly using @lorm/core
     console.log(chalk.blue(`🌐 Starting server on http://${host}:${port}`));
-    await startServer(port, {
-      host,
-      cors: {
-        credentials: true,
-      },
-    });
+    await startServer();
 
     console.log(chalk.green("✅ Development server started successfully"));
     console.log(chalk.gray("   Press Ctrl+C to stop the server"));
